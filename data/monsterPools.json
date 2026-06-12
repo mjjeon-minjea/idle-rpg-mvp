@@ -1,0 +1,50 @@
+[
+  {
+    "id": "dawn_forest_normals",
+    "role": "normal",
+    "entries": [
+      {
+        "monsterId": "dawn_slime",
+        "weight": 70
+      },
+      {
+        "monsterId": "dawn_mushroom",
+        "weight": 30
+      }
+    ]
+  },
+  {
+    "id": "dawn_forest_leaders",
+    "role": "leader",
+    "entries": [
+      {
+        "monsterId": "dawn_wolf",
+        "weight": 100
+      }
+    ]
+  },
+  {
+    "id": "mist_gate_normals",
+    "role": "normal",
+    "entries": [
+      {
+        "monsterId": "mist_goblin",
+        "weight": 60
+      },
+      {
+        "monsterId": "mist_bat",
+        "weight": 40
+      }
+    ]
+  },
+  {
+    "id": "mist_gate_leaders",
+    "role": "leader",
+    "entries": [
+      {
+        "monsterId": "mist_guardian",
+        "weight": 100
+      }
+    ]
+  }
+]

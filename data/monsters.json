@@ -1,0 +1,79 @@
+[
+  {
+    "id": "dawn_slime",
+    "name": "새벽 슬라임",
+    "role": "normal",
+    "maxHp": 34,
+    "attack": 5,
+    "defense": 1,
+    "baseExp": 4,
+    "baseGold": 3,
+    "dropTableId": "normal_forest_drop"
+  },
+  {
+    "id": "dawn_mushroom",
+    "name": "새벽 버섯병",
+    "role": "normal",
+    "maxHp": 42,
+    "attack": 6,
+    "defense": 2,
+    "baseExp": 5,
+    "baseGold": 4,
+    "dropTableId": "normal_forest_drop"
+  },
+  {
+    "id": "mist_goblin",
+    "name": "안개 고블린",
+    "role": "normal",
+    "maxHp": 62,
+    "attack": 8,
+    "defense": 2,
+    "baseExp": 7,
+    "baseGold": 5,
+    "dropTableId": "normal_mist_drop"
+  },
+  {
+    "id": "mist_bat",
+    "name": "안개 박쥐",
+    "role": "normal",
+    "maxHp": 54,
+    "attack": 10,
+    "defense": 1,
+    "baseExp": 8,
+    "baseGold": 6,
+    "dropTableId": "normal_mist_drop"
+  },
+  {
+    "id": "dawn_wolf",
+    "name": "새벽 늑대",
+    "role": "leader",
+    "maxHp": 120,
+    "attack": 11,
+    "defense": 3,
+    "baseExp": 18,
+    "baseGold": 15,
+    "dropTableId": "leader_drop"
+  },
+  {
+    "id": "mist_guardian",
+    "name": "안개 수문장",
+    "role": "leader",
+    "maxHp": 190,
+    "attack": 16,
+    "defense": 5,
+    "baseExp": 32,
+    "baseGold": 28,
+    "dropTableId": "leader_drop"
+  },
+  {
+    "id": "sleepy_ogre",
+    "name": "졸린 오우거",
+    "role": "boss",
+    "maxHp": 360,
+    "attack": 24,
+    "defense": 8,
+    "baseExp": 80,
+    "baseGold": 90,
+    "dropTableId": "boss_drop"
+  }
+]

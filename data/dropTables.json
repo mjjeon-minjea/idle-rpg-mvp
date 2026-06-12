@@ -1,0 +1,70 @@
+[
+  {
+    "id": "normal_forest_drop",
+    "entries": [
+      {
+        "itemId": "soft_leaf",
+        "dropRate": 0.35,
+        "minAmount": 1,
+        "maxAmount": 2
+      },
+      {
+        "itemId": "trainee_medal",
+        "dropRate": 0.08,
+        "minAmount": 1,
+        "maxAmount": 1
+      }
+    ]
+  },
+  {
+    "id": "normal_mist_drop",
+    "entries": [
+      {
+        "itemId": "mist_shard",
+        "dropRate": 0.32,
+        "minAmount": 1,
+        "maxAmount": 2
+      },
+      {
+        "itemId": "mist_core",
+        "dropRate": 0.08,
+        "minAmount": 1,
+        "maxAmount": 1
+      }
+    ]
+  },
+  {
+    "id": "leader_drop",
+    "entries": [
+      {
+        "itemId": "trainee_medal",
+        "dropRate": 0.35,
+        "minAmount": 1,
+        "maxAmount": 2
+      },
+      {
+        "itemId": "mist_core",
+        "dropRate": 0.18,
+        "minAmount": 1,
+        "maxAmount": 1
+      }
+    ]
+  },
+  {
+    "id": "boss_drop",
+    "entries": [
+      {
+        "itemId": "ogre_badge",
+        "dropRate": 0.45,
+        "minAmount": 1,
+        "maxAmount": 1
+      },
+      {
+        "itemId": "mist_core",
+        "dropRate": 0.4,
+        "minAmount": 1,
+        "maxAmount": 3
+      }
+    ]
+  }
+]

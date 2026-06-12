@@ -1,0 +1,32 @@
+[
+  {
+    "id": "trainee_medal",
+    "name": "수습기사의 증표",
+    "type": "material",
+    "rarity": "common"
+  },
+  {
+    "id": "soft_leaf",
+    "name": "부드러운 새벽잎",
+    "type": "material",
+    "rarity": "common"
+  },
+  {
+    "id": "mist_shard",
+    "name": "안개 조각",
+    "type": "material",
+    "rarity": "common"
+  },
+  {
+    "id": "mist_core",
+    "name": "안개의 핵",
+    "type": "material",
+    "rarity": "advanced"
+  },
+  {
+    "id": "ogre_badge",
+    "name": "오우거 토벌 증표",
+    "type": "material",
+    "rarity": "rare"
+  }
+]

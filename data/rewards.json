@@ -1,0 +1,24 @@
+[
+  {
+    "id": "dawn_forest_1_clear",
+    "exp": 40,
+    "gold": 50,
+    "items": [
+      {
+        "itemId": "trainee_medal",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "mist_gate_1_clear",
+    "exp": 70,
+    "gold": 90,
+    "items": [
+      {
+        "itemId": "mist_core",
+        "quantity": 1
+      }
+    ]
+  }
+]

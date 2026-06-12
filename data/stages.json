@@ -1,0 +1,29 @@
+[
+  {
+    "id": "dawn_forest_1",
+    "name": "새벽 숲 1단계",
+    "order": 1,
+    "normalMonsterPoolId": "dawn_forest_normals",
+    "leaderMonsterPoolId": "dawn_forest_leaders",
+    "requiredNormalKills": 10,
+    "clearRewardId": "dawn_forest_1_clear",
+    "expMultiplier": 1,
+    "goldMultiplier": 1,
+    "dropRateBonus": 0,
+    "clearRewardMultiplier": 1
+  },
+  {
+    "id": "mist_gate_1",
+    "name": "안개 관문 1단계",
+    "order": 2,
+    "normalMonsterPoolId": "mist_gate_normals",
+    "leaderMonsterPoolId": "mist_gate_leaders",
+    "bossMonsterId": "sleepy_ogre",
+    "requiredNormalKills": 10,
+    "clearRewardId": "mist_gate_1_clear",
+    "expMultiplier": 1.25,
+    "goldMultiplier": 1.2,
+    "dropRateBonus": 0.1,
+    "clearRewardMultiplier": 1
+  }
+]
