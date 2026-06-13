@@ -5,6 +5,7 @@ import { DropResolver } from "../systems/DropResolver";
 import { InventorySystem } from "../systems/InventorySystem";
 import { MonsterFactory } from "../systems/MonsterFactory";
 import { MonsterPoolSystem } from "../systems/MonsterPoolSystem";
+import { PlayerGrowthSystem } from "../systems/PlayerGrowthSystem";
 import { RandomService } from "../systems/RandomService";
 import { RewardResolver } from "../systems/RewardResolver";
 import { RewardSystem } from "../systems/RewardSystem";
@@ -21,6 +22,7 @@ export class GameScene extends Phaser.Scene {
   private monsterFactory!: MonsterFactory;
   private monsterPoolSystem!: MonsterPoolSystem;
   private inventorySystem!: InventorySystem;
+  private growthSystem!: PlayerGrowthSystem;
   private rewardResolver!: RewardResolver;
   private rewardSystem!: RewardSystem;
   private saveSystem!: SaveSystem;
@@ -38,15 +40,8 @@ export class GameScene extends Phaser.Scene {
     this.saveSystem = new SaveSystem();
     const saved = this.saveSystem.load();
 
-    this.player = saved?.player ?? {
-      level: 1,
-      exp: 0,
-      gold: 0,
-      maxHp: 120,
-      hp: 120,
-      attack: 14,
-      defense: 3,
-    };
+    this.growthSystem = new PlayerGrowthSystem();
+    this.player = this.normalizePlayerState(saved?.player);
 
     this.inventorySystem = new InventorySystem(saved?.inventory);
     this.stageSystem = new StageProgressSystem(this.dataSet.stages, saved?.stage);
@@ -55,12 +50,42 @@ export class GameScene extends Phaser.Scene {
     this.monsterFactory = new MonsterFactory();
     this.monsterPoolSystem = new MonsterPoolSystem(this.dataSet.monsters, this.dataSet.monsterPools, randomService);
     this.rewardResolver = new RewardResolver(new DropResolver(this.dataSet.dropTables, randomService));
-    this.rewardSystem = new RewardSystem(this.dataSet.rewards);
+    this.rewardSystem = new RewardSystem(this.dataSet.rewards, this.growthSystem);
     this.hud = new Hud(this, this.dataSet.config.title, this.dataSet.config.subtitle);
     this.monster = this.createTargetMonster(this.time.now);
 
     this.add.rectangle(480, 270, 900, 460, 0x171b22, 1).setDepth(-1);
     this.add.rectangle(480, 92, 900, 2, 0x2b3440, 1);
+  }
+
+  private normalizePlayerState(savedPlayer?: Partial<PlayerState>): PlayerState {
+    if (!savedPlayer) {
+      return {
+        level: 1,
+        exp: 0,
+        totalExp: 0,
+        gold: 0,
+        maxHp: 120,
+        hp: 120,
+        attack: 14,
+        defense: 3,
+      };
+    }
+
+    const level = savedPlayer.level ?? 1;
+    const exp = savedPlayer.exp ?? 0;
+    const totalExp = savedPlayer.totalExp ?? this.growthSystem.getTotalExpAtLevelStart(level) + exp;
+
+    return {
+      level,
+      exp,
+      totalExp,
+      gold: savedPlayer.gold ?? 0,
+      maxHp: savedPlayer.maxHp ?? 120,
+      hp: savedPlayer.hp ?? savedPlayer.maxHp ?? 120,
+      attack: savedPlayer.attack ?? 14,
+      defense: savedPlayer.defense ?? 3,
+    };
   }
 
   update(_time: number, delta: number): void {
@@ -85,6 +110,7 @@ export class GameScene extends Phaser.Scene {
       this.stageSystem.getNormalKills(),
       this.stageSystem.getEncounterType(),
       this.player,
+      this.growthSystem.getRequiredExp(this.player.level),
       this.monster,
       this.inventorySystem.list(),
     );
@@ -95,13 +121,16 @@ export class GameScene extends Phaser.Scene {
     const defeatedMonster = this.monster.data;
     this.pushLog(`${defeatedMonster.name} 처치`);
     const monsterReward = this.rewardResolver.resolveMonsterReward(defeatedMonster, this.stageSystem.getCurrentStage());
-    this.rewardSystem.applyResolvedReward(monsterReward, this.player, this.inventorySystem);
+    const monsterRewardResult = this.rewardSystem.applyResolvedReward(monsterReward, this.player, this.inventorySystem);
     this.pushLog(`처치 보상 EXP ${monsterReward.exp}, Gold ${monsterReward.gold}, Items ${monsterReward.items.length}`);
+    this.pushGrowthLog(monsterRewardResult.growth);
 
     const clearResult = this.stageSystem.recordMonsterDefeat(defeatedMonster);
     if (clearResult.cleared && clearResult.rewardId) {
-      const reward = this.rewardSystem.applyReward(clearResult.rewardId, this.player, this.inventorySystem);
+      const rewardResult = this.rewardSystem.applyReward(clearResult.rewardId, this.player, this.inventorySystem);
+      const reward = rewardResult.reward;
       this.pushLog(`스테이지 클리어 보상 EXP ${reward.exp}, Gold ${reward.gold}`);
+      this.pushGrowthLog(rewardResult.growth);
     }
 
     this.monster = this.createTargetMonster(this.time.now);
@@ -129,5 +158,14 @@ export class GameScene extends Phaser.Scene {
     if (this.logLines.length > 8) {
       this.logLines.length = 8;
     }
+  }
+
+  private pushGrowthLog(growth: { levelsGained: number; levelAfter: number; statGain: { maxHp: number; attack: number; defense: number } }): void {
+    if (growth.levelsGained <= 0) {
+      return;
+    }
+
+    this.pushLog(`레벨업! Lv ${growth.levelAfter} 달성`);
+    this.pushLog(`스탯 상승 HP +${growth.statGain.maxHp} / ATK +${growth.statGain.attack} / DEF +${growth.statGain.defense}`);
   }
 }

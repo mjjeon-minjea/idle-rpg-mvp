@@ -37,6 +37,7 @@ src/
 │  ├─ InventorySystem.ts
 │  ├─ MonsterFactory.ts
 │  ├─ MonsterPoolSystem.ts
+│  ├─ PlayerGrowthSystem.ts
 │  ├─ RandomService.ts
 │  ├─ RewardResolver.ts
 │  ├─ RewardSystem.ts
@@ -74,13 +75,13 @@ Implemented (구현됨)
 - Monster runtime creation (몬스터 런타임 생성)
 - Stage progression (스테이지 진행)
 - Kill reward resolution (처치 보상 계산)
+- Player growth (플레이어 성장)
 - Stage clear rewards (스테이지 클리어 보상)
 - Inventory quantity storage (인벤토리 수량 저장)
 - Local save/load (로컬 저장/불러오기)
 
 Not started (미시작)
 
-- PlayerGrowthSystem (플레이어 성장 시스템)
 - EquipmentSystem (장비 시스템)
 - SkillSystem (스킬 시스템)
 - RebirthSystem (환생 시스템)

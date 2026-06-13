@@ -167,7 +167,57 @@ interface ResolvedReward {
 
 `ResolvedReward (계산 완료 보상)`는 `RewardResolver (보상 계산기)`가 만든 최종 보상이며, `RewardSystem (보상 적용 시스템)`이 플레이어와 인벤토리에 적용한다.
 
-## 9. Validation Rules (검증 규칙)
+## 9. PlayerState (플레이어 상태)
+
+Runtime/save type (런타임/저장 타입):
+
+```ts
+interface PlayerState {
+  level: number;
+  exp: number;
+  totalExp: number;
+  gold: number;
+  maxHp: number;
+  hp: number;
+  attack: number;
+  defense: number;
+}
+```
+
+Experience rules (경험치 규칙):
+
+```text
+exp = 현재 레벨에서 다음 레벨까지의 진행 경험치
+totalExp = 지금까지 누적 획득한 전체 경험치
+requiredExp = 저장하지 않고 PlayerGrowthSystem 공식으로 계산하는 파생값
+```
+
+기존 저장 데이터에는 `totalExp`가 없을 수 있으므로 `GameScene (게임 씬)`에서 fallback/migration (fallback/마이그레이션)을 처리한다.
+
+## 10. GrowthResult (성장 결과)
+
+Runtime type (런타임 타입):
+
+```ts
+interface GrowthResult {
+  gainedExp: number;
+  totalExp: number;
+  levelBefore: number;
+  levelAfter: number;
+  levelsGained: number;
+  expBefore: number;
+  expAfter: number;
+  requiredExpBefore: number;
+  requiredExpAfter: number;
+  statGain: {
+    maxHp: number;
+    attack: number;
+    defense: number;
+  };
+}
+```
+
+## 11. Validation Rules (검증 규칙)
 
 `DataLoader (데이터 로더)` must throw clear errors for:
 

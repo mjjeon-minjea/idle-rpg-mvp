@@ -18,6 +18,7 @@ Last updated: 2026-06-13
 - Reward Resolver (보상 계산)
 - Drop Resolver (드랍 계산)
 - Reward System (보상 적용)
+- Player Growth System (플레이어 성장)
 - Inventory quantity storage (인벤토리 수량 저장)
 - localStorage save/load (로컬 저장/불러오기)
 - HUD display (HUD 표시)
@@ -38,7 +39,6 @@ Last updated: 2026-06-13
 
 ## Not Started (미시작)
 
-- PlayerGrowthSystem (플레이어 성장 시스템)
 - EquipmentSystem (장비 시스템)
 - SkillSystem (스킬 시스템)
 - RebirthSystem (환생 시스템)
@@ -53,4 +53,4 @@ npm.cmd run build
 
 ## Important Note (중요 메모)
 
-`idle-rpg-mvp` 폴더 자체는 현재 Git repository (Git 저장소)가 아닙니다. 따라서 `git status --short`는 실패합니다.
+`idle-rpg-mvp` 폴더는 Git repository (Git 저장소)로 초기화되어 있으며, `origin/main`은 GitHub 저장소 `mjjeon-minjea/idle-rpg-mvp`를 추적합니다.

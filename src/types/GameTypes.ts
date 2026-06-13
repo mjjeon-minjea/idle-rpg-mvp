@@ -89,11 +89,29 @@ export interface GameData {
 export interface PlayerState {
   level: number;
   exp: number;
+  totalExp: number;
   gold: number;
   maxHp: number;
   hp: number;
   attack: number;
   defense: number;
+}
+
+export interface GrowthResult {
+  gainedExp: number;
+  totalExp: number;
+  levelBefore: number;
+  levelAfter: number;
+  levelsGained: number;
+  expBefore: number;
+  expAfter: number;
+  requiredExpBefore: number;
+  requiredExpAfter: number;
+  statGain: {
+    maxHp: number;
+    attack: number;
+    defense: number;
+  };
 }
 
 export interface MonsterInstance {

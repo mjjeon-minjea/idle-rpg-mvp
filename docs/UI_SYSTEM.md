@@ -10,6 +10,7 @@
 - Current stage (현재 스테이지)
 - Encounter type (전투 대상 종류)
 - Player stats (플레이어 스탯)
+- Current exp / required exp / total exp (현재 경험치 / 필요 경험치 / 누적 경험치)
 - Monster stats (몬스터 스탯)
 - Inventory entries (인벤토리 목록)
 - Combat log (전투 로그)

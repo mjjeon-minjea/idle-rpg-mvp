@@ -21,3 +21,15 @@ localStorage
 - Save versioning (저장 버전 관리)이 아직 없다.
 - Save migration (저장 데이터 마이그레이션)이 아직 없다.
 - PlayerGrowthSystem, EquipmentSystem, SkillSystem 추가 전 저장 포맷 버전 필드를 검토해야 한다.
+
+## Player Growth Fallback (플레이어 성장 fallback)
+
+기존 저장 데이터에는 `PlayerState.totalExp`가 없을 수 있다.
+
+현재 fallback rule (fallback 규칙):
+
+```text
+totalExp = saved.totalExp ?? getTotalExpAtLevelStart(level) + exp
+```
+
+`requiredExp (필요 경험치)`는 저장하지 않고 `PlayerGrowthSystem (플레이어 성장 시스템)`이 공식으로 계산한다.

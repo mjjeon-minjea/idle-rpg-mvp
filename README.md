@@ -2,7 +2,7 @@
 
 로컬 기반 2D idle RPG (방치형 RPG) MVP 프로젝트입니다. 플레이어는 Trainee Knight (수습기사)로 시작해 Auto Combat (자동 전투), Reward (보상), Growth (성장), Stage Progress (스테이지 진행), Equipment Farming (장비 파밍), Skill Upgrade (스킬 강화), Rebirth (환생), Job Change (전직)로 점점 강해지는 이세계 무쌍형 게임을 목표로 합니다.
 
-현재 작업 범위는 README.md, docs 문서, 실제 폴더/파일 구조의 정합성을 맞추는 것입니다. PlayerGrowthSystem (플레이어 성장 시스템) 같은 다음 기능 구현은 아직 진행하지 않습니다.
+현재 MVP는 core loop (핵심 루프)와 PlayerGrowthSystem (플레이어 성장 시스템) 1차 구현까지 포함합니다.
 
 ## Current Implemented Scope (현재 구현 범위)
 
@@ -15,6 +15,7 @@ Implemented (구현됨)
 - StageProgressSystem (스테이지 진행 시스템)
 - RewardResolver (보상 계산기)
 - RewardSystem (보상 적용 시스템)
+- PlayerGrowthSystem (플레이어 성장 시스템)
 - DropResolver (드랍 계산기)
 - InventorySystem (인벤토리 시스템) 기본 수량 관리
 - SaveSystem (저장 시스템) localStorage 저장/불러오기
@@ -33,10 +34,10 @@ Documented / Designed (문서화/설계됨)
 - Strategy Pattern (전략 패턴)
 - Component Composition (컴포넌트 조합)
 - Future source folder structure (미래 소스 폴더 구조)
+- GrowthConfig (성장 설정) JSON 분리 방향
 
 Planned (예정)
 
-- PlayerGrowthSystem (플레이어 성장 시스템)
 - EquipmentSystem (장비 시스템)
 - SkillSystem (스킬 시스템)
 - RebirthSystem (환생 시스템)
@@ -127,6 +128,7 @@ idle-rpg-mvp/
 | `docs/COMBAT_SYSTEM.md` | Combat system (전투 시스템) |
 | `docs/STAGE_SYSTEM.md` | Stage system (스테이지 시스템) |
 | `docs/REWARD_SYSTEM.md` | Reward system (보상 시스템) |
+| `docs/PLAYER_GROWTH_SYSTEM.md` | Player growth system (플레이어 성장 시스템) |
 | `docs/INVENTORY_SYSTEM.md` | Inventory system (인벤토리 시스템) |
 | `docs/SAVE_SYSTEM.md` | Save system (저장 시스템) |
 | `docs/SCENE_STRUCTURE.md` | Scene structure (Phaser 씬 구조) |
@@ -134,13 +136,13 @@ idle-rpg-mvp/
 
 ## Next Work (다음 작업)
 
-다음 구현 진입점은 PlayerGrowthSystem (플레이어 성장 시스템)입니다. 단, 이 작업은 현재 README/docs/구조 정리와 분리해서 새 작업으로 진행합니다.
+다음 구현 진입점은 EquipmentSystem (장비 시스템) 또는 Electron game preview integration (Electron 게임 미리보기 연동)입니다.
 
 ```text
 Next recommended task:
-PlayerGrowthSystem (플레이어 성장 시스템)
--> exp requirement (경험치 요구량)
--> level up (레벨업)
--> stat growth (스탯 성장)
--> RewardSystem integration (보상 적용 시스템 연동)
+EquipmentSystem (장비 시스템)
+-> equipment data (장비 데이터)
+-> equip/unequip (장착/해제)
+-> stat aggregation (스탯 합산)
+-> duplicate stat prevention (스탯 중복 적용 방지)
 ```

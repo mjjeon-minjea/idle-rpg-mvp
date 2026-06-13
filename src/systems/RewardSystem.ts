@@ -1,26 +1,32 @@
-import type { PlayerState, ResolvedReward, RewardData } from "../types/GameTypes";
+import type { GrowthResult, PlayerState, ResolvedReward, RewardData } from "../types/GameTypes";
 import { InventorySystem } from "./InventorySystem";
+import { PlayerGrowthSystem } from "./PlayerGrowthSystem";
+
+export interface RewardApplicationResult {
+  reward: ResolvedReward;
+  growth: GrowthResult;
+}
 
 export class RewardSystem {
-  constructor(private readonly rewards: RewardData[]) {}
+  constructor(private readonly rewards: RewardData[], private readonly growthSystem: PlayerGrowthSystem) {}
 
-  applyResolvedReward(reward: ResolvedReward, player: PlayerState, inventory: InventorySystem): void {
-    player.exp += reward.exp;
+  applyResolvedReward(reward: ResolvedReward, player: PlayerState, inventory: InventorySystem): RewardApplicationResult {
+    const growth = this.growthSystem.addExp(player, reward.exp);
     player.gold += reward.gold;
 
     for (const item of reward.items) {
       inventory.addItem(item.itemId, item.quantity);
     }
+
+    return { reward, growth };
   }
 
-  applyReward(rewardId: string, player: PlayerState, inventory: InventorySystem): RewardData {
+  applyReward(rewardId: string, player: PlayerState, inventory: InventorySystem): RewardApplicationResult {
     const reward = this.rewards.find((candidate) => candidate.id === rewardId);
     if (!reward) {
       throw new Error(`Reward not found: ${rewardId}`);
     }
 
-    this.applyResolvedReward(reward, player, inventory);
-
-    return reward;
+    return this.applyResolvedReward(reward, player, inventory);
   }
 }

@@ -32,6 +32,7 @@ export class Hud {
     normalKills: number,
     encounterType: StageEncounterType,
     player: PlayerState,
+    requiredExp: number,
     monster: MonsterInstance,
     inventory: InventoryEntry[],
   ): void {
@@ -45,7 +46,8 @@ export class Hud {
       "수습기사 전민재",
       `Lv ${player.level} / HP ${player.hp}/${player.maxHp}`,
       `ATK ${player.attack} / DEF ${player.defense}`,
-      `EXP ${player.exp} / Gold ${player.gold}`,
+      `EXP ${player.exp}/${requiredExp} / Total ${player.totalExp}`,
+      `Gold ${player.gold}`,
     ]);
 
     this.monsterText.setText([

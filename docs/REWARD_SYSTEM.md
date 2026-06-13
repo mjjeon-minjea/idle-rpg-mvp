@@ -13,11 +13,14 @@ RewardResolver (보상 계산기)
 
 RewardSystem (보상 적용 시스템)
 = applies final reward to player/inventory (최종 보상을 플레이어/인벤토리에 적용)
+
+PlayerGrowthSystem (플레이어 성장 시스템)
+= applies exp progress, level up, and stat growth (경험치 진행/레벨업/스탯 성장 적용)
 ```
 
 ## Monster Kill Reward (몬스터 처치 보상)
 
-`RewardResolver (보상 계산기)`가 계산한다.
+`RewardResolver (보상 계산기)`가 계산하고, `RewardSystem (보상 적용 시스템)`이 `PlayerGrowthSystem (플레이어 성장 시스템)`에 경험치 적용을 위임한다.
 
 ```ts
 finalExp = Math.floor(monster.baseExp * stage.expMultiplier);
@@ -43,6 +46,8 @@ finalDropRate = clamp(finalDropRate, 0, 1);
 
 - `dropRateBonus` applies only to item drop rate.
 - `CombatSystem (전투 시스템)` must not grant rewards.
+- `RewardSystem (보상 적용 시스템)` remains the reward application entry point.
+- `PlayerGrowthSystem (플레이어 성장 시스템)` owns exp accumulation, level up, required exp, and stat growth.
 - `MonsterData (몬스터 정적 데이터)` uses `baseExp` and `baseGold`.
 - `rewardMultiplier` is not used.
 - `clearRewardMultiplier` is reserved only for stage clear rewards if needed.
