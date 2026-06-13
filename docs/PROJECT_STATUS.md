@@ -71,3 +71,21 @@ location.reload();
 Stage 1~9 브라우저 수동 검증은 `docs/MANUAL_PLAYTEST_CHECKLIST.md`를 기준으로 진행한다.
 
 현재 화면 가독성 개선은 정식 아트 제작이 아니라 `MVP Visual Readability Pass (MVP 화면 가독성 개선)`이다.
+
+## Balance Patch 1 (밸런스 패치 1)
+
+Status: No Data Patch (데이터 패치 없음)
+
+Reason: Current Stage 1~9 numbers are suitable for later Manual Validation (수동 검증)에 사용하기 적합하다.
+
+Watch Point (주시 항목):
+
+- Stage 9 boss death/reset feel (Stage 9 보스 사망/회복 체감)
+- Armor impact (방어구 장착 체감)
+
+Decision (결정):
+
+- `data/*.json`은 아직 수정하지 않는다.
+- Gold economy (골드 경제)는 gold sink (골드 소비처)가 없으므로 아직 조정하지 않는다.
+- Korean Display Text Fix (한글 표시 문자열 수정)는 Balance Patch 1에 섞지 않고 별도 작업 후보로 분리한다.
+- CombatSystem / RewardSystem / PlayerGrowthSystem / EquipmentSystem / SkillSystem / StageProgressSystem 구조는 유지한다.
