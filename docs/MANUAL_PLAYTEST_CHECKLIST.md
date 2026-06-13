@@ -25,6 +25,28 @@ http://127.0.0.1:5173/
 
 이미 포트가 사용 중이면 Vite가 `5174`, `5175`처럼 다른 주소를 보여줄 수 있다. 터미널에 표시된 `Local:` 주소를 브라우저에서 열면 된다.
 
+### Electron Preview (Electron 미리보기)
+
+Electron 창에서 확인하려면 게임 dev server를 먼저 켠 뒤 아래를 실행한다.
+
+```powershell
+cd "C:\Users\jmj\Desktop\코덱스 자료\codex-electron-console"
+npm.cmd start
+```
+
+Electron 화면에서는 아래 로컬 Vite URL만 Load 한다.
+
+```text
+http://127.0.0.1:5173/
+http://127.0.0.1:5174/
+http://127.0.0.1:5175/
+http://localhost:5173/
+http://localhost:5174/
+http://localhost:5175/
+```
+
+iframe에서 입력, 포커스, 스케일 문제가 보이면 다음 작업에서 `webview` 또는 `BrowserWindow.loadURL` 방식 전환을 검토한다.
+
 ## 2. Save Reset (저장 데이터 초기화)
 
 MVP 개발 중에는 stage data (스테이지 데이터)가 바뀌면 기존 저장 데이터와 현재 데이터가 어긋날 수 있다.
