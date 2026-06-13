@@ -36,9 +36,52 @@ clearRewardId
 expMultiplier
 goldMultiplier
 dropRateBonus
-clearRewardMultiplier?
+```
+
+## Current Stage Content (현재 스테이지 콘텐츠)
+
+현재 MVP 데이터는 3개 지역, 9개 스테이지로 구성된다.
+
+```text
+Region 1: Dawn Forest (새벽 숲)
+1. dawn_forest_1
+2. dawn_forest_2
+3. dawn_forest_3 boss: dawn_treant
+
+Region 2: Mist Gate (안개 관문)
+4. mist_gate_1
+5. mist_gate_2
+6. mist_gate_3 boss: sleepy_ogre
+
+Region 3: Old Mine (오래된 광산)
+7. old_mine_1
+8. old_mine_2
+9. old_mine_3 boss: ancient_mine_guardian
+```
+
+Content scale (콘텐츠 규모):
+
+```text
+stages: 9
+normal monsters: 9
+leader monsters: 3
+boss monsters: 3
+```
+
+## Stage Validation (스테이지 검증)
+
+`DataLoader (데이터 로더)`는 아래를 검증한다.
+
+```text
+StageData.order 중복 금지
+StageData.order는 1 이상
+StageData.requiredNormalKills는 1 이상
+StageData.expMultiplier > 0
+StageData.goldMultiplier > 0
+StageData.dropRateBonus >= 0
+stages 배열은 order 오름차순
 ```
 
 ## Current Risk (현재 위험)
 
-현재 샘플 스테이지 수는 적다. 스테이지 콘텐츠 확장은 core loop (핵심 루프)가 안정화된 뒤 진행한다.
+MVP 개발 중 stage id/order (스테이지 ID/순서) 변경은 기존 localStorage 저장 데이터와 어긋날 수 있다. 필요하면 저장 데이터를 초기화한다.

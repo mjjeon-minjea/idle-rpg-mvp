@@ -42,6 +42,16 @@ finalDropRate = clamp(finalDropRate, 0, 1);
 
 `data/rewards.json`의 clear reward (클리어 보상)를 `RewardSystem (보상 적용 시스템)`이 적용한다.
 
+Current stage clear reward guarantee (현재 스테이지 클리어 보상 보장):
+
+```text
+Stage 3 dawn_forest_3_clear -> rusty_training_sword
+Stage 6 mist_gate_3_clear -> worn_apprentice_armor
+Stage 9 old_mine_3_clear -> cracked_apprentice_ring + guardian_stone
+```
+
+이 보장은 드랍 운이 나빠도 `EquipmentSystem (장비 시스템)`과 후반 스테이지 진행을 검증할 수 있게 하기 위한 MVP 정책이다.
+
 ## Rules (규칙)
 
 - `dropRateBonus` applies only to item drop rate.
@@ -50,7 +60,6 @@ finalDropRate = clamp(finalDropRate, 0, 1);
 - `RewardSystem (보상 적용 시스템)` remains the reward application entry point.
 - `PlayerGrowthSystem (플레이어 성장 시스템)` owns exp accumulation, level up, required exp, and stat growth.
 - `MonsterData (몬스터 정적 데이터)` uses `baseExp` and `baseGold`.
-- `rewardMultiplier` is not used.
-- `clearRewardMultiplier` is reserved only for stage clear rewards if needed.
+- Legacy generic reward multiplier fields are not used.
 - Equipment item drops (장비 아이템 드랍) still use the same `DropResolver -> RewardResolver -> RewardSystem -> InventorySystem` flow.
 - Skill defeats (스킬 처치) reuse the same `handleMonsterDefeat -> RewardResolver -> RewardSystem` flow, so rewards are applied once.

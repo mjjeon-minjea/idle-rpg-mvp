@@ -61,6 +61,16 @@ MVP 1 equipment items (1차 MVP 장비):
 - `worn_apprentice_armor (수습기사의 낡은 갑옷)` - armor, maxHp/defense 중심
 - `cracked_apprentice_ring (금 간 수습기사 반지)` - accessory, 소량 복합 스탯
 
+Guaranteed stage rewards (스테이지 보장 보상):
+
+```text
+dawn_forest_3_clear -> rusty_training_sword
+mist_gate_3_clear -> worn_apprentice_armor
+old_mine_3_clear -> cracked_apprentice_ring
+```
+
+MVP 1 inventory is quantity-based (수량 기반)이라 이미 보유한 장비가 다시 지급되어도 저장 구조가 깨지지 않는다.
+
 ## Effective Stats (최종 스탯)
 
 중요 원칙:

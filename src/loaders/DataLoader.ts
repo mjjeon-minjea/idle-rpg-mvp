@@ -121,6 +121,8 @@ export class DataLoader {
       }
     }
 
+    this.validateStageOrder(data.stages);
+
     for (const stage of data.stages) {
       if (!monsterPoolIds.has(stage.normalMonsterPoolId)) {
         throw new Error(`Stage "${stage.id}" references missing normalMonsterPoolId "${stage.normalMonsterPoolId}".`);
@@ -145,13 +147,39 @@ export class DataLoader {
         throw new Error(`Stage "${stage.id}" references missing clearRewardId "${stage.clearRewardId}".`);
       }
 
-      if (stage.expMultiplier < 0 || stage.goldMultiplier < 0 || stage.dropRateBonus < 0) {
+      if (stage.expMultiplier <= 0 || stage.goldMultiplier <= 0 || stage.dropRateBonus < 0) {
         throw new Error(`Stage "${stage.id}" has invalid reward multiplier values.`);
       }
     }
 
     this.validateSkills(data.skills, skillIds);
     this.validateSkillState(data.defaultSkillState, skillIds, "defaultSkillState");
+  }
+
+  private static validateStageOrder(stages: StageData[]): void {
+    const seenOrders = new Set<number>();
+    let previousOrder = 0;
+
+    for (const stage of stages) {
+      if (stage.order < 1) {
+        throw new Error(`Stage "${stage.id}" order must be at least 1.`);
+      }
+
+      if (seenOrders.has(stage.order)) {
+        throw new Error(`Duplicate stage order "${stage.order}" found at stage "${stage.id}".`);
+      }
+
+      if (stage.order < previousOrder) {
+        throw new Error(`Stages must be sorted by ascending order. Stage "${stage.id}" is out of order.`);
+      }
+
+      if (stage.requiredNormalKills < 1) {
+        throw new Error(`Stage "${stage.id}" requiredNormalKills must be at least 1.`);
+      }
+
+      seenOrders.add(stage.order);
+      previousOrder = stage.order;
+    }
   }
 
   private static validateSkills(skills: SkillData[], skillIds: Set<string>): void {

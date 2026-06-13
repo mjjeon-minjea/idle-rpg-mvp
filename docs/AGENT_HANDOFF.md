@@ -1,6 +1,6 @@
 # Agent Handoff (새 Codex 세션 인수인계)
 
-Last updated: 2026-06-13 10:11:52
+Last updated: 2026-06-13 10:33:09
 
 이 문서는 새 Codex 대화에서 현재 프로젝트 상태를 이어받기 위한 기준 문서입니다.
 
@@ -94,6 +94,7 @@ Implemented (구현됨)
 - Player growth (플레이어 성장)
 - Equipment slots and effective stats (장비 슬롯과 최종 스탯)
 - Auto skill trigger and cooldown (자동 스킬 발동과 쿨타임)
+- Stage 1~9 content (스테이지 1~9 콘텐츠)
 - Stage clear rewards (스테이지 클리어 보상)
 - Inventory quantity storage (인벤토리 수량 저장)
 - Local save/load (로컬 저장/불러오기)
@@ -110,11 +111,15 @@ Recently implemented (최근 구현)
 - SkillData (스킬 정적 데이터) 2종
 - SkillState (스킬 상태) 저장 fallback
 - Hud skill cooldown display (스킬 쿨타임 표시)
+- Stage Content Expansion (스테이지 콘텐츠 확장)
+- Dawn Forest / Mist Gate / Old Mine 9-stage data
+- MonsterData 15종
+- Stage order validation (스테이지 순서 검증)
 
 Current Git note (Git 메모)
 
-- Last pushed commit before SkillSystem work: `2a4b63f Add equipment system`
-- SkillSystem changes may be uncommitted unless a later walkthrough or git log says otherwise.
+- Last pushed commit before Stage Content Expansion work: `d1b6241 Add skill system`
+- Stage Content Expansion changes may be uncommitted unless a later walkthrough or git log says otherwise.
 - Ignored generated folders/files include `dist/`, `node_modules/`, and dev-server logs.
 - There is an unrelated untracked note file under `files/` named like `EquipmentSystem (...) 구현 플랜.txt`; do not modify/delete it unless the user asks.
 
@@ -135,6 +140,11 @@ Last validation before this handoff (이번 인수인계 전 마지막 검증)
 - `npm.cmd run typecheck`: pass
 - `npm.cmd run build`: normal sandbox run failed due access restriction, elevated run passed
 - Vite chunk size warning remains; it is not a build failure.
+
+Save note (저장 메모)
+
+- Stage data expansion can make old localStorage stage progress point to a different order.
+- During MVP development, reset with `localStorage.removeItem("idle-rpg-mvp-save"); location.reload();` if stage progress looks wrong.
 
 ## New Conversation Start Prompt (새 대화 시작 문구)
 

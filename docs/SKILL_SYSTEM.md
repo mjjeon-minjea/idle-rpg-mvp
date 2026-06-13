@@ -154,3 +154,15 @@ GameScene.update
 ```
 
 `CombatSystem (전투 시스템)`은 계속 기본 공격과 몬스터 공격 타이밍을 담당한다.
+
+## Stage Balance Note (스테이지 밸런스 메모)
+
+Stage Content Expansion (스테이지 콘텐츠 확장) 후 보스 HP는 스킬 발동을 여러 번 확인할 수 있도록 아래 기준을 사용한다.
+
+```text
+dawn_treant (새벽 나무정령): 260 HP
+sleepy_ogre (졸린 오우거): 420 HP
+ancient_mine_guardian (고대 광산 수호자): 720 HP
+```
+
+스킬 피해는 `EffectivePlayerStats (최종 플레이어 스탯)`를 사용하므로 장비 보너스가 누적될수록 스킬 피해도 증가한다.

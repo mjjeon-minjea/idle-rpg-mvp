@@ -45,7 +45,6 @@ export interface StageData {
   expMultiplier: number;
   goldMultiplier: number;
   dropRateBonus: number;
-  clearRewardMultiplier?: number;
 }
 
 export interface RewardData {

@@ -4,19 +4,65 @@
     "entries": [
       {
         "itemId": "soft_leaf",
-        "dropRate": 0.35,
+        "dropRate": 0.32,
         "minAmount": 1,
         "maxAmount": 2
       },
       {
         "itemId": "trainee_medal",
-        "dropRate": 0.08,
+        "dropRate": 0.07,
         "minAmount": 1,
         "maxAmount": 1
       },
       {
         "itemId": "rusty_training_sword",
+        "dropRate": 0.03,
+        "minAmount": 1,
+        "maxAmount": 1
+      }
+    ]
+  },
+  {
+    "id": "dawn_leader_drop",
+    "entries": [
+      {
+        "itemId": "trainee_medal",
+        "dropRate": 0.3,
+        "minAmount": 1,
+        "maxAmount": 2
+      },
+      {
+        "itemId": "soft_leaf",
+        "dropRate": 0.25,
+        "minAmount": 2,
+        "maxAmount": 3
+      },
+      {
+        "itemId": "cracked_apprentice_ring",
+        "dropRate": 0.02,
+        "minAmount": 1,
+        "maxAmount": 1
+      }
+    ]
+  },
+  {
+    "id": "dawn_boss_drop",
+    "entries": [
+      {
+        "itemId": "trainee_medal",
+        "dropRate": 0.45,
+        "minAmount": 2,
+        "maxAmount": 3
+      },
+      {
+        "itemId": "rusty_training_sword",
         "dropRate": 0.08,
+        "minAmount": 1,
+        "maxAmount": 1
+      },
+      {
+        "itemId": "cracked_apprentice_ring",
+        "dropRate": 0.04,
         "minAmount": 1,
         "maxAmount": 1
       }
@@ -27,7 +73,7 @@
     "entries": [
       {
         "itemId": "mist_shard",
-        "dropRate": 0.32,
+        "dropRate": 0.3,
         "minAmount": 1,
         "maxAmount": 2
       },
@@ -39,37 +85,37 @@
       },
       {
         "itemId": "worn_apprentice_armor",
-        "dropRate": 0.06,
+        "dropRate": 0.025,
         "minAmount": 1,
         "maxAmount": 1
       }
     ]
   },
   {
-    "id": "leader_drop",
+    "id": "mist_leader_drop",
     "entries": [
-      {
-        "itemId": "trainee_medal",
-        "dropRate": 0.35,
-        "minAmount": 1,
-        "maxAmount": 2
-      },
       {
         "itemId": "mist_core",
         "dropRate": 0.18,
         "minAmount": 1,
-        "maxAmount": 1
+        "maxAmount": 2
+      },
+      {
+        "itemId": "trainee_medal",
+        "dropRate": 0.25,
+        "minAmount": 1,
+        "maxAmount": 2
       },
       {
         "itemId": "cracked_apprentice_ring",
-        "dropRate": 0.1,
+        "dropRate": 0.04,
         "minAmount": 1,
         "maxAmount": 1
       }
     ]
   },
   {
-    "id": "boss_drop",
+    "id": "mist_boss_drop",
     "entries": [
       {
         "itemId": "ogre_badge",
@@ -82,6 +128,105 @@
         "dropRate": 0.4,
         "minAmount": 1,
         "maxAmount": 3
+      },
+      {
+        "itemId": "worn_apprentice_armor",
+        "dropRate": 0.08,
+        "minAmount": 1,
+        "maxAmount": 1
+      },
+      {
+        "itemId": "cracked_apprentice_ring",
+        "dropRate": 0.05,
+        "minAmount": 1,
+        "maxAmount": 1
+      }
+    ]
+  },
+  {
+    "id": "old_mine_drop",
+    "entries": [
+      {
+        "itemId": "old_ore_fragment",
+        "dropRate": 0.25,
+        "minAmount": 1,
+        "maxAmount": 3
+      },
+      {
+        "itemId": "old_ore_core",
+        "dropRate": 0.1,
+        "minAmount": 1,
+        "maxAmount": 1
+      },
+      {
+        "itemId": "guardian_stone",
+        "dropRate": 0.025,
+        "minAmount": 1,
+        "maxAmount": 1
+      },
+      {
+        "itemId": "worn_apprentice_armor",
+        "dropRate": 0.02,
+        "minAmount": 1,
+        "maxAmount": 1
+      }
+    ]
+  },
+  {
+    "id": "old_mine_leader_drop",
+    "entries": [
+      {
+        "itemId": "old_ore_fragment",
+        "dropRate": 0.45,
+        "minAmount": 2,
+        "maxAmount": 4
+      },
+      {
+        "itemId": "old_ore_core",
+        "dropRate": 0.18,
+        "minAmount": 1,
+        "maxAmount": 2
+      },
+      {
+        "itemId": "guardian_stone",
+        "dropRate": 0.05,
+        "minAmount": 1,
+        "maxAmount": 1
+      },
+      {
+        "itemId": "cracked_apprentice_ring",
+        "dropRate": 0.04,
+        "minAmount": 1,
+        "maxAmount": 1
+      }
+    ]
+  },
+  {
+    "id": "old_mine_boss_drop",
+    "entries": [
+      {
+        "itemId": "guardian_stone",
+        "dropRate": 0.35,
+        "minAmount": 1,
+        "maxAmount": 2
+      },
+      {
+        "itemId": "old_ore_core",
+        "dropRate": 0.35,
+        "minAmount": 2,
+        "maxAmount": 4
+      },
+      {
+        "itemId": "cracked_apprentice_ring",
+        "dropRate": 0.1,
+        "minAmount": 1,
+        "maxAmount": 1
+      },
+      {
+        "itemId": "worn_apprentice_armor",
+        "dropRate": 0.08,
+        "minAmount": 1,
+        "maxAmount": 1
       }
     ]
   }

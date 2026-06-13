@@ -30,6 +30,24 @@
     "rarity": "rare"
   },
   {
+    "id": "old_ore_fragment",
+    "name": "오래된 광석 조각",
+    "type": "material",
+    "rarity": "common"
+  },
+  {
+    "id": "old_ore_core",
+    "name": "오래된 광석 핵",
+    "type": "material",
+    "rarity": "advanced"
+  },
+  {
+    "id": "guardian_stone",
+    "name": "수호자의 돌",
+    "type": "material",
+    "rarity": "rare"
+  },
+  {
     "id": "rusty_training_sword",
     "name": "낡은 수련검",
     "type": "equipment",

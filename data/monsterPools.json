@@ -5,11 +5,15 @@
     "entries": [
       {
         "monsterId": "dawn_slime",
-        "weight": 70
+        "weight": 45
       },
       {
         "monsterId": "dawn_mushroom",
-        "weight": 30
+        "weight": 35
+      },
+      {
+        "monsterId": "dawn_hornet",
+        "weight": 20
       }
     ]
   },
@@ -29,11 +33,15 @@
     "entries": [
       {
         "monsterId": "mist_goblin",
-        "weight": 60
+        "weight": 45
       },
       {
         "monsterId": "mist_bat",
-        "weight": 40
+        "weight": 35
+      },
+      {
+        "monsterId": "mist_sentinel",
+        "weight": 20
       }
     ]
   },
@@ -43,6 +51,34 @@
     "entries": [
       {
         "monsterId": "mist_guardian",
+        "weight": 100
+      }
+    ]
+  },
+  {
+    "id": "old_mine_normals",
+    "role": "normal",
+    "entries": [
+      {
+        "monsterId": "mine_rat",
+        "weight": 40
+      },
+      {
+        "monsterId": "ore_sprite",
+        "weight": 35
+      },
+      {
+        "monsterId": "rust_crawler",
+        "weight": 25
+      }
+    ]
+  },
+  {
+    "id": "old_mine_leaders",
+    "role": "leader",
+    "entries": [
+      {
+        "monsterId": "mine_foreman_golem",
         "weight": 100
       }
     ]

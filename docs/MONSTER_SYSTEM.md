@@ -114,6 +114,24 @@ data/
 └─ stages.json                    # StageData (스테이지 데이터)
 ```
 
+Current content scale (현재 콘텐츠 규모):
+
+```text
+normal monsters: 9
+leader monsters: 3
+boss monsters: 3
+total monsters: 15
+stages: 9
+```
+
+Current regions (현재 지역):
+
+```text
+Dawn Forest (새벽 숲)
+Mist Gate (안개 관문)
+Old Mine (오래된 광산)
+```
+
 ## 4. StateMachine (상태 머신)
 
 현재 MVP는 enum-based state (문자열 상태)로 관리한다.

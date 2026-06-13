@@ -11,12 +11,93 @@
     ]
   },
   {
+    "id": "dawn_forest_2_clear",
+    "exp": 55,
+    "gold": 65,
+    "items": [
+      {
+        "itemId": "soft_leaf",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "id": "dawn_forest_3_clear",
+    "exp": 85,
+    "gold": 100,
+    "items": [
+      {
+        "itemId": "rusty_training_sword",
+        "quantity": 1
+      }
+    ]
+  },
+  {
     "id": "mist_gate_1_clear",
     "exp": 70,
     "gold": 90,
     "items": [
       {
+        "itemId": "mist_shard",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "id": "mist_gate_2_clear",
+    "exp": 95,
+    "gold": 120,
+    "items": [
+      {
         "itemId": "mist_core",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "mist_gate_3_clear",
+    "exp": 135,
+    "gold": 160,
+    "items": [
+      {
+        "itemId": "worn_apprentice_armor",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "old_mine_1_clear",
+    "exp": 130,
+    "gold": 170,
+    "items": [
+      {
+        "itemId": "old_ore_fragment",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "id": "old_mine_2_clear",
+    "exp": 170,
+    "gold": 220,
+    "items": [
+      {
+        "itemId": "old_ore_core",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "old_mine_3_clear",
+    "exp": 240,
+    "gold": 320,
+    "items": [
+      {
+        "itemId": "cracked_apprentice_ring",
+        "quantity": 1
+      },
+      {
+        "itemId": "guardian_stone",
         "quantity": 1
       }
     ]

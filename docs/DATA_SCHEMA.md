@@ -109,7 +109,6 @@ interface StageData {
   expMultiplier: number;
   goldMultiplier: number;
   dropRateBonus: number;
-  clearRewardMultiplier?: number;
 }
 ```
 
@@ -117,9 +116,13 @@ Rules (규칙):
 
 - `StageData` must not use `normalMonsterId` or `leaderMonsterId`.
 - `StageData` must use `normalMonsterPoolId`, `leaderMonsterPoolId`, and optional `bossMonsterId`.
-- Do not use `rewardMultiplier`.
-- Use `clearRewardMultiplier` only for stage clear rewards if needed.
+- Do not add a legacy generic reward multiplier field.
 - `bossMonsterId` must reference a monster whose role is `boss`.
+- `order` must be unique and at least 1.
+- `requiredNormalKills` must be at least 1.
+- `expMultiplier` and `goldMultiplier` must be greater than 0.
+- `dropRateBonus` must not be negative.
+- `stages.json` array must be sorted by ascending `order`.
 
 ## 6. StageClearRewardData (스테이지 클리어 보상 데이터)
 
@@ -348,5 +351,8 @@ interface GrowthResult {
 - Invalid skill data (잘못된 스킬 데이터)
 - Missing skillId in default skill state (기본 스킬 상태의 없는 스킬 ID)
 - Duplicate equippedSkillIds (중복 장착 스킬 ID)
+- Duplicate stage order (중복 스테이지 순서)
+- Stage order not sorted ascending (스테이지 순서 정렬 오류)
+- Invalid stage multiplier or required kill values (잘못된 스테이지 배율 또는 처치 수)
 
 No silent fallback (조용히 무시하는 fallback 금지).

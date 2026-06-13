@@ -23,6 +23,7 @@ localStorage
 - Save versioning (저장 버전 관리)이 아직 없다.
 - Save migration (저장 데이터 마이그레이션)이 아직 없다.
 - RebirthSystem, JobSystem 같은 장기 진행 시스템을 추가하기 전 저장 포맷 버전 필드를 검토해야 한다.
+- Stage data expansion (스테이지 데이터 확장) 후 기존 localStorage 저장 데이터는 현재 스테이지 위치가 어긋날 수 있다.
 
 ## Player Growth Fallback (플레이어 성장 fallback)
 
@@ -67,4 +68,15 @@ MVP 1 default skill state (1차 MVP 기본 스킬 상태):
 
 ```text
 저장/불러오기 후 쿨타임은 0부터 시작한다.
+```
+
+## MVP Development Reset (MVP 개발 중 저장 초기화)
+
+MVP 개발 중 스테이지 데이터가 확장되면 기존 저장 데이터의 `currentStageId (현재 스테이지 ID)`가 의도와 다르게 해석될 수 있다. 예를 들어 기존 `mist_gate_1` 저장 데이터는 확장 후 Stage 4 위치를 가리킨다.
+
+개발 중에는 필요 시 브라우저 콘솔에서 아래 명령으로 저장 데이터를 초기화한다.
+
+```js
+localStorage.removeItem("idle-rpg-mvp-save");
+location.reload();
 ```

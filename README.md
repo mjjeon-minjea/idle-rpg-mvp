@@ -13,6 +13,7 @@ Implemented (구현됨)
 - MonsterData (몬스터 정적 데이터)와 MonsterInstance (몬스터 런타임 객체) 분리
 - MonsterPoolSystem (몬스터 풀 시스템)
 - StageProgressSystem (스테이지 진행 시스템)
+- Stage Content 1~9 (스테이지 1~9 콘텐츠)
 - RewardResolver (보상 계산기)
 - RewardSystem (보상 적용 시스템)
 - PlayerGrowthSystem (플레이어 성장 시스템)
@@ -26,7 +27,7 @@ Implemented (구현됨)
 
 Partial (부분 구현)
 
-- Boss Monster (보스 몬스터) 흐름 지원: 데이터와 진행 흐름은 지원하지만 보스 전용 패턴/페이즈는 없음
+- Boss Monster (보스 몬스터) 흐름 지원: 3개 보스 스테이지는 구현됐지만 보스 전용 패턴/페이즈는 없음
 - Item Drop (아이템 드랍): 기본 드랍 테이블과 고정 스탯 장비 드랍은 구현됐지만 랜덤 옵션 장비는 아직 없음
 - Stage Clear Reward (스테이지 클리어 보상): 기본 보상 지급은 구현됐지만 보상 연출/상세 UI는 없음
 - SkillSystem (스킬 시스템): 자동 발동 공격 스킬과 쿨타임은 구현됐지만 스킬 강화/트리/이펙트는 없음
@@ -58,6 +59,38 @@ Normal Monster N kills (일반 몬스터 N마리 처치)
 -> Next stage (다음 스테이지)
 ```
 
+## Current Stage Content (현재 스테이지 콘텐츠)
+
+```text
+Region 1: Dawn Forest (새벽 숲)
+- dawn_forest_1
+- dawn_forest_2
+- dawn_forest_3 boss
+
+Region 2: Mist Gate (안개 관문)
+- mist_gate_1
+- mist_gate_2
+- mist_gate_3 boss
+
+Region 3: Old Mine (오래된 광산)
+- old_mine_1
+- old_mine_2
+- old_mine_3 boss
+```
+
+현재 데이터 규모:
+
+```text
+stages: 9
+monsters: 15
+  normal: 9
+  leader: 3
+  boss: 3
+dropTables: 9
+stage rewards: 9
+items: 11
+```
+
 ## Development Commands (개발 명령어)
 
 ```powershell
@@ -76,6 +109,15 @@ http://127.0.0.1:5173
 ```powershell
 npm.cmd run typecheck
 npm.cmd run build
+```
+
+MVP save reset (MVP 저장 초기화):
+
+Stage data expansion (스테이지 데이터 확장) 후 기존 localStorage 저장 데이터는 현재 스테이지 위치가 어긋날 수 있다. 개발 중에는 아래 명령으로 저장 데이터를 초기화할 수 있다.
+
+```js
+localStorage.removeItem("idle-rpg-mvp-save");
+location.reload();
 ```
 
 Electron console (Electron 콘솔)는 별도 프로젝트입니다.
@@ -140,7 +182,7 @@ idle-rpg-mvp/
 
 ## Next Work (다음 작업)
 
-다음 구현 진입점은 Electron game preview integration (Electron 게임 미리보기 연동), Stage Content Expansion (스테이지 콘텐츠 확장), 또는 Skill Upgrade (스킬 강화) 설계입니다.
+다음 구현 진입점은 Electron game preview integration (Electron 게임 미리보기 연동), Stage balance pass (스테이지 밸런스 점검), 또는 Skill Upgrade (스킬 강화) 설계입니다.
 
 ```text
 Next recommended task:
