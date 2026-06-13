@@ -58,8 +58,29 @@ F12
 - Current monster (현재 몬스터)
 - Inventory (인벤토리)
 - Combat log (전투 로그)
+- Player HP bar (플레이어 체력 바)
+- Monster HP bar (몬스터 체력 바)
+- Player placeholder (플레이어 임시 표시)
+- Monster placeholder (몬스터 임시 표시)
 
 한글이 깨져 보이면 브라우저 새로고침 후 다시 확인한다. 계속 깨지면 `src/scenes/GameScene.ts`, `src/ui/Hud.ts`, JSON 데이터 파일의 인코딩을 UTF-8로 확인해야 한다.
+
+## 3-1. MVP Visual Readability Pass Check (MVP 화면 가독성 확인)
+
+현재 화면은 정식 아트가 아니라 수동 검증을 위한 임시 시각화다.
+
+아래 항목을 확인한다.
+
+- Top Area (상단 영역): 제목, 현재 스테이지, 진행도가 겹치지 않는다.
+- Left Panel (왼쪽 패널): 플레이어 레벨, HP bar, ATK/DEF, EXP/Gold가 한눈에 보인다.
+- Center Area (중앙 전투 영역): 플레이어 placeholder와 몬스터 placeholder가 구분된다.
+- Right Panel (오른쪽 패널): 전투 로그가 6~8줄 정도 보이고 다른 UI와 겹치지 않는다.
+- Bottom Area (하단 영역): 스킬, 장비, 인벤토리 요약이 한눈에 보인다.
+- Normal Monster (일반 몬스터)는 초록 원으로 보인다.
+- Leader Monster (리더 몬스터)는 노란 원으로 보인다.
+- Boss Monster (보스 몬스터)는 큰 빨간 원으로 보인다.
+- 플레이어와 몬스터 HP bar가 전투 중 줄어드는지 확인한다.
+- 최소 `1280 x 720` 화면에서 텍스트가 겹치지 않는다.
 
 ## 4. Stage 1~9 Flow Check (스테이지 1~9 흐름 확인)
 
@@ -86,6 +107,7 @@ dawn_forest_1
 ### Stage 3 (첫 보스)
 
 - 리더 처치 후 `boss (보스 몬스터)`가 등장하는지 확인한다.
+- 보스 placeholder가 일반/리더보다 큰 빨간 원으로 표시되는지 확인한다.
 - 보스 처치 후 `rusty_training_sword (낡은 수련검)`이 지급되는지 확인한다.
 - 지급 후 장비 목록의 `weapon (무기)` 슬롯에 장착되는지 확인한다.
 
@@ -98,6 +120,7 @@ dawn_forest_1
 ### Stage 6 (방어구 보장)
 
 - 보스가 정상 등장하는지 확인한다.
+- 보스 HP bar가 표시되는지 확인한다.
 - 클리어 후 `worn_apprentice_armor (수습기사의 낡은 갑옷)`이 지급되는지 확인한다.
 - 지급 후 `armor (방어구)` 슬롯에 장착되는지 확인한다.
 - HP/DEF 장비 보너스가 증가하는지 확인한다.
@@ -107,6 +130,7 @@ dawn_forest_1
 - `old_mine` 계열 스테이지로 정상 진입하는지 확인한다.
 - 광산 몬스터와 보상이 화면에 어색하지 않게 연결되는지 확인한다.
 - Stage 9에서 `ancient_mine_guardian (고대 광산 수호자)`가 보스로 등장하는지 확인한다.
+- Stage 9 보스가 Boss Monster (보스 몬스터) 색상/크기/라벨로 구분되는지 확인한다.
 - Stage 9 클리어 후 `cracked_apprentice_ring (금 간 수습기사 반지)`와 `guardian_stone (수호자의 돌)`이 지급되는지 확인한다.
 
 ## 5. Save / Load Check (저장 / 불러오기 확인)
@@ -184,4 +208,4 @@ Stage 9: MVP 1 최종 보스 난이도
 - 현재 저장 데이터에는 별도 version field (버전 필드)가 없다.
 - `SkillRuntimeState (스킬 런타임 상태)`의 cooldown (쿨타임)은 저장하지 않는다. 새로고침 후 쿨타임은 0부터 시작한다.
 - UI는 현재 MVP용 텍스트 HUD이며, 최종 디자인/반응형 레이아웃은 아직 아니다.
-
+- 현재 `MVP Visual Readability Pass (MVP 화면 가독성 개선)`는 정식 아트 작업이 아니라 수동 검증을 위한 임시 레이아웃이다.

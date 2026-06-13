@@ -26,6 +26,7 @@ Last updated: 2026-06-13
 - localStorage save/load (로컬 저장/불러오기)
 - HUD display (HUD 표시)
 - Manual playtest checklist (수동 플레이 검증 체크리스트)
+- MVP Visual Readability Pass (MVP 화면 가독성 개선)
 
 ## Partial (부분 구현)
 
@@ -33,6 +34,7 @@ Last updated: 2026-06-13
 - Item drops (아이템 드랍): 기본 드랍과 고정 스탯 장비 드랍은 있으나 랜덤 옵션 장비는 없음
 - Stage clear rewards (스테이지 클리어 보상): 기본 적용만 있음
 - Skill system (스킬 시스템): 자동 발동 단일 대상 공격 스킬과 쿨타임은 구현됐으나 스킬 강화/트리/이펙트는 없음
+- UI art (UI 아트): 수동 검증용 임시 패널/placeholder/HP bar만 있으며 정식 아트는 없음
 
 ## Documented / Designed (문서화/설계됨)
 
@@ -67,3 +69,5 @@ location.reload();
 ```
 
 Stage 1~9 브라우저 수동 검증은 `docs/MANUAL_PLAYTEST_CHECKLIST.md`를 기준으로 진행한다.
+
+현재 화면 가독성 개선은 정식 아트 제작이 아니라 `MVP Visual Readability Pass (MVP 화면 가독성 개선)`이다.

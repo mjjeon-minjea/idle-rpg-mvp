@@ -60,8 +60,7 @@ export class GameScene extends Phaser.Scene {
     this.hud = new Hud(this, this.dataSet.config.title, this.dataSet.config.subtitle);
     this.monster = this.createTargetMonster(this.time.now);
 
-    this.add.rectangle(480, 270, 900, 460, 0x171b22, 1).setDepth(-1);
-    this.add.rectangle(480, 92, 900, 2, 0x2b3440, 1);
+    this.add.rectangle(640, 360, 1280, 720, 0x111318, 1).setDepth(-2);
   }
 
   private normalizePlayerState(savedPlayer?: Partial<PlayerState>): PlayerState {

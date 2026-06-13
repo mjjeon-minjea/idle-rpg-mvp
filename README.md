@@ -24,6 +24,7 @@ Implemented (구현됨)
 - SaveSystem (저장 시스템) localStorage 저장/불러오기
 - JSON data loading and validation (JSON 데이터 로딩과 검증)
 - HUD (화면 표시 UI)
+- MVP Visual Readability Pass (MVP 화면 가독성 개선): 수동 검증용 임시 패널, HP bar, placeholder 표시
 
 Partial (부분 구현)
 
@@ -31,6 +32,7 @@ Partial (부분 구현)
 - Item Drop (아이템 드랍): 기본 드랍 테이블과 고정 스탯 장비 드랍은 구현됐지만 랜덤 옵션 장비는 아직 없음
 - Stage Clear Reward (스테이지 클리어 보상): 기본 보상 지급은 구현됐지만 보상 연출/상세 UI는 없음
 - SkillSystem (스킬 시스템): 자동 발동 공격 스킬과 쿨타임은 구현됐지만 스킬 강화/트리/이펙트는 없음
+- Visual Art (비주얼 아트): 정식 캐릭터/몬스터 이미지, 애니메이션, 스킬 이펙트는 아직 없음
 
 Documented / Designed (문서화/설계됨)
 
@@ -119,6 +121,14 @@ Stage data expansion (스테이지 데이터 확장) 후 기존 localStorage 저
 localStorage.removeItem("idle-rpg-mvp-save");
 location.reload();
 ```
+
+Manual playtest (수동 플레이 검증):
+
+```text
+docs/MANUAL_PLAYTEST_CHECKLIST.md
+```
+
+현재 화면은 정식 아트가 아니라 `MVP Visual Readability Pass (MVP 화면 가독성 개선)` 상태다. 1280 x 720 기준으로 플레이어 정보, 몬스터 정보, 스킬, 장비, 인벤토리, 전투 로그를 분리해 Stage 1~9 수동 검증을 쉽게 하는 것이 목적이다.
 
 Electron console (Electron 콘솔)는 별도 프로젝트입니다.
 
