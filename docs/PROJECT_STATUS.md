@@ -89,3 +89,21 @@ Decision (결정):
 - Gold economy (골드 경제)는 gold sink (골드 소비처)가 없으므로 아직 조정하지 않는다.
 - Korean Display Text Fix (한글 표시 문자열 수정)는 Balance Patch 1에 섞지 않고 별도 작업 후보로 분리한다.
 - CombatSystem / RewardSystem / PlayerGrowthSystem / EquipmentSystem / SkillSystem / StageProgressSystem 구조는 유지한다.
+
+## UI Panel Refinement (UI 패널 개선)
+
+Status: Implemented for Manual Validation (수동 검증용 구현 완료)
+
+Scope:
+
+- HUD / Panel / Battle Log readability (HUD / 패널 / 전투 로그 가독성) 개선
+- Current Stage / Region / Objective 표시
+- Owned Equipment (보유 장비)와 Equipped Equipment (장착 장비) 구분 표시
+- Skill / Combat / Reward / Reset 로그 태그 추가
+
+Preserved:
+
+- `data/*.json` 수정 없음
+- `src/systems/*` 수정 없음
+- 정식 이미지 / 애니메이션 / 이펙트 작업 없음
+- Korean Display Text Fix (한글 표시 문자열 수정)는 별도 작업 후보로 유지

@@ -231,3 +231,16 @@ Stage 9: MVP 1 최종 보스 난이도
 - `SkillRuntimeState (스킬 런타임 상태)`의 cooldown (쿨타임)은 저장하지 않는다. 새로고침 후 쿨타임은 0부터 시작한다.
 - UI는 현재 MVP용 텍스트 HUD이며, 최종 디자인/반응형 레이아웃은 아직 아니다.
 - 현재 `MVP Visual Readability Pass (MVP 화면 가독성 개선)`는 정식 아트 작업이 아니라 수동 검증을 위한 임시 레이아웃이다.
+
+## UI Panel Refinement Check (UI 패널 개선 확인)
+
+아래 항목을 추가로 확인한다.
+
+- Top Bar에서 Stage / Region / Objective가 보이는가?
+- Monster Type이 Normal / Leader / Boss 텍스트로 보이는가?
+- Player Panel에서 Lv, EXP, Next EXP, HP가 구분되는가?
+- ATK / DEF가 Base + Equip 구조로 보이는가?
+- Equipped Equipment와 Owned Equipment가 구분되는가?
+- Skill cooldown이 Ready / seconds / level requirement 형태로 보이는가?
+- Battle Log에 [Skill], [Combat], [Reward], [Clear], [Equip], [Reset] 같은 태그가 보여 흐름을 이해하기 쉬운가?
+- Stage 9 boss에서 HP reset이 발생하면 [Reset] 로그가 보이는가?

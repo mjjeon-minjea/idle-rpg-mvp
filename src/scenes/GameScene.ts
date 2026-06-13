@@ -14,7 +14,7 @@ import { SaveSystem } from "../systems/SaveSystem";
 import { SkillSystem } from "../systems/SkillSystem";
 import { StageProgressSystem } from "../systems/StageProgressSystem";
 import type { GameData, MonsterInstance, PlayerState, RewardItemData } from "../types/GameTypes";
-import { Hud } from "../ui/Hud";
+import { Hud, type OwnedEquipmentView } from "../ui/Hud";
 
 export class GameScene extends Phaser.Scene {
   private dataSet!: GameData;
@@ -99,7 +99,7 @@ export class GameScene extends Phaser.Scene {
     let defeatedBySkill = false;
 
     if (skillResult.triggered) {
-      this.pushLog(`스킬 발동: ${skillResult.skillName} / 피해 ${skillResult.damage}`);
+      this.pushLog(`[Skill] ${skillResult.skillId} dealt ${skillResult.damage} damage`);
 
       if (skillResult.defeated) {
         defeatedBySkill = true;
@@ -107,10 +107,15 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
+    const hpBeforeCombat = this.player.hp;
     const result = defeatedBySkill ? null : this.combatSystem.update(delta, this.player, effectiveStats, this.monster);
 
     if (result) {
-      this.pushLog(`기본 공격 피해 ${result.monsterDamage} / 몬스터 반격 피해 ${result.playerDamage}`);
+      this.pushLog(`[Combat] Basic ${result.monsterDamage} / Counter ${result.playerDamage}`);
+
+      if (result.playerDamage > 0 && hpBeforeCombat - result.playerDamage <= 0) {
+        this.pushLog("[Reset] Player HP reached 0 and auto-recovered");
+      }
 
       if (result.monsterDefeated) {
         this.handleMonsterDefeat();
@@ -132,6 +137,7 @@ export class GameScene extends Phaser.Scene {
       effectiveStats,
       this.equipmentSystem.getEquipmentBonus(),
       this.equipmentSystem.getEquippedItems(),
+      this.getOwnedEquipmentView(),
       this.skillSystem.getCooldownViews(this.player),
       this.monster,
       this.inventorySystem.list(),
@@ -141,10 +147,10 @@ export class GameScene extends Phaser.Scene {
 
   private handleMonsterDefeat(): void {
     const defeatedMonster = this.monster.data;
-    this.pushLog(`${defeatedMonster.name} 처치`);
+    this.pushLog(`[Defeat] ${defeatedMonster.id}`);
     const monsterReward = this.rewardResolver.resolveMonsterReward(defeatedMonster, this.stageSystem.getCurrentStage());
     const monsterRewardResult = this.rewardSystem.applyResolvedReward(monsterReward, this.player, this.inventorySystem);
-    this.pushLog(`처치 보상 EXP ${monsterReward.exp} / 골드 ${monsterReward.gold} / 아이템 ${monsterReward.items.length}개`);
+    this.pushLog(`[Reward] EXP ${monsterReward.exp} / Gold ${monsterReward.gold} / Items ${monsterReward.items.length}`);
     this.pushGrowthLog(monsterRewardResult.growth);
     this.autoEquipRewardItems(monsterRewardResult.reward.items);
 
@@ -152,7 +158,7 @@ export class GameScene extends Phaser.Scene {
     if (clearResult.cleared && clearResult.rewardId) {
       const rewardResult = this.rewardSystem.applyReward(clearResult.rewardId, this.player, this.inventorySystem);
       const reward = rewardResult.reward;
-      this.pushLog(`스테이지 클리어 보상 EXP ${reward.exp} / 골드 ${reward.gold}`);
+      this.pushLog(`[Clear] Stage reward EXP ${reward.exp} / Gold ${reward.gold}`);
       this.pushGrowthLog(rewardResult.growth);
       this.autoEquipRewardItems(reward.items);
     }
@@ -191,8 +197,8 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    this.pushLog(`레벨업! Lv ${growth.levelAfter} 달성`);
-    this.pushLog(`스탯 상승 HP +${growth.statGain.maxHp} / ATK +${growth.statGain.attack} / DEF +${growth.statGain.defense}`);
+    this.pushLog(`[Level Up] Lv ${growth.levelAfter}`);
+    this.pushLog(`[Stats] HP +${growth.statGain.maxHp} / ATK +${growth.statGain.attack} / DEF +${growth.statGain.defense}`);
   }
 
   private autoEquipRewardItems(items: RewardItemData[]): void {
@@ -202,8 +208,21 @@ export class GameScene extends Phaser.Scene {
         continue;
       }
 
-      const replaced = result.replacedItemId ? ` / 교체 장비: ${result.replacedItemId}` : "";
-      this.pushLog(`장비 장착: ${result.equippedItemId}${replaced}`);
+      const replaced = result.replacedItemId ? ` / Replaced ${result.replacedItemId}` : "";
+      this.pushLog(`[Equip] ${result.equippedItemId}${replaced}`);
     }
+  }
+
+  private getOwnedEquipmentView(): OwnedEquipmentView[] {
+    const quantityByItemId = new Map(this.inventorySystem.list().map((entry) => [entry.itemId, entry.quantity]));
+
+    return this.dataSet.items
+      .filter((item) => item.type === "equipment" && quantityByItemId.has(item.id))
+      .map((item) => ({
+        itemId: item.id,
+        name: item.name,
+        quantity: quantityByItemId.get(item.id) ?? 0,
+        slot: item.equipment?.slot ?? "unknown",
+      }));
   }
 }

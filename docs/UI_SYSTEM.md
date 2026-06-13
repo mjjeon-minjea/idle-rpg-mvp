@@ -105,3 +105,21 @@ If level requirement is not met (레벨 조건을 만족하지 못하면):
 - Player / Monster placeholders (플레이어 / 몬스터 임시 표시)
 
 사용자에게 보이는 UI 문구와 전투 로그는 자연스러운 한국어를 사용한다. 코드 식별자, 파일명, 타입명은 영어를 유지한다.
+
+## UI Panel Refinement (UI 패널 개선)
+
+이번 개선은 정식 이미지 / 애니메이션 / 이펙트 작업이 아니라 Manual Validation (수동 검증)을 위한 HUD 정보 구조 개선이다.
+
+추가/개선된 표시 정보:
+
+- Current Stage / Region / Objective (현재 스테이지 / 지역 / 목표)
+- Monster Type (몬스터 타입): Normal / Leader / Boss
+- Player Level / EXP / Next EXP (플레이어 레벨 / 경험치 / 다음 레벨까지 경험치)
+- Player HP with base/equipment split (기본 체력과 장비 체력 구분)
+- Effective ATK / DEF with base/equipment split (최종 공격력/방어력과 기본/장비 구분)
+- Equipped Equipment (장착 장비)
+- Owned Equipment summary (보유 장비 요약)
+- Skill Cooldown status (스킬 쿨타임 상태)
+- Battle Log category tags (전투 로그 분류 태그)
+
+Death / Reset log (사망 / 회복 로그)는 CombatSystem 구조를 바꾸지 않고, 전투 전 HP와 받은 피해량을 비교하는 방식으로 GameScene에서 표시한다.

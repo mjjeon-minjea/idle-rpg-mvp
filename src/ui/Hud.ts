@@ -26,6 +26,13 @@ interface PanelBounds {
   height: number;
 }
 
+export interface OwnedEquipmentView {
+  itemId: string;
+  name: string;
+  quantity: number;
+  slot: string;
+}
+
 export class Hud {
   private readonly graphics: Phaser.GameObjects.Graphics;
   private readonly stageText: Phaser.GameObjects.Text;
@@ -33,7 +40,9 @@ export class Hud {
   private readonly playerHpText: Phaser.GameObjects.Text;
   private readonly monsterText: Phaser.GameObjects.Text;
   private readonly monsterHpText: Phaser.GameObjects.Text;
-  private readonly bottomText: Phaser.GameObjects.Text;
+  private readonly skillText: Phaser.GameObjects.Text;
+  private readonly equipmentText: Phaser.GameObjects.Text;
+  private readonly inventoryText: Phaser.GameObjects.Text;
   private readonly logText: Phaser.GameObjects.Text;
   private readonly monsterLabelText: Phaser.GameObjects.Text;
 
@@ -43,13 +52,15 @@ export class Hud {
     scene.add.text(32, 18, title, this.textStyle("#f4f0df", "22px", 820));
     scene.add.text(32, 52, subtitle, this.textStyle("#aeb7c7", "14px", 820));
 
-    this.stageText = scene.add.text(34, 82, "", this.textStyle("#9bd0ff", "16px", 1180));
-    this.playerText = scene.add.text(48, 134, "", this.textStyle("#f4f0df", "16px", 245));
-    this.playerHpText = scene.add.text(48, 258, "", this.textStyle("#e3e8f2", "14px", 245));
-    this.monsterText = scene.add.text(360, 352, "", this.textStyle("#ffd1a3", "16px", 480));
-    this.monsterHpText = scene.add.text(588, 300, "", this.textStyle("#e3e8f2", "14px", 250));
-    this.bottomText = scene.add.text(48, 546, "", this.textStyle("#d9f6dd", "15px", 1168));
-    this.logText = scene.add.text(928, 142, "", this.textStyle("#e3e8f2", "15px", 300));
+    this.stageText = scene.add.text(34, 80, "", this.textStyle("#9bd0ff", "15px", 1180));
+    this.playerText = scene.add.text(48, 144, "", this.textStyle("#f4f0df", "15px", 245));
+    this.playerHpText = scene.add.text(48, 286, "", this.textStyle("#e3e8f2", "14px", 245));
+    this.monsterText = scene.add.text(360, 354, "", this.textStyle("#ffd1a3", "15px", 480));
+    this.monsterHpText = scene.add.text(588, 306, "", this.textStyle("#e3e8f2", "14px", 250));
+    this.skillText = scene.add.text(48, 546, "", this.textStyle("#d9f6dd", "14px", 350));
+    this.equipmentText = scene.add.text(430, 546, "", this.textStyle("#f8e7b0", "14px", 360));
+    this.inventoryText = scene.add.text(820, 546, "", this.textStyle("#d7e4ff", "14px", 395));
+    this.logText = scene.add.text(928, 142, "", this.textStyle("#e3e8f2", "14px", 300));
     scene.add.text(420, 302, "수습기사", this.textStyle("#cfe8ff", "15px", 160));
     this.monsterLabelText = scene.add.text(710, 302, "", this.textStyle("#ffe1b8", "15px", 200));
   }
@@ -63,51 +74,60 @@ export class Hud {
     effectiveStats: EffectivePlayerStats,
     equipmentBonus: EquipmentStatBonus,
     equippedItems: EquippedItemView[],
+    ownedEquipment: OwnedEquipmentView[],
     skillCooldowns: SkillCooldownView[],
     monster: MonsterInstance,
     inventory: InventoryEntry[],
   ): void {
     this.drawLayout(player, effectiveStats, monster);
 
+    const nextExp = Math.max(0, requiredExp - player.exp);
     this.stageText.setText(
       [
-        `Stage ${stage.order}: ${stage.name}`,
-        `진행 ${Math.min(normalKills, stage.requiredNormalKills)} / ${stage.requiredNormalKills} 처치`,
-        `전투 단계: ${this.getEncounterLabel(encounterType)}`,
-      ].join("   |   "),
+        `Stage ${stage.order}/9: ${stage.id} | Region: ${this.getRegionLabel(stage.id)} | Encounter: ${this.getEncounterLabel(encounterType)}`,
+        `Objective: ${this.getObjectiveText(stage, normalKills, encounterType)}`,
+      ].join("\n"),
     );
 
     this.playerText.setText([
       "Player (플레이어)",
       `Lv ${player.level}`,
-      `ATK ${effectiveStats.attack} (기본 ${player.attack} + 장비 ${equipmentBonus.attack})`,
-      `DEF ${effectiveStats.defense} (기본 ${player.defense} + 장비 ${equipmentBonus.defense})`,
       `EXP ${player.exp} / ${requiredExp}`,
-      `누적 EXP ${player.totalExp}`,
-      `골드 ${player.gold}`,
+      `Next EXP ${nextExp}`,
+      `Total EXP ${player.totalExp}`,
+      `Gold ${player.gold}`,
+      `ATK ${effectiveStats.attack} (Base ${player.attack} + Equip ${equipmentBonus.attack})`,
+      `DEF ${effectiveStats.defense} (Base ${player.defense} + Equip ${equipmentBonus.defense})`,
     ]);
 
-    this.playerHpText.setText(`HP ${player.hp} / ${effectiveStats.maxHp}`);
+    this.playerHpText.setText(`HP ${player.hp} / ${effectiveStats.maxHp} (Base ${player.maxHp} + Equip ${equipmentBonus.maxHp})`);
 
     this.monsterText.setText([
       "Target (대상)",
       `${monster.data.name}`,
-      `역할: ${this.getEncounterLabel(monster.data.role)}`,
-      `상태: ${this.getMonsterStateLabel(monster.currentState)}`,
+      `Type: ${this.getEncounterLabel(monster.data.role)}`,
+      `State: ${this.getMonsterStateLabel(monster.currentState)}`,
       `ATK ${monster.data.attack} / DEF ${monster.data.defense}`,
     ]);
 
     this.monsterHpText.setText(`HP ${monster.currentHp} / ${monster.data.maxHp}`);
     this.monsterLabelText.setText(monster.data.name);
 
-    this.bottomText.setText([
+    this.skillText.setText([
       "Skills (스킬)",
       ...this.createSkillLines(player, skillCooldowns),
-      "",
-      "Equipment (장비)",
+    ]);
+
+    this.equipmentText.setText([
+      "Equipped (장착)",
       ...equippedItems.map((item) => `${this.getSlotLabel(item.slot)}: ${item.name}`),
-      `장비 보너스: HP +${equipmentBonus.maxHp} / ATK +${equipmentBonus.attack} / DEF +${equipmentBonus.defense}`,
+      `Bonus: HP +${equipmentBonus.maxHp} / ATK +${equipmentBonus.attack} / DEF +${equipmentBonus.defense}`,
       "",
+      "Owned Equipment (보유 장비)",
+      ...this.createOwnedEquipmentLines(ownedEquipment),
+    ]);
+
+    this.inventoryText.setText([
       "Inventory (인벤토리)",
       this.createInventorySummary(inventory),
     ]);
@@ -119,16 +139,16 @@ export class Hud {
 
   private drawLayout(player: PlayerState, effectiveStats: EffectivePlayerStats, monster: MonsterInstance): void {
     this.graphics.clear();
-    this.drawPanel({ x: 24, y: 72, width: 1232, height: 34 });
-    this.drawPanel({ x: 24, y: 118, width: 280, height: 386 });
-    this.drawPanel({ x: 328, y: 118, width: 552, height: 386 });
-    this.drawPanel({ x: 904, y: 118, width: 352, height: 386 });
+    this.drawPanel({ x: 24, y: 72, width: 1232, height: 52 });
+    this.drawPanel({ x: 24, y: 136, width: 280, height: 374 });
+    this.drawPanel({ x: 328, y: 136, width: 552, height: 374 });
+    this.drawPanel({ x: 904, y: 136, width: 352, height: 374 });
     this.drawPanel({ x: 24, y: 526, width: 1232, height: 170 });
 
     this.drawPlayerPlaceholder();
     this.drawMonsterPlaceholder(monster.data.role);
-    this.drawHpBar(48, 288, 230, 18, player.hp, effectiveStats.maxHp);
-    this.drawHpBar(588, 330, 250, 18, monster.currentHp, monster.data.maxHp);
+    this.drawHpBar(48, 316, 230, 18, player.hp, effectiveStats.maxHp);
+    this.drawHpBar(588, 336, 250, 18, monster.currentHp, monster.data.maxHp);
   }
 
   private drawPanel(bounds: PanelBounds): void {
@@ -215,10 +235,38 @@ export class Hud {
     }
 
     if (skill.ready) {
-      return "준비됨";
+      return "Ready (준비됨)";
     }
 
     return `${(skill.cooldownRemainingMs / 1000).toFixed(1)}s`;
+  }
+
+  private getRegionLabel(stageId: string): string {
+    if (stageId.startsWith("dawn_forest")) {
+      return "Dawn Forest (새벽 숲)";
+    }
+
+    if (stageId.startsWith("mist_gate")) {
+      return "Mist Gate (안개 관문)";
+    }
+
+    if (stageId.startsWith("old_mine")) {
+      return "Old Mine (오래된 광산)";
+    }
+
+    return "Unknown (미확인)";
+  }
+
+  private getObjectiveText(stage: StageData, normalKills: number, encounterType: StageEncounterType): string {
+    if (encounterType === "normal") {
+      return `Defeat normal monsters ${Math.min(normalKills, stage.requiredNormalKills)} / ${stage.requiredNormalKills}`;
+    }
+
+    if (encounterType === "leader") {
+      return stage.bossMonsterId ? "Defeat leader, then boss appears" : "Defeat leader to clear stage";
+    }
+
+    return "Defeat boss to clear stage";
   }
 
   private getMonsterVisual(role: MonsterRole): { color: number; strokeColor: number; radius: number } {
@@ -235,19 +283,29 @@ export class Hud {
 
   private createSkillLines(player: PlayerState, skillCooldowns: SkillCooldownView[]): string[] {
     if (skillCooldowns.length === 0) {
-      return ["- 비어 있음"];
+      return ["- Empty (없음)"];
     }
 
     return skillCooldowns.map((skill) => `- ${skill.skillName}: ${this.getSkillStatus(player, skill)}`);
   }
 
+  private createOwnedEquipmentLines(ownedEquipment: OwnedEquipmentView[]): string[] {
+    if (ownedEquipment.length === 0) {
+      return ["- Empty (없음)"];
+    }
+
+    return ownedEquipment
+      .slice(0, 3)
+      .map((item) => `- ${this.getSlotLabel(item.slot)}: ${item.itemId} x${item.quantity}`);
+  }
+
   private createInventorySummary(inventory: InventoryEntry[]): string {
     if (inventory.length === 0) {
-      return "비어 있음";
+      return "Empty (없음)";
     }
 
     const visibleItems = inventory.slice(0, 6).map((entry) => `${entry.itemId} x${entry.quantity}`);
     const hiddenCount = inventory.length - visibleItems.length;
-    return hiddenCount > 0 ? `${visibleItems.join(" / ")} / 외 ${hiddenCount}개` : visibleItems.join(" / ");
+    return hiddenCount > 0 ? `${visibleItems.join(" / ")} / +${hiddenCount} more` : visibleItems.join(" / ");
   }
 }
