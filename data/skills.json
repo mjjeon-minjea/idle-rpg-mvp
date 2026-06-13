@@ -1,0 +1,30 @@
+{
+  "defaultState": {
+    "unlockedSkillIds": ["trainee_slash"],
+    "equippedSkillIds": ["trainee_slash", "heavy_training_strike"]
+  },
+  "skills": [
+    {
+      "id": "trainee_slash",
+      "name": "수습 베기",
+      "description": "수습기사의 기본 자동 공격 스킬",
+      "trigger": "auto",
+      "target": "currentMonster",
+      "cooldownMs": 2500,
+      "damageMultiplier": 1.5,
+      "flatDamage": 2,
+      "requiredLevel": 1
+    },
+    {
+      "id": "heavy_training_strike",
+      "name": "묵직한 수련 일격",
+      "description": "느리지만 강한 단일 대상 공격 스킬",
+      "trigger": "auto",
+      "target": "currentMonster",
+      "cooldownMs": 6000,
+      "damageMultiplier": 2.4,
+      "flatDamage": 5,
+      "requiredLevel": 3
+    }
+  ]
+}

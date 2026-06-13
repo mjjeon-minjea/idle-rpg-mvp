@@ -5,6 +5,7 @@ import type {
   InventoryEntry,
   MonsterInstance,
   PlayerState,
+  SkillCooldownView,
   StageData,
   StageEncounterType,
 } from "../types/GameTypes";
@@ -45,6 +46,7 @@ export class Hud {
     effectiveStats: EffectivePlayerStats,
     equipmentBonus: EquipmentStatBonus,
     equippedItems: EquippedItemView[],
+    skillCooldowns: SkillCooldownView[],
     monster: MonsterInstance,
     inventory: InventoryEntry[],
   ): void {
@@ -75,7 +77,14 @@ export class Hud {
       ? inventory.map((entry) => `${entry.itemId} x${entry.quantity}`)
       : ["비어 있음"];
     const equipmentLines = equippedItems.map((item) => `${this.getSlotLabel(item.slot)}: ${item.name}`);
+    const skillLines = skillCooldowns.length > 0
+      ? skillCooldowns.map((skill) => `${skill.skillName}: ${this.getSkillStatus(player, skill)}`)
+      : ["비어 있음"];
+
     this.inventoryText.setText([
+      "스킬",
+      ...skillLines,
+      "",
       "장비",
       ...equipmentLines,
       `Bonus HP +${equipmentBonus.maxHp} / ATK +${equipmentBonus.attack} / DEF +${equipmentBonus.defense}`,
@@ -106,5 +115,17 @@ export class Hud {
     };
 
     return labels[slot] ?? slot;
+  }
+
+  private getSkillStatus(player: PlayerState, skill: SkillCooldownView): string {
+    if (player.level < skill.requiredLevel || !skill.unlocked) {
+      return `Lv ${skill.requiredLevel} 필요`;
+    }
+
+    if (skill.ready) {
+      return "준비됨";
+    }
+
+    return `${(skill.cooldownRemainingMs / 1000).toFixed(1)}s`;
   }
 }

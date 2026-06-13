@@ -46,9 +46,11 @@ finalDropRate = clamp(finalDropRate, 0, 1);
 
 - `dropRateBonus` applies only to item drop rate.
 - `CombatSystem (전투 시스템)` must not grant rewards.
+- `SkillSystem (스킬 시스템)` must not grant rewards.
 - `RewardSystem (보상 적용 시스템)` remains the reward application entry point.
 - `PlayerGrowthSystem (플레이어 성장 시스템)` owns exp accumulation, level up, required exp, and stat growth.
 - `MonsterData (몬스터 정적 데이터)` uses `baseExp` and `baseGold`.
 - `rewardMultiplier` is not used.
 - `clearRewardMultiplier` is reserved only for stage clear rewards if needed.
 - Equipment item drops (장비 아이템 드랍) still use the same `DropResolver -> RewardResolver -> RewardSystem -> InventorySystem` flow.
+- Skill defeats (스킬 처치) reuse the same `handleMonsterDefeat -> RewardResolver -> RewardSystem` flow, so rewards are applied once.

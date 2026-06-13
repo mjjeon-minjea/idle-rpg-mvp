@@ -85,6 +85,7 @@ Rules (규칙):
 - `RewardResolver (보상 계산기)`는 보상을 계산만 한다.
 - `RewardSystem (보상 적용 시스템)`은 보상 적용 진입점이다.
 - `PlayerGrowthSystem (플레이어 성장 시스템)`은 경험치/레벨/스탯 성장만 담당한다.
+- `SkillSystem (스킬 시스템)`은 스킬 발동으로 `PlayerState (플레이어 상태)`의 기본 스탯을 직접 변경하지 않는다.
 
 ## Save Fallback (저장 데이터 fallback)
 

@@ -20,6 +20,7 @@ Last updated: 2026-06-13
 - Reward System (보상 적용)
 - Player Growth System (플레이어 성장)
 - Equipment System (장비 시스템)
+- Skill System (스킬 시스템)
 - Inventory quantity storage (인벤토리 수량 저장)
 - localStorage save/load (로컬 저장/불러오기)
 - HUD display (HUD 표시)
@@ -29,6 +30,7 @@ Last updated: 2026-06-13
 - Boss flow (보스 흐름): 스테이지 흐름은 있으나 보스 전용 패턴은 없음
 - Item drops (아이템 드랍): 기본 드랍과 고정 스탯 장비 드랍은 있으나 랜덤 옵션 장비는 없음
 - Stage clear rewards (스테이지 클리어 보상): 기본 적용만 있음
+- Skill system (스킬 시스템): 자동 발동 단일 대상 공격 스킬과 쿨타임은 구현됐으나 스킬 강화/트리/이펙트는 없음
 
 ## Documented / Designed (문서화/설계됨)
 
@@ -41,7 +43,6 @@ Last updated: 2026-06-13
 
 ## Not Started (미시작)
 
-- SkillSystem (스킬 시스템)
 - RebirthSystem (환생 시스템)
 - JobSystem (전직 시스템)
 

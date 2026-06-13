@@ -106,6 +106,8 @@ combatSystem.update(delta, player, effectivePlayerStats, monster);
 
 `PlayerState.hp`는 실제 현재 체력으로 유지하고, damage calculation (피해 계산)에는 장비 보너스가 포함된 attack/defense를 사용한다.
 
+`SkillSystem (스킬 시스템)`도 skill damage calculation (스킬 피해 계산)에 같은 `EffectivePlayerStats (최종 플레이어 스탯)`를 사용한다. 장비 장착/해제는 스킬 발동 시에도 `player.attack`, `player.defense`, `player.maxHp`에 직접 누적되지 않는다.
+
 ## Save Fallback (저장 fallback)
 
 기존 저장 데이터에는 `equipment`가 없을 수 있다.

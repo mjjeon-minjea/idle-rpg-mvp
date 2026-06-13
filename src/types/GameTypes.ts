@@ -2,6 +2,8 @@ export type MonsterRole = "normal" | "leader" | "boss";
 export type MonsterRuntimeState = "spawning" | "idle" | "attacking" | "stunned" | "dead";
 export type StageEncounterType = "normal" | "leader" | "boss";
 export type EquipmentSlot = "weapon" | "armor" | "accessory";
+export type SkillTrigger = "auto";
+export type SkillTarget = "currentMonster";
 
 export interface GameConfigData {
   title: string;
@@ -89,6 +91,32 @@ export interface EquipmentStatBonus {
   defense: number;
 }
 
+export interface SkillData {
+  id: string;
+  name: string;
+  description: string;
+  trigger: SkillTrigger;
+  target: SkillTarget;
+  cooldownMs: number;
+  damageMultiplier: number;
+  flatDamage: number;
+  requiredLevel: number;
+}
+
+export interface SkillState {
+  unlockedSkillIds: string[];
+  equippedSkillIds: string[];
+}
+
+export interface SkillRuntimeState {
+  cooldownRemainingBySkillId: Record<string, number>;
+}
+
+export interface SkillConfigData {
+  defaultState: SkillState;
+  skills: SkillData[];
+}
+
 export interface GameData {
   config: GameConfigData;
   stages: StageData[];
@@ -97,6 +125,8 @@ export interface GameData {
   dropTables: DropTableData[];
   rewards: RewardData[];
   items: ItemData[];
+  skills: SkillData[];
+  defaultSkillState: SkillState;
 }
 
 export interface PlayerState {
@@ -181,6 +211,7 @@ export interface SaveData {
   player: PlayerState;
   inventory: InventoryEntry[];
   equipment?: EquipmentState;
+  skills?: SkillState;
   stage: StageState;
 }
 
@@ -195,4 +226,22 @@ export interface MonsterDefeatedResult {
   monsterRole: MonsterRole;
   playerDamage: number;
   monsterDamage: number;
+}
+
+export interface SkillResult {
+  triggered: boolean;
+  skillId?: string;
+  skillName?: string;
+  damage?: number;
+  defeated: boolean;
+  reason?: string;
+}
+
+export interface SkillCooldownView {
+  skillId: string;
+  skillName: string;
+  ready: boolean;
+  cooldownRemainingMs: number;
+  requiredLevel: number;
+  unlocked: boolean;
 }

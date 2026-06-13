@@ -11,6 +11,7 @@ import { RandomService } from "../systems/RandomService";
 import { RewardResolver } from "../systems/RewardResolver";
 import { RewardSystem } from "../systems/RewardSystem";
 import { SaveSystem } from "../systems/SaveSystem";
+import { SkillSystem } from "../systems/SkillSystem";
 import { StageProgressSystem } from "../systems/StageProgressSystem";
 import type { GameData, MonsterInstance, PlayerState, RewardItemData } from "../types/GameTypes";
 import { Hud } from "../ui/Hud";
@@ -28,6 +29,7 @@ export class GameScene extends Phaser.Scene {
   private rewardResolver!: RewardResolver;
   private rewardSystem!: RewardSystem;
   private saveSystem!: SaveSystem;
+  private skillSystem!: SkillSystem;
   private stageSystem!: StageProgressSystem;
   private hud!: Hud;
   private logLines: string[] = [];
@@ -47,6 +49,7 @@ export class GameScene extends Phaser.Scene {
 
     this.inventorySystem = new InventorySystem(saved?.inventory);
     this.equipmentSystem = new EquipmentSystem(this.dataSet.items, saved?.equipment ?? { equipped: {} });
+    this.skillSystem = new SkillSystem(this.dataSet.skills, saved?.skills ?? this.dataSet.defaultSkillState);
     this.stageSystem = new StageProgressSystem(this.dataSet.stages, saved?.stage);
     const randomService = new RandomService();
     this.combatSystem = new CombatSystem();
@@ -93,7 +96,19 @@ export class GameScene extends Phaser.Scene {
 
   update(_time: number, delta: number): void {
     const effectiveStats = this.equipmentSystem.calculateEffectiveStats(this.player);
-    const result = this.combatSystem.update(delta, this.player, effectiveStats, this.monster);
+    const skillResult = this.skillSystem.update(delta, this.player, effectiveStats, this.monster);
+    let defeatedBySkill = false;
+
+    if (skillResult.triggered) {
+      this.pushLog(`스킬 발동: ${skillResult.skillName} ${skillResult.damage} 피해`);
+
+      if (skillResult.defeated) {
+        defeatedBySkill = true;
+        this.handleMonsterDefeat();
+      }
+    }
+
+    const result = defeatedBySkill ? null : this.combatSystem.update(delta, this.player, effectiveStats, this.monster);
 
     if (result) {
       this.pushLog(`피해: ${result.monsterDamage} / 반격: ${result.playerDamage}`);
@@ -118,6 +133,7 @@ export class GameScene extends Phaser.Scene {
       effectiveStats,
       this.equipmentSystem.getEquipmentBonus(),
       this.equipmentSystem.getEquippedItems(),
+      this.skillSystem.getCooldownViews(this.player),
       this.monster,
       this.inventorySystem.list(),
     );
@@ -159,6 +175,7 @@ export class GameScene extends Phaser.Scene {
       player: this.player,
       inventory: this.inventorySystem.list(),
       equipment: this.equipmentSystem.toState(),
+      skills: this.skillSystem.toState(),
       stage: this.stageSystem.toState(),
     });
   }

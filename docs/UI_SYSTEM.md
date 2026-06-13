@@ -13,6 +13,7 @@
 - Current exp / required exp / total exp (현재 경험치 / 필요 경험치 / 누적 경험치)
 - Effective stats and equipment bonus (최종 스탯과 장비 보너스)
 - Equipped items by slot (슬롯별 장착 장비)
+- Skill cooldowns and level requirements (스킬 쿨타임과 레벨 조건)
 - Monster stats (몬스터 스탯)
 - Inventory entries (인벤토리 목록)
 - Combat log (전투 로그)
@@ -24,3 +25,19 @@
 - Electron console integration (Electron 콘솔 연동)은 아직 없다.
 
 UI 문구는 한국어를 사용할 수 있다. 코드 식별자와 주석은 영어를 유지한다.
+
+## Skill Display (스킬 표시)
+
+MVP 1 uses simple text display (1차 MVP는 간단한 텍스트 표시를 사용한다).
+
+```text
+스킬
+수습 베기: 준비됨
+묵직한 수련 일격: 3.2s
+```
+
+If level requirement is not met (레벨 조건을 만족하지 못하면):
+
+```text
+묵직한 수련 일격: Lv 3 필요
+```

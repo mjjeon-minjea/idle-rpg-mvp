@@ -4,6 +4,7 @@ import items from "../../data/items.json";
 import monsterPools from "../../data/monsterPools.json";
 import monsters from "../../data/monsters.json";
 import rewards from "../../data/rewards.json";
+import skills from "../../data/skills.json";
 import stages from "../../data/stages.json";
 import type {
   DropTableData,
@@ -13,6 +14,9 @@ import type {
   MonsterData,
   MonsterPoolData,
   RewardData,
+  SkillConfigData,
+  SkillData,
+  SkillState,
   StageData,
 } from "../types/GameTypes";
 
@@ -28,6 +32,8 @@ export class DataLoader {
       dropTables: dropTables as DropTableData[],
       rewards: rewards as RewardData[],
       items: items as ItemData[],
+      skills: (skills as SkillConfigData).skills,
+      defaultSkillState: (skills as SkillConfigData).defaultState,
     };
 
     this.validate(data);
@@ -40,6 +46,7 @@ export class DataLoader {
     const monsterPoolIds = this.createIdSet(data.monsterPools, "monster pool");
     const dropTableIds = this.createIdSet(data.dropTables, "drop table");
     const rewardIds = this.createIdSet(data.rewards, "reward");
+    const skillIds = this.createIdSet(data.skills, "skill");
     const monstersById = new Map(data.monsters.map((monster) => [monster.id, monster]));
 
     for (const item of data.items) {
@@ -141,6 +148,65 @@ export class DataLoader {
       if (stage.expMultiplier < 0 || stage.goldMultiplier < 0 || stage.dropRateBonus < 0) {
         throw new Error(`Stage "${stage.id}" has invalid reward multiplier values.`);
       }
+    }
+
+    this.validateSkills(data.skills, skillIds);
+    this.validateSkillState(data.defaultSkillState, skillIds, "defaultSkillState");
+  }
+
+  private static validateSkills(skills: SkillData[], skillIds: Set<string>): void {
+    for (const skill of skills) {
+      if (!skillIds.has(skill.id)) {
+        throw new Error(`Skill "${skill.id}" is not registered correctly.`);
+      }
+
+      if (skill.trigger !== "auto") {
+        throw new Error(`Skill "${skill.id}" has unsupported trigger "${skill.trigger}".`);
+      }
+
+      if (skill.target !== "currentMonster") {
+        throw new Error(`Skill "${skill.id}" has unsupported target "${skill.target}".`);
+      }
+
+      if (skill.cooldownMs <= 0) {
+        throw new Error(`Skill "${skill.id}" cooldownMs must be greater than 0.`);
+      }
+
+      if (skill.damageMultiplier < 0) {
+        throw new Error(`Skill "${skill.id}" damageMultiplier must not be negative.`);
+      }
+
+      if (skill.flatDamage < 0) {
+        throw new Error(`Skill "${skill.id}" flatDamage must not be negative.`);
+      }
+
+      if (skill.requiredLevel < 1) {
+        throw new Error(`Skill "${skill.id}" requiredLevel must be at least 1.`);
+      }
+    }
+  }
+
+  private static validateSkillState(state: SkillState, skillIds: Set<string>, label: string): void {
+    this.validateSkillIdList(state.unlockedSkillIds, skillIds, `${label}.unlockedSkillIds`);
+    this.validateSkillIdList(state.equippedSkillIds, skillIds, `${label}.equippedSkillIds`);
+
+    if (state.equippedSkillIds.length > 2) {
+      throw new Error(`${label}.equippedSkillIds must include at most 2 skills.`);
+    }
+  }
+
+  private static validateSkillIdList(skillIdsToValidate: string[], skillIds: Set<string>, label: string): void {
+    const seen = new Set<string>();
+    for (const skillId of skillIdsToValidate) {
+      if (!skillIds.has(skillId)) {
+        throw new Error(`${label} references missing skillId "${skillId}".`);
+      }
+
+      if (seen.has(skillId)) {
+        throw new Error(`${label} includes duplicate skillId "${skillId}".`);
+      }
+
+      seen.add(skillId);
     }
   }
 

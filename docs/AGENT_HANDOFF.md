@@ -1,6 +1,6 @@
 # Agent Handoff (새 Codex 세션 인수인계)
 
-Last updated: 2026-06-13 09:29:32
+Last updated: 2026-06-13 10:11:52
 
 이 문서는 새 Codex 대화에서 현재 프로젝트 상태를 이어받기 위한 기준 문서입니다.
 
@@ -43,6 +43,7 @@ src/
 │  ├─ RewardResolver.ts
 │  ├─ RewardSystem.ts
 │  ├─ SaveSystem.ts
+│  ├─ SkillSystem.ts
 │  └─ StageProgressSystem.ts
 ├─ types/
 │  └─ GameTypes.ts
@@ -68,6 +69,7 @@ StageData (스테이지 데이터)
 -> PlayerGrowthSystem (플레이어 성장 시스템)
 -> InventorySystem (인벤토리 시스템)
 -> EquipmentSystem (장비 시스템)
+-> SkillSystem (스킬 시스템)
 ```
 
 Combat flow (전투 흐름):
@@ -76,6 +78,7 @@ Combat flow (전투 흐름):
 PlayerState (기본 성장 스탯)
 -> EquipmentSystem.calculateEffectiveStats (최종 스탯 계산)
 -> EffectivePlayerStats (전투용 최종 스탯)
+-> SkillSystem.update (자동 스킬 추가 공격)
 -> CombatSystem.update (전투 계산)
 ```
 
@@ -90,6 +93,7 @@ Implemented (구현됨)
 - Kill reward resolution (처치 보상 계산)
 - Player growth (플레이어 성장)
 - Equipment slots and effective stats (장비 슬롯과 최종 스탯)
+- Auto skill trigger and cooldown (자동 스킬 발동과 쿨타임)
 - Stage clear rewards (스테이지 클리어 보상)
 - Inventory quantity storage (인벤토리 수량 저장)
 - Local save/load (로컬 저장/불러오기)
@@ -102,17 +106,20 @@ Recently implemented (최근 구현)
 - MVP equipment items (MVP 장비 아이템) 3종
 - Equipment data validation (장비 데이터 검증)
 - Hud equipment display (장비 표시)
+- SkillSystem (스킬 시스템)
+- SkillData (스킬 정적 데이터) 2종
+- SkillState (스킬 상태) 저장 fallback
+- Hud skill cooldown display (스킬 쿨타임 표시)
 
 Current Git note (Git 메모)
 
-- Last pushed commit: `8295c64 Add player growth system`
-- EquipmentSystem changes were implemented after that commit and should be committed as `Add equipment system` if not already pushed.
+- Last pushed commit before SkillSystem work: `2a4b63f Add equipment system`
+- SkillSystem changes may be uncommitted unless a later walkthrough or git log says otherwise.
 - Ignored generated folders/files include `dist/`, `node_modules/`, and dev-server logs.
 - There is an unrelated untracked note file under `files/` named like `EquipmentSystem (...) 구현 플랜.txt`; do not modify/delete it unless the user asks.
 
 Not started (미시작)
 
-- SkillSystem (스킬 시스템)
 - RebirthSystem (환생 시스템)
 - JobSystem (전직 시스템)
 
