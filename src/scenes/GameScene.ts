@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import { DataLoader } from "../loaders/DataLoader";
 import { CombatSystem } from "../systems/CombatSystem";
 import { DropResolver } from "../systems/DropResolver";
+import { EquipmentSystem } from "../systems/EquipmentSystem";
 import { InventorySystem } from "../systems/InventorySystem";
 import { MonsterFactory } from "../systems/MonsterFactory";
 import { MonsterPoolSystem } from "../systems/MonsterPoolSystem";
@@ -11,7 +12,7 @@ import { RewardResolver } from "../systems/RewardResolver";
 import { RewardSystem } from "../systems/RewardSystem";
 import { SaveSystem } from "../systems/SaveSystem";
 import { StageProgressSystem } from "../systems/StageProgressSystem";
-import type { GameData, MonsterInstance, PlayerState } from "../types/GameTypes";
+import type { GameData, MonsterInstance, PlayerState, RewardItemData } from "../types/GameTypes";
 import { Hud } from "../ui/Hud";
 
 export class GameScene extends Phaser.Scene {
@@ -22,6 +23,7 @@ export class GameScene extends Phaser.Scene {
   private monsterFactory!: MonsterFactory;
   private monsterPoolSystem!: MonsterPoolSystem;
   private inventorySystem!: InventorySystem;
+  private equipmentSystem!: EquipmentSystem;
   private growthSystem!: PlayerGrowthSystem;
   private rewardResolver!: RewardResolver;
   private rewardSystem!: RewardSystem;
@@ -44,6 +46,7 @@ export class GameScene extends Phaser.Scene {
     this.player = this.normalizePlayerState(saved?.player);
 
     this.inventorySystem = new InventorySystem(saved?.inventory);
+    this.equipmentSystem = new EquipmentSystem(this.dataSet.items, saved?.equipment ?? { equipped: {} });
     this.stageSystem = new StageProgressSystem(this.dataSet.stages, saved?.stage);
     const randomService = new RandomService();
     this.combatSystem = new CombatSystem();
@@ -89,7 +92,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(_time: number, delta: number): void {
-    const result = this.combatSystem.update(delta, this.player, this.monster);
+    const effectiveStats = this.equipmentSystem.calculateEffectiveStats(this.player);
+    const result = this.combatSystem.update(delta, this.player, effectiveStats, this.monster);
 
     if (result) {
       this.pushLog(`피해: ${result.monsterDamage} / 반격: ${result.playerDamage}`);
@@ -111,6 +115,9 @@ export class GameScene extends Phaser.Scene {
       this.stageSystem.getEncounterType(),
       this.player,
       this.growthSystem.getRequiredExp(this.player.level),
+      effectiveStats,
+      this.equipmentSystem.getEquipmentBonus(),
+      this.equipmentSystem.getEquippedItems(),
       this.monster,
       this.inventorySystem.list(),
     );
@@ -124,6 +131,7 @@ export class GameScene extends Phaser.Scene {
     const monsterRewardResult = this.rewardSystem.applyResolvedReward(monsterReward, this.player, this.inventorySystem);
     this.pushLog(`처치 보상 EXP ${monsterReward.exp}, Gold ${monsterReward.gold}, Items ${monsterReward.items.length}`);
     this.pushGrowthLog(monsterRewardResult.growth);
+    this.autoEquipRewardItems(monsterRewardResult.reward.items);
 
     const clearResult = this.stageSystem.recordMonsterDefeat(defeatedMonster);
     if (clearResult.cleared && clearResult.rewardId) {
@@ -131,6 +139,7 @@ export class GameScene extends Phaser.Scene {
       const reward = rewardResult.reward;
       this.pushLog(`스테이지 클리어 보상 EXP ${reward.exp}, Gold ${reward.gold}`);
       this.pushGrowthLog(rewardResult.growth);
+      this.autoEquipRewardItems(reward.items);
     }
 
     this.monster = this.createTargetMonster(this.time.now);
@@ -149,6 +158,7 @@ export class GameScene extends Phaser.Scene {
     this.saveSystem.save({
       player: this.player,
       inventory: this.inventorySystem.list(),
+      equipment: this.equipmentSystem.toState(),
       stage: this.stageSystem.toState(),
     });
   }
@@ -167,5 +177,17 @@ export class GameScene extends Phaser.Scene {
 
     this.pushLog(`레벨업! Lv ${growth.levelAfter} 달성`);
     this.pushLog(`스탯 상승 HP +${growth.statGain.maxHp} / ATK +${growth.statGain.attack} / DEF +${growth.statGain.defense}`);
+  }
+
+  private autoEquipRewardItems(items: RewardItemData[]): void {
+    for (const item of items) {
+      const result = this.equipmentSystem.equip(item.itemId, this.inventorySystem);
+      if (!result.success || !result.equippedItemId) {
+        continue;
+      }
+
+      const replaced = result.replacedItemId ? ` / 교체: ${result.replacedItemId}` : "";
+      this.pushLog(`장비 장착: ${result.equippedItemId}${replaced}`);
+    }
   }
 }

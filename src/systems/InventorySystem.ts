@@ -17,6 +17,10 @@ export class InventorySystem {
     this.entries.set(itemId, (this.entries.get(itemId) ?? 0) + quantity);
   }
 
+  hasItem(itemId: string, quantity = 1): boolean {
+    return (this.entries.get(itemId) ?? 0) >= quantity;
+  }
+
   list(): InventoryEntry[] {
     return Array.from(this.entries, ([itemId, quantity]) => ({ itemId, quantity }));
   }

@@ -7,6 +7,7 @@ import rewards from "../../data/rewards.json";
 import stages from "../../data/stages.json";
 import type {
   DropTableData,
+  EquipmentSlot,
   GameData,
   ItemData,
   MonsterData,
@@ -14,6 +15,8 @@ import type {
   RewardData,
   StageData,
 } from "../types/GameTypes";
+
+const EQUIPMENT_SLOTS: EquipmentSlot[] = ["weapon", "armor", "accessory"];
 
 export class DataLoader {
   static load(): GameData {
@@ -38,6 +41,35 @@ export class DataLoader {
     const dropTableIds = this.createIdSet(data.dropTables, "drop table");
     const rewardIds = this.createIdSet(data.rewards, "reward");
     const monstersById = new Map(data.monsters.map((monster) => [monster.id, monster]));
+
+    for (const item of data.items) {
+      if (item.type === "equipment") {
+        if (!item.equipment) {
+          throw new Error(`Equipment item "${item.id}" must include equipment data.`);
+        }
+
+        if (!EQUIPMENT_SLOTS.includes(item.equipment.slot)) {
+          throw new Error(`Equipment item "${item.id}" has invalid slot "${item.equipment.slot}".`);
+        }
+
+        const stats = item.equipment.stats;
+        if (
+          typeof stats.maxHp !== "number" ||
+          typeof stats.attack !== "number" ||
+          typeof stats.defense !== "number"
+        ) {
+          throw new Error(`Equipment item "${item.id}" has invalid stat values.`);
+        }
+
+        if (stats.maxHp < 0 || stats.attack < 0 || stats.defense < 0) {
+          throw new Error(`Equipment item "${item.id}" cannot include negative stats in MVP 1.`);
+        }
+      }
+
+      if (item.type === "material" && item.equipment) {
+        throw new Error(`Material item "${item.id}" must not include equipment data.`);
+      }
+    }
 
     for (const monster of data.monsters) {
       if (!dropTableIds.has(monster.dropTableId)) {

@@ -8,6 +8,7 @@
 
 - PlayerState (플레이어 상태)
 - InventoryEntry[] (인벤토리 목록)
+- EquipmentState (장착 상태)
 - StageState (스테이지 상태)
 
 ## Current Storage (현재 저장 방식)
@@ -33,3 +34,13 @@ totalExp = saved.totalExp ?? getTotalExpAtLevelStart(level) + exp
 ```
 
 `requiredExp (필요 경험치)`는 저장하지 않고 `PlayerGrowthSystem (플레이어 성장 시스템)`이 공식으로 계산한다.
+
+## Equipment Fallback (장비 fallback)
+
+기존 저장 데이터에는 `equipment`가 없을 수 있다.
+
+```text
+equipment = saved.equipment ?? { equipped: {} }
+```
+
+장착 상태는 `EquipmentSystem.toState()` 결과로 저장한다.

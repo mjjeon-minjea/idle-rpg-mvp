@@ -51,3 +51,4 @@ finalDropRate = clamp(finalDropRate, 0, 1);
 - `MonsterData (몬스터 정적 데이터)` uses `baseExp` and `baseGold`.
 - `rewardMultiplier` is not used.
 - `clearRewardMultiplier` is reserved only for stage clear rewards if needed.
+- Equipment item drops (장비 아이템 드랍) still use the same `DropResolver -> RewardResolver -> RewardSystem -> InventorySystem` flow.

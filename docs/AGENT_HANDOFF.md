@@ -1,6 +1,6 @@
 # Agent Handoff (새 Codex 세션 인수인계)
 
-Last updated: 2026-06-13
+Last updated: 2026-06-13 09:29:32
 
 이 문서는 새 Codex 대화에서 현재 프로젝트 상태를 이어받기 위한 기준 문서입니다.
 
@@ -34,6 +34,7 @@ src/
 ├─ systems/
 │  ├─ CombatSystem.ts
 │  ├─ DropResolver.ts
+│  ├─ EquipmentSystem.ts
 │  ├─ InventorySystem.ts
 │  ├─ MonsterFactory.ts
 │  ├─ MonsterPoolSystem.ts
@@ -64,6 +65,18 @@ StageData (스테이지 데이터)
 -> MonsterDefeatedResult (몬스터 처치 결과)
 -> RewardResolver (보상 계산기)
 -> RewardSystem (보상 적용 시스템)
+-> PlayerGrowthSystem (플레이어 성장 시스템)
+-> InventorySystem (인벤토리 시스템)
+-> EquipmentSystem (장비 시스템)
+```
+
+Combat flow (전투 흐름):
+
+```text
+PlayerState (기본 성장 스탯)
+-> EquipmentSystem.calculateEffectiveStats (최종 스탯 계산)
+-> EffectivePlayerStats (전투용 최종 스탯)
+-> CombatSystem.update (전투 계산)
 ```
 
 ## Current Implementation Boundary (현재 구현 경계)
@@ -76,13 +89,29 @@ Implemented (구현됨)
 - Stage progression (스테이지 진행)
 - Kill reward resolution (처치 보상 계산)
 - Player growth (플레이어 성장)
+- Equipment slots and effective stats (장비 슬롯과 최종 스탯)
 - Stage clear rewards (스테이지 클리어 보상)
 - Inventory quantity storage (인벤토리 수량 저장)
 - Local save/load (로컬 저장/불러오기)
 
-Not started (미시작)
+Recently implemented (최근 구현)
 
 - EquipmentSystem (장비 시스템)
+- EquipmentState (장착 상태) 저장 fallback
+- EffectivePlayerStats (최종 플레이어 스탯) 전투 반영
+- MVP equipment items (MVP 장비 아이템) 3종
+- Equipment data validation (장비 데이터 검증)
+- Hud equipment display (장비 표시)
+
+Current Git note (Git 메모)
+
+- Last pushed commit: `8295c64 Add player growth system`
+- EquipmentSystem changes were implemented after that commit and should be committed as `Add equipment system` if not already pushed.
+- Ignored generated folders/files include `dist/`, `node_modules/`, and dev-server logs.
+- There is an unrelated untracked note file under `files/` named like `EquipmentSystem (...) 구현 플랜.txt`; do not modify/delete it unless the user asks.
+
+Not started (미시작)
+
 - SkillSystem (스킬 시스템)
 - RebirthSystem (환생 시스템)
 - JobSystem (전직 시스템)
@@ -93,6 +122,12 @@ Not started (미시작)
 npm.cmd run typecheck
 npm.cmd run build
 ```
+
+Last validation before this handoff (이번 인수인계 전 마지막 검증)
+
+- `npm.cmd run typecheck`: pass
+- `npm.cmd run build`: normal sandbox run failed due access restriction, elevated run passed
+- Vite chunk size warning remains; it is not a build failure.
 
 ## New Conversation Start Prompt (새 대화 시작 문구)
 

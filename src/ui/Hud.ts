@@ -1,4 +1,13 @@
-import type { InventoryEntry, MonsterInstance, PlayerState, StageData, StageEncounterType } from "../types/GameTypes";
+import type {
+  EffectivePlayerStats,
+  EquippedItemView,
+  EquipmentStatBonus,
+  InventoryEntry,
+  MonsterInstance,
+  PlayerState,
+  StageData,
+  StageEncounterType,
+} from "../types/GameTypes";
 
 export class Hud {
   private readonly playerText: Phaser.GameObjects.Text;
@@ -33,6 +42,9 @@ export class Hud {
     encounterType: StageEncounterType,
     player: PlayerState,
     requiredExp: number,
+    effectiveStats: EffectivePlayerStats,
+    equipmentBonus: EquipmentStatBonus,
+    equippedItems: EquippedItemView[],
     monster: MonsterInstance,
     inventory: InventoryEntry[],
   ): void {
@@ -44,8 +56,9 @@ export class Hud {
 
     this.playerText.setText([
       "수습기사 전민재",
-      `Lv ${player.level} / HP ${player.hp}/${player.maxHp}`,
-      `ATK ${player.attack} / DEF ${player.defense}`,
+      `Lv ${player.level} / HP ${player.hp}/${effectiveStats.maxHp} (기본 ${player.maxHp} + 장비 ${equipmentBonus.maxHp})`,
+      `ATK ${effectiveStats.attack} (기본 ${player.attack} + 장비 ${equipmentBonus.attack})`,
+      `DEF ${effectiveStats.defense} (기본 ${player.defense} + 장비 ${equipmentBonus.defense})`,
       `EXP ${player.exp}/${requiredExp} / Total ${player.totalExp}`,
       `Gold ${player.gold}`,
     ]);
@@ -61,7 +74,15 @@ export class Hud {
     const inventoryLines = inventory.length > 0
       ? inventory.map((entry) => `${entry.itemId} x${entry.quantity}`)
       : ["비어 있음"];
-    this.inventoryText.setText(["인벤토리", ...inventoryLines]);
+    const equipmentLines = equippedItems.map((item) => `${this.getSlotLabel(item.slot)}: ${item.name}`);
+    this.inventoryText.setText([
+      "장비",
+      ...equipmentLines,
+      `Bonus HP +${equipmentBonus.maxHp} / ATK +${equipmentBonus.attack} / DEF +${equipmentBonus.defense}`,
+      "",
+      "인벤토리",
+      ...inventoryLines,
+    ]);
   }
 
   setLog(lines: string[]): void {
@@ -75,5 +96,15 @@ export class Hud {
       color,
       lineSpacing: 8,
     };
+  }
+
+  private getSlotLabel(slot: string): string {
+    const labels: Record<string, string> = {
+      weapon: "무기",
+      armor: "방어구",
+      accessory: "장신구",
+    };
+
+    return labels[slot] ?? slot;
   }
 }

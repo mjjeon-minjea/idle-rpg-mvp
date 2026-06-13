@@ -28,5 +28,47 @@
     "name": "오우거 토벌 증표",
     "type": "material",
     "rarity": "rare"
+  },
+  {
+    "id": "rusty_training_sword",
+    "name": "낡은 수련검",
+    "type": "equipment",
+    "rarity": "common",
+    "equipment": {
+      "slot": "weapon",
+      "stats": {
+        "maxHp": 0,
+        "attack": 4,
+        "defense": 0
+      }
+    }
+  },
+  {
+    "id": "worn_apprentice_armor",
+    "name": "수습기사의 낡은 갑옷",
+    "type": "equipment",
+    "rarity": "common",
+    "equipment": {
+      "slot": "armor",
+      "stats": {
+        "maxHp": 20,
+        "attack": 0,
+        "defense": 2
+      }
+    }
+  },
+  {
+    "id": "cracked_apprentice_ring",
+    "name": "금 간 수습기사 반지",
+    "type": "equipment",
+    "rarity": "advanced",
+    "equipment": {
+      "slot": "accessory",
+      "stats": {
+        "maxHp": 8,
+        "attack": 1,
+        "defense": 1
+      }
+    }
   }
 ]

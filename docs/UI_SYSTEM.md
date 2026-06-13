@@ -11,6 +11,8 @@
 - Encounter type (전투 대상 종류)
 - Player stats (플레이어 스탯)
 - Current exp / required exp / total exp (현재 경험치 / 필요 경험치 / 누적 경험치)
+- Effective stats and equipment bonus (최종 스탯과 장비 보너스)
+- Equipped items by slot (슬롯별 장착 장비)
 - Monster stats (몬스터 스탯)
 - Inventory entries (인벤토리 목록)
 - Combat log (전투 로그)

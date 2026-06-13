@@ -1,6 +1,7 @@
 export type MonsterRole = "normal" | "leader" | "boss";
 export type MonsterRuntimeState = "spawning" | "idle" | "attacking" | "stunned" | "dead";
 export type StageEncounterType = "normal" | "leader" | "boss";
+export type EquipmentSlot = "weapon" | "armor" | "accessory";
 
 export interface GameConfigData {
   title: string;
@@ -74,6 +75,18 @@ export interface ItemData {
   name: string;
   type: "material" | "equipment";
   rarity: "common" | "advanced" | "rare";
+  equipment?: EquipmentData;
+}
+
+export interface EquipmentData {
+  slot: EquipmentSlot;
+  stats: EquipmentStatBonus;
+}
+
+export interface EquipmentStatBonus {
+  maxHp: number;
+  attack: number;
+  defense: number;
 }
 
 export interface GameData {
@@ -93,6 +106,12 @@ export interface PlayerState {
   gold: number;
   maxHp: number;
   hp: number;
+  attack: number;
+  defense: number;
+}
+
+export interface EffectivePlayerStats {
+  maxHp: number;
   attack: number;
   defense: number;
 }
@@ -129,6 +148,29 @@ export interface InventoryEntry {
   quantity: number;
 }
 
+export interface EquipmentState {
+  equipped: Partial<Record<EquipmentSlot, string>>;
+}
+
+export interface EquippedItemView {
+  slot: EquipmentSlot;
+  itemId: string | null;
+  name: string;
+}
+
+export interface EquipResult {
+  success: boolean;
+  equippedItemId?: string;
+  replacedItemId?: string;
+  reason?: "item_not_found" | "not_owned" | "not_equipment" | "invalid_slot";
+}
+
+export interface UnequipResult {
+  success: boolean;
+  unequippedItemId?: string;
+  reason?: "slot_empty" | "invalid_slot";
+}
+
 export interface StageState {
   currentStageId: string;
   normalKills: number;
@@ -138,6 +180,7 @@ export interface StageState {
 export interface SaveData {
   player: PlayerState;
   inventory: InventoryEntry[];
+  equipment?: EquipmentState;
   stage: StageState;
 }
 

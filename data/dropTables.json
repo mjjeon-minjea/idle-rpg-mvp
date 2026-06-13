@@ -13,6 +13,12 @@
         "dropRate": 0.08,
         "minAmount": 1,
         "maxAmount": 1
+      },
+      {
+        "itemId": "rusty_training_sword",
+        "dropRate": 0.08,
+        "minAmount": 1,
+        "maxAmount": 1
       }
     ]
   },
@@ -30,6 +36,12 @@
         "dropRate": 0.08,
         "minAmount": 1,
         "maxAmount": 1
+      },
+      {
+        "itemId": "worn_apprentice_armor",
+        "dropRate": 0.06,
+        "minAmount": 1,
+        "maxAmount": 1
       }
     ]
   },
@@ -45,6 +57,12 @@
       {
         "itemId": "mist_core",
         "dropRate": 0.18,
+        "minAmount": 1,
+        "maxAmount": 1
+      },
+      {
+        "itemId": "cracked_apprentice_ring",
+        "dropRate": 0.1,
         "minAmount": 1,
         "maxAmount": 1
       }

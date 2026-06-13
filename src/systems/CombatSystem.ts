@@ -1,4 +1,4 @@
-import type { MonsterDefeatedResult, MonsterInstance, PlayerState } from "../types/GameTypes";
+import type { EffectivePlayerStats, MonsterDefeatedResult, MonsterInstance, PlayerState } from "../types/GameTypes";
 
 export interface CombatResult {
   monsterDefeated: boolean;
@@ -10,7 +10,7 @@ export interface CombatResult {
 export class CombatSystem {
   private elapsedMs = 0;
 
-  update(deltaMs: number, player: PlayerState, monster: MonsterInstance): CombatResult | null {
+  update(deltaMs: number, player: PlayerState, effectiveStats: EffectivePlayerStats, monster: MonsterInstance): CombatResult | null {
     this.elapsedMs += deltaMs;
 
     if (this.elapsedMs < monster.attackCooldown || monster.isDead) {
@@ -20,7 +20,7 @@ export class CombatSystem {
     this.elapsedMs = 0;
     monster.currentState = "attacking";
 
-    const monsterDamage = Math.max(1, player.attack - monster.data.defense);
+    const monsterDamage = Math.max(1, effectiveStats.attack - monster.data.defense);
     monster.currentHp = Math.max(0, monster.currentHp - monsterDamage);
 
     if (monster.currentHp <= 0) {
@@ -40,13 +40,13 @@ export class CombatSystem {
       };
     }
 
-    const playerDamage = Math.max(1, monster.data.attack - player.defense);
+    const playerDamage = Math.max(1, monster.data.attack - effectiveStats.defense);
     player.hp = Math.max(0, player.hp - playerDamage);
     monster.lastAttackAt += monster.attackCooldown;
     monster.currentState = "idle";
 
     if (player.hp <= 0) {
-      player.hp = player.maxHp;
+      player.hp = effectiveStats.maxHp;
     }
 
     return {
