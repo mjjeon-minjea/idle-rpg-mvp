@@ -25,6 +25,7 @@ Last updated: 2026-06-13
 - Inventory quantity storage (인벤토리 수량 저장)
 - localStorage save/load (로컬 저장/불러오기)
 - HUD display (HUD 표시)
+- Manual playtest checklist (수동 플레이 검증 체크리스트)
 
 ## Partial (부분 구현)
 
@@ -64,3 +65,5 @@ Stage data expansion (스테이지 데이터 확장) 후 기존 localStorage 저
 localStorage.removeItem("idle-rpg-mvp-save");
 location.reload();
 ```
+
+Stage 1~9 브라우저 수동 검증은 `docs/MANUAL_PLAYTEST_CHECKLIST.md`를 기준으로 진행한다.

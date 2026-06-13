@@ -100,7 +100,7 @@ export class GameScene extends Phaser.Scene {
     let defeatedBySkill = false;
 
     if (skillResult.triggered) {
-      this.pushLog(`스킬 발동: ${skillResult.skillName} ${skillResult.damage} 피해`);
+      this.pushLog(`스킬 발동: ${skillResult.skillName} / 피해 ${skillResult.damage}`);
 
       if (skillResult.defeated) {
         defeatedBySkill = true;
@@ -111,7 +111,7 @@ export class GameScene extends Phaser.Scene {
     const result = defeatedBySkill ? null : this.combatSystem.update(delta, this.player, effectiveStats, this.monster);
 
     if (result) {
-      this.pushLog(`피해: ${result.monsterDamage} / 반격: ${result.playerDamage}`);
+      this.pushLog(`기본 공격 피해 ${result.monsterDamage} / 몬스터 반격 피해 ${result.playerDamage}`);
 
       if (result.monsterDefeated) {
         this.handleMonsterDefeat();
@@ -145,7 +145,7 @@ export class GameScene extends Phaser.Scene {
     this.pushLog(`${defeatedMonster.name} 처치`);
     const monsterReward = this.rewardResolver.resolveMonsterReward(defeatedMonster, this.stageSystem.getCurrentStage());
     const monsterRewardResult = this.rewardSystem.applyResolvedReward(monsterReward, this.player, this.inventorySystem);
-    this.pushLog(`처치 보상 EXP ${monsterReward.exp}, Gold ${monsterReward.gold}, Items ${monsterReward.items.length}`);
+    this.pushLog(`처치 보상 EXP ${monsterReward.exp} / 골드 ${monsterReward.gold} / 아이템 ${monsterReward.items.length}개`);
     this.pushGrowthLog(monsterRewardResult.growth);
     this.autoEquipRewardItems(monsterRewardResult.reward.items);
 
@@ -153,7 +153,7 @@ export class GameScene extends Phaser.Scene {
     if (clearResult.cleared && clearResult.rewardId) {
       const rewardResult = this.rewardSystem.applyReward(clearResult.rewardId, this.player, this.inventorySystem);
       const reward = rewardResult.reward;
-      this.pushLog(`스테이지 클리어 보상 EXP ${reward.exp}, Gold ${reward.gold}`);
+      this.pushLog(`스테이지 클리어 보상 EXP ${reward.exp} / 골드 ${reward.gold}`);
       this.pushGrowthLog(rewardResult.growth);
       this.autoEquipRewardItems(reward.items);
     }
@@ -203,7 +203,7 @@ export class GameScene extends Phaser.Scene {
         continue;
       }
 
-      const replaced = result.replacedItemId ? ` / 교체: ${result.replacedItemId}` : "";
+      const replaced = result.replacedItemId ? ` / 교체 장비: ${result.replacedItemId}` : "";
       this.pushLog(`장비 장착: ${result.equippedItemId}${replaced}`);
     }
   }

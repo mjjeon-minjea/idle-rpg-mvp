@@ -41,3 +41,18 @@ If level requirement is not met (레벨 조건을 만족하지 못하면):
 ```text
 묵직한 수련 일격: Lv 3 필요
 ```
+
+## Manual Verification (수동 검증)
+
+브라우저에서 실제 HUD 표시를 확인할 때는 `docs/MANUAL_PLAYTEST_CHECKLIST.md`를 기준으로 진행한다.
+
+확인할 핵심 UI:
+
+- Stage progress (스테이지 진행도)
+- Encounter type (전투 단계)
+- Effective stats (최종 스탯)
+- Equipment bonus (장비 보너스)
+- Skill cooldown (스킬 쿨타임)
+- Combat log (전투 로그)
+
+사용자에게 보이는 UI 문구와 전투 로그는 자연스러운 한국어를 사용한다. 코드 식별자, 파일명, 타입명은 영어를 유지한다.

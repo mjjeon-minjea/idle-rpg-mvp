@@ -179,10 +179,13 @@ idle-rpg-mvp/
 | `docs/SAVE_SYSTEM.md` | Save system (저장 시스템) |
 | `docs/SCENE_STRUCTURE.md` | Scene structure (Phaser 씬 구조) |
 | `docs/UI_SYSTEM.md` | UI system (HUD/UI 시스템) |
+| `docs/MANUAL_PLAYTEST_CHECKLIST.md` | Manual browser verification (브라우저 수동 검증 체크리스트) |
 
 ## Next Work (다음 작업)
 
-다음 구현 진입점은 Electron game preview integration (Electron 게임 미리보기 연동), Stage balance pass (스테이지 밸런스 점검), 또는 Skill Upgrade (스킬 강화) 설계입니다.
+다음 구현으로 넘어가기 전에는 `docs/MANUAL_PLAYTEST_CHECKLIST.md`를 기준으로 Stage 1~9 실제 브라우저 수동 검증을 먼저 진행합니다.
+
+그 다음 구현 진입점은 Electron game preview integration (Electron 게임 미리보기 연동), Stage balance pass (스테이지 밸런스 점검), 또는 Skill Upgrade (스킬 강화) 설계입니다.
 
 ```text
 Next recommended task:

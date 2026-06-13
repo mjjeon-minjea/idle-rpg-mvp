@@ -80,3 +80,23 @@ MVP 개발 중 스테이지 데이터가 확장되면 기존 저장 데이터의
 localStorage.removeItem("idle-rpg-mvp-save");
 location.reload();
 ```
+
+## Manual Save Verification (수동 저장 검증)
+
+브라우저에서 저장 데이터를 직접 확인하려면 개발자 도구 콘솔에서 아래 명령을 실행한다.
+
+```js
+JSON.parse(localStorage.getItem("idle-rpg-mvp-save"));
+```
+
+저장 데이터에는 최소한 아래 항목이 포함되어야 한다.
+
+```text
+player
+inventory
+equipment
+skills
+stage
+```
+
+수동 검증 절차는 `docs/MANUAL_PLAYTEST_CHECKLIST.md`를 따른다.

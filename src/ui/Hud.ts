@@ -53,7 +53,7 @@ export class Hud {
     this.stageText.setText([
       `스테이지: ${stage.name}`,
       `진행: ${stage.requiredNormalKills}마리 중 ${Math.min(normalKills, stage.requiredNormalKills)}마리 처치`,
-      `전투 단계: ${encounterType}`,
+      `전투 단계: ${this.getEncounterLabel(encounterType)}`,
     ]);
 
     this.playerText.setText([
@@ -61,14 +61,14 @@ export class Hud {
       `Lv ${player.level} / HP ${player.hp}/${effectiveStats.maxHp} (기본 ${player.maxHp} + 장비 ${equipmentBonus.maxHp})`,
       `ATK ${effectiveStats.attack} (기본 ${player.attack} + 장비 ${equipmentBonus.attack})`,
       `DEF ${effectiveStats.defense} (기본 ${player.defense} + 장비 ${equipmentBonus.defense})`,
-      `EXP ${player.exp}/${requiredExp} / Total ${player.totalExp}`,
-      `Gold ${player.gold}`,
+      `EXP ${player.exp}/${requiredExp} / 누적 ${player.totalExp}`,
+      `골드 ${player.gold}`,
     ]);
 
     this.monsterText.setText([
       `대상: ${monster.data.name}`,
-      `Role: ${monster.data.role}`,
-      `State: ${monster.currentState}`,
+      `역할: ${this.getEncounterLabel(monster.data.role)}`,
+      `상태: ${this.getMonsterStateLabel(monster.currentState)}`,
       `HP ${monster.currentHp}/${monster.data.maxHp}`,
       `ATK ${monster.data.attack} / DEF ${monster.data.defense}`,
     ]);
@@ -87,7 +87,7 @@ export class Hud {
       "",
       "장비",
       ...equipmentLines,
-      `Bonus HP +${equipmentBonus.maxHp} / ATK +${equipmentBonus.attack} / DEF +${equipmentBonus.defense}`,
+      `장비 보너스 HP +${equipmentBonus.maxHp} / ATK +${equipmentBonus.attack} / DEF +${equipmentBonus.defense}`,
       "",
       "인벤토리",
       ...inventoryLines,
@@ -115,6 +115,28 @@ export class Hud {
     };
 
     return labels[slot] ?? slot;
+  }
+
+  private getEncounterLabel(encounterType: string): string {
+    const labels: Record<string, string> = {
+      normal: "일반 몬스터",
+      leader: "리더 몬스터",
+      boss: "보스 몬스터",
+    };
+
+    return labels[encounterType] ?? encounterType;
+  }
+
+  private getMonsterStateLabel(state: string): string {
+    const labels: Record<string, string> = {
+      spawning: "생성 중",
+      idle: "대기",
+      attacking: "공격 중",
+      stunned: "기절",
+      dead: "사망",
+    };
+
+    return labels[state] ?? state;
   }
 
   private getSkillStatus(player: PlayerState, skill: SkillCooldownView): string {
