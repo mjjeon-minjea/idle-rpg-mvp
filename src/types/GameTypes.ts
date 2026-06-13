@@ -1,7 +1,10 @@
 export type MonsterRole = "normal" | "leader" | "boss";
 export type MonsterRuntimeState = "spawning" | "idle" | "attacking" | "stunned" | "dead";
 export type StageEncounterType = "normal" | "leader" | "boss";
-export type EquipmentSlot = "weapon" | "armor" | "accessory";
+export const EQUIPMENT_SLOTS = ["weapon", "helmet", "armor", "boots", "necklace", "ring"] as const;
+export const WEAPON_TYPES = ["sword", "spear", "axe"] as const;
+export type EquipmentSlot = (typeof EQUIPMENT_SLOTS)[number];
+export type WeaponType = (typeof WEAPON_TYPES)[number];
 export type SkillTrigger = "auto";
 export type SkillTarget = "currentMonster";
 
@@ -81,6 +84,7 @@ export interface ItemData {
 
 export interface EquipmentData {
   slot: EquipmentSlot;
+  weaponType?: WeaponType;
   stats: EquipmentStatBonus;
 }
 

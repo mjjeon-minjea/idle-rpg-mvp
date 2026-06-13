@@ -9,9 +9,13 @@ import type {
   PlayerState,
   UnequipResult,
 } from "../types/GameTypes";
+import { EQUIPMENT_SLOTS } from "../types/GameTypes";
 import { InventorySystem } from "./InventorySystem";
 
-const EQUIPMENT_SLOTS: EquipmentSlot[] = ["weapon", "armor", "accessory"];
+type LegacyEquipmentSlot = EquipmentSlot | "accessory";
+type LegacyEquipmentState = {
+  equipped?: Partial<Record<LegacyEquipmentSlot, string>>;
+};
 
 export class EquipmentSystem {
   private readonly equipped: Partial<Record<EquipmentSlot, string>>;
@@ -19,7 +23,7 @@ export class EquipmentSystem {
 
   constructor(items: ItemData[], initialState?: EquipmentState) {
     this.itemsById = new Map(items.map((item) => [item.id, item]));
-    this.equipped = { ...(initialState?.equipped ?? {}) };
+    this.equipped = this.normalizeEquipmentState(initialState);
   }
 
   equip(itemId: string, inventory: InventorySystem): EquipResult {
@@ -120,5 +124,20 @@ export class EquipmentSystem {
 
   private isValidSlot(slot: string): slot is EquipmentSlot {
     return EQUIPMENT_SLOTS.includes(slot as EquipmentSlot);
+  }
+
+  private normalizeEquipmentState(initialState?: EquipmentState): Partial<Record<EquipmentSlot, string>> {
+    const equipped = ((initialState as LegacyEquipmentState | undefined)?.equipped ?? {}) as Partial<
+      Record<LegacyEquipmentSlot, string>
+    >;
+
+    return {
+      weapon: equipped.weapon,
+      helmet: equipped.helmet,
+      armor: equipped.armor,
+      boots: equipped.boots,
+      necklace: equipped.necklace,
+      ring: equipped.ring ?? equipped.accessory,
+    };
   }
 }

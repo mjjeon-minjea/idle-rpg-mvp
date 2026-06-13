@@ -128,6 +128,44 @@ equipment: saved?.equipment ?? { equipped: {} }
 
 저장 시에는 `EquipmentSystem.toState()` 결과를 `SaveData.equipment`에 포함한다.
 
+## 2026-06-13 Equipment Slot Expansion Update (장비 슬롯 확장 갱신)
+
+Status (상태): Implemented with Option B (Option B 기준 구현).
+
+Implemented Scope (구현 범위):
+
+- EquipmentSlot (장비 슬롯)을 `weapon`, `helmet`, `armor`, `boots`, `necklace`, `ring`으로 확장했다.
+- 기존 `accessory` 슬롯은 신규 데이터에서는 사용하지 않는다.
+- 기존 저장 데이터에 `accessory`가 남아 있을 경우 `ring`으로 읽는 fallback을 유지한다.
+- Weapon equipment (무기 장비)에만 `weaponType`을 추가했다.
+- MVP 1 weaponType (무기 종류)는 `sword`, `spear`, `axe`만 허용한다.
+- EquipmentSystem은 장착 상태와 장비 보너스 계산만 담당한다.
+- 장비 장착/해제는 여전히 `player.attack`, `player.defense`, `player.maxHp`에 직접 누적하지 않는다.
+
+New Equipment Items (신규 장비 아이템):
+
+| itemId | Slot | weaponType | Note |
+| --- | --- | --- | --- |
+| `bent_training_spear` | `weapon` | `spear` | 신규 수련창 |
+| `chipped_training_axe` | `weapon` | `axe` | 신규 수련도끼 |
+| `dented_apprentice_helmet` | `helmet` | - | 신규 투구 |
+| `worn_apprentice_boots` | `boots` | - | 신규 신발 |
+| `frayed_apprentice_necklace` | `necklace` | - | 신규 목걸이 |
+
+Preserved Scope (유지 범위):
+
+- CombatSystem / SkillSystem / RewardSystem / RewardResolver / DropResolver / StageProgressSystem은 수정하지 않는다.
+- 신규 장비 5종은 `data/items.json` 등록까지만 완료했다.
+- 신규 장비의 dropTable / reward / stage clear reward 연결은 별도 승인 전까지 진행하지 않는다.
+- Batch 2 Equipment / Material Icons 작업은 장비 슬롯 확정 후 v2로 다시 작성한다.
+
+Future Candidate Only (문서 후보로만 유지):
+
+- `weaponProfile`
+- `DamageType`
+- 무기별 상세 전투 공식
+- 장비 강화 / 랜덤 옵션 / 세트 효과
+
 ## MVP 1 Exclusions (1차 MVP 제외)
 
 - 랜덤 옵션 장비

@@ -155,7 +155,8 @@ interface ItemData {
 }
 
 interface EquipmentData {
-  slot: "weapon" | "armor" | "accessory";
+  slot: "weapon" | "helmet" | "armor" | "boots" | "necklace" | "ring";
+  weaponType?: "sword" | "spear" | "axe";
   stats: EquipmentStatBonus;
 }
 
@@ -347,6 +348,9 @@ interface GrowthResult {
 - Equipment item missing equipment data (장비 아이템의 장비 데이터 누락)
 - Material item includes equipment data (재료 아이템에 장비 데이터 포함)
 - Invalid equipment slot (잘못된 장비 슬롯)
+- Missing weaponType on weapon equipment (무기 장비의 weaponType 누락)
+- Invalid weaponType (잘못된 weaponType)
+- weaponType on non-weapon equipment (무기가 아닌 장비의 weaponType 포함)
 - Negative equipment stats (음수 장비 스탯)
 - Invalid skill data (잘못된 스킬 데이터)
 - Missing skillId in default skill state (기본 스킬 상태의 없는 스킬 ID)

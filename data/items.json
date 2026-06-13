@@ -1,59 +1,60 @@
 [
   {
     "id": "trainee_medal",
-    "name": "수습기사의 증표",
+    "name": "\uc218\uc2b5\uae30\uc0ac\uc758 \uc99d\ud45c",
     "type": "material",
     "rarity": "common"
   },
   {
     "id": "soft_leaf",
-    "name": "부드러운 새벽잎",
+    "name": "\ubd80\ub4dc\ub7ec\uc6b4 \uc0c8\ubcbd\uc78e",
     "type": "material",
     "rarity": "common"
   },
   {
     "id": "mist_shard",
-    "name": "안개 조각",
+    "name": "\uc548\uac1c \uc870\uac01",
     "type": "material",
     "rarity": "common"
   },
   {
     "id": "mist_core",
-    "name": "안개의 핵",
+    "name": "\uc548\uac1c\uc758 \ud575",
     "type": "material",
     "rarity": "advanced"
   },
   {
     "id": "ogre_badge",
-    "name": "오우거 토벌 증표",
+    "name": "\uc624\uc6b0\uac70 \ud1a0\ubc8c \uc99d\ud45c",
     "type": "material",
     "rarity": "rare"
   },
   {
     "id": "old_ore_fragment",
-    "name": "오래된 광석 조각",
+    "name": "\uc624\ub798\ub41c \uad11\uc11d \uc870\uac01",
     "type": "material",
     "rarity": "common"
   },
   {
     "id": "old_ore_core",
-    "name": "오래된 광석 핵",
+    "name": "\uc624\ub798\ub41c \uad11\uc11d \ud575",
     "type": "material",
     "rarity": "advanced"
   },
   {
     "id": "guardian_stone",
-    "name": "수호자의 돌",
+    "name": "\uc218\ud638\uc790\uc758 \ub3cc",
     "type": "material",
     "rarity": "rare"
   },
   {
     "id": "rusty_training_sword",
-    "name": "낡은 수련검",
+    "name": "\ub0a1\uc740 \uc218\ub828\uac80",
     "type": "equipment",
     "rarity": "common",
     "equipment": {
       "slot": "weapon",
+      "weaponType": "sword",
       "stats": {
         "maxHp": 0,
         "attack": 4,
@@ -63,7 +64,7 @@
   },
   {
     "id": "worn_apprentice_armor",
-    "name": "수습기사의 낡은 갑옷",
+    "name": "\uc218\uc2b5\uae30\uc0ac\uc758 \ub0a1\uc740 \uac11\uc637",
     "type": "equipment",
     "rarity": "common",
     "equipment": {
@@ -77,15 +78,87 @@
   },
   {
     "id": "cracked_apprentice_ring",
-    "name": "금 간 수습기사 반지",
+    "name": "\uae08 \uac04 \uc218\uc2b5\uae30\uc0ac \ubc18\uc9c0",
     "type": "equipment",
     "rarity": "advanced",
     "equipment": {
-      "slot": "accessory",
+      "slot": "ring",
       "stats": {
         "maxHp": 8,
         "attack": 1,
         "defense": 1
+      }
+    }
+  },
+  {
+    "id": "bent_training_spear",
+    "name": "\ud718\uc5b4\uc9c4 \uc218\ub828\ucc3d",
+    "type": "equipment",
+    "rarity": "common",
+    "equipment": {
+      "slot": "weapon",
+      "weaponType": "spear",
+      "stats": {
+        "maxHp": 0,
+        "attack": 3,
+        "defense": 0
+      }
+    }
+  },
+  {
+    "id": "chipped_training_axe",
+    "name": "\uc774 \ube60\uc9c4 \uc218\ub828\ub3c4\ub07c",
+    "type": "equipment",
+    "rarity": "common",
+    "equipment": {
+      "slot": "weapon",
+      "weaponType": "axe",
+      "stats": {
+        "maxHp": 0,
+        "attack": 5,
+        "defense": 0
+      }
+    }
+  },
+  {
+    "id": "dented_apprentice_helmet",
+    "name": "\ucc0c\uadf8\ub7ec\uc9c4 \uc218\uc2b5\uae30\uc0ac \ud22c\uad6c",
+    "type": "equipment",
+    "rarity": "common",
+    "equipment": {
+      "slot": "helmet",
+      "stats": {
+        "maxHp": 4,
+        "attack": 0,
+        "defense": 1
+      }
+    }
+  },
+  {
+    "id": "worn_apprentice_boots",
+    "name": "\ub0a1\uc740 \uc218\uc2b5\uae30\uc0ac \uc2e0\ubc1c",
+    "type": "equipment",
+    "rarity": "common",
+    "equipment": {
+      "slot": "boots",
+      "stats": {
+        "maxHp": 3,
+        "attack": 0,
+        "defense": 1
+      }
+    }
+  },
+  {
+    "id": "frayed_apprentice_necklace",
+    "name": "\ud574\uc9c4 \uc218\uc2b5\uae30\uc0ac \ubaa9\uac78\uc774",
+    "type": "equipment",
+    "rarity": "common",
+    "equipment": {
+      "slot": "necklace",
+      "stats": {
+        "maxHp": 5,
+        "attack": 0,
+        "defense": 0
       }
     }
   }

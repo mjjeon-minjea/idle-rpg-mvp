@@ -191,6 +191,29 @@ idle-rpg-mvp/
 | `docs/UI_SYSTEM.md` | UI system (HUD/UI 시스템) |
 | `docs/MANUAL_PLAYTEST_CHECKLIST.md` | Manual browser verification (브라우저 수동 검증 체크리스트) |
 
+## Equipment Slot Expansion (장비 슬롯 확장)
+
+현재 장비 시스템은 MVP 1 기준으로 아래 슬롯을 사용한다.
+
+```text
+weapon
+helmet
+armor
+boots
+necklace
+ring
+```
+
+무기 장비에는 `weaponType`을 사용한다.
+
+```text
+sword
+spear
+axe
+```
+
+이번 확장은 Option B 기준이다. `weaponProfile`과 `DamageType`은 코드와 JSON 데이터에 넣지 않고 추후 후보로만 남긴다. 신규 장비 5종은 `data/items.json`에 등록되어 있지만, 드랍/보상/스테이지 획득 경로 연결은 별도 승인 전까지 진행하지 않는다.
+
 ## Next Work (다음 작업)
 
 다음 구현으로 넘어가기 전에는 `docs/MANUAL_PLAYTEST_CHECKLIST.md`를 기준으로 Stage 1~9 실제 브라우저 수동 검증을 먼저 진행합니다.

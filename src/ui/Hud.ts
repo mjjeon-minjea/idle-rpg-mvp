@@ -120,7 +120,8 @@ export class Hud {
 
     this.equipmentText.setText([
       "Equipped (장착)",
-      ...equippedItems.map((item) => `${this.getSlotLabel(item.slot)}: ${item.name}`),
+      `Slots: ${this.countEquippedItems(equippedItems)} / ${equippedItems.length}`,
+      ...this.createEquippedEquipmentLines(equippedItems),
       `Bonus: HP +${equipmentBonus.maxHp} / ATK +${equipmentBonus.attack} / DEF +${equipmentBonus.defense}`,
       "",
       "Owned Equipment (보유 장비)",
@@ -198,6 +199,19 @@ export class Hud {
   }
 
   private getSlotLabel(slot: string): string {
+    const expandedLabels: Record<string, string> = {
+      weapon: "Weapon (무기)",
+      helmet: "Helmet (투구)",
+      armor: "Armor (갑옷)",
+      boots: "Boots (신발)",
+      necklace: "Necklace (목걸이)",
+      ring: "Ring (반지)",
+    };
+
+    if (expandedLabels[slot]) {
+      return expandedLabels[slot];
+    }
+
     const labels: Record<string, string> = {
       weapon: "Weapon (무기)",
       armor: "Armor (방어구)",
@@ -287,6 +301,19 @@ export class Hud {
     }
 
     return skillCooldowns.map((skill) => `- ${skill.skillName}: ${this.getSkillStatus(player, skill)}`);
+  }
+
+  private createEquippedEquipmentLines(equippedItems: EquippedItemView[]): string[] {
+    const visibleItems = equippedItems.filter((item) => item.itemId);
+    if (visibleItems.length === 0) {
+      return ["- Empty (없음)"];
+    }
+
+    return visibleItems.slice(0, 4).map((item) => `- ${this.getSlotLabel(item.slot)}: ${item.name}`);
+  }
+
+  private countEquippedItems(equippedItems: EquippedItemView[]): number {
+    return equippedItems.filter((item) => item.itemId).length;
   }
 
   private createOwnedEquipmentLines(ownedEquipment: OwnedEquipmentView[]): string[] {

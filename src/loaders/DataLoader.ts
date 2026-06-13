@@ -6,9 +6,9 @@ import monsters from "../../data/monsters.json";
 import rewards from "../../data/rewards.json";
 import skills from "../../data/skills.json";
 import stages from "../../data/stages.json";
+import { EQUIPMENT_SLOTS, WEAPON_TYPES } from "../types/GameTypes";
 import type {
   DropTableData,
-  EquipmentSlot,
   GameData,
   ItemData,
   MonsterData,
@@ -19,8 +19,6 @@ import type {
   SkillState,
   StageData,
 } from "../types/GameTypes";
-
-const EQUIPMENT_SLOTS: EquipmentSlot[] = ["weapon", "armor", "accessory"];
 
 export class DataLoader {
   static load(): GameData {
@@ -57,6 +55,20 @@ export class DataLoader {
 
         if (!EQUIPMENT_SLOTS.includes(item.equipment.slot)) {
           throw new Error(`Equipment item "${item.id}" has invalid slot "${item.equipment.slot}".`);
+        }
+
+        if (item.equipment.slot === "weapon") {
+          if (!item.equipment.weaponType) {
+            throw new Error(`Weapon item "${item.id}" must include weaponType.`);
+          }
+
+          if (!WEAPON_TYPES.includes(item.equipment.weaponType)) {
+            throw new Error(`Weapon item "${item.id}" has invalid weaponType "${item.equipment.weaponType}".`);
+          }
+        }
+
+        if (item.equipment.slot !== "weapon" && item.equipment.weaponType) {
+          throw new Error(`Non-weapon equipment item "${item.id}" must not include weaponType.`);
         }
 
         const stats = item.equipment.stats;

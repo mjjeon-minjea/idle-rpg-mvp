@@ -107,3 +107,27 @@ Preserved:
 - `src/systems/*` 수정 없음
 - 정식 이미지 / 애니메이션 / 이펙트 작업 없음
 - Korean Display Text Fix (한글 표시 문자열 수정)는 별도 작업 후보로 유지
+
+## Equipment Slot Expansion (장비 슬롯 확장)
+
+Status: Implemented with Option B (Option B 기준 구현 완료)
+
+Scope:
+
+- Equipment slots expanded to `weapon`, `helmet`, `armor`, `boots`, `necklace`, `ring`.
+- Weapon equipment now requires `weaponType`.
+- MVP 1 weaponType values are `sword`, `spear`, `axe`.
+- Existing `accessory` save data is treated as `ring` through fallback.
+- Five new equipment items were registered in `data/items.json` only.
+
+Preserved:
+
+- No CombatSystem / SkillSystem / RewardSystem / StageProgressSystem changes.
+- No dropTable / reward / stage reward connection for the five new equipment items yet.
+- Batch 2 Equipment / Material Icons remains on hold until the slot structure is fully accepted.
+
+Deferred:
+
+- `weaponProfile`
+- `DamageType`
+- Weapon-specific combat formulas
