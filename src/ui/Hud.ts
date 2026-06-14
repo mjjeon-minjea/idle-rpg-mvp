@@ -238,14 +238,21 @@ export class Hud {
     this.graphics.fillRoundedRect(22, 22, 70, 70, 10);
     this.graphics.lineStyle(2, 0xc7d8e9, 0.9);
     this.graphics.strokeRoundedRect(22, 22, 70, 70, 10);
-    this.graphics.fillStyle(0x6b4d39, 1);
-    this.graphics.fillCircle(57, 47, 19);
-    this.graphics.fillStyle(0xd8b08a, 1);
-    this.graphics.fillCircle(57, 56, 20);
-    this.graphics.lineStyle(3, 0x1f2833, 1);
-    this.graphics.strokeCircle(57, 56, 20);
     this.graphics.fillStyle(0x2e3948, 1);
-    this.graphics.fillRoundedRect(34, 70, 46, 16, 4);
+    this.graphics.fillRoundedRect(36, 64, 42, 22, 5);
+    this.graphics.fillStyle(0xc6d1db, 1);
+    this.graphics.fillRoundedRect(42, 62, 30, 26, 5);
+    this.graphics.fillStyle(0xd8b08a, 1);
+    this.graphics.fillCircle(57, 51, 19);
+    this.graphics.fillStyle(0x6b4d39, 1);
+    this.graphics.fillCircle(44, 39, 12);
+    this.graphics.fillCircle(56, 35, 14);
+    this.graphics.fillCircle(70, 40, 10);
+    this.graphics.lineStyle(2, 0x1f2833, 1);
+    this.graphics.lineBetween(48, 54, 53, 55);
+    this.graphics.lineBetween(62, 55, 67, 54);
+    this.graphics.lineStyle(2, 0x5d3526, 1);
+    this.graphics.lineBetween(52, 63, 62, 62);
   }
 
   private drawTopStagePanel(): void {
@@ -299,20 +306,46 @@ export class Hud {
   }
 
   private drawPlayerPlaceholder(): void {
-    this.graphics.fillStyle(0x9b6b48, 1);
-    this.graphics.fillCircle(380, 320, 28);
-    this.graphics.fillStyle(0xd8b08a, 1);
-    this.graphics.fillCircle(380, 336, 30);
-    this.graphics.fillStyle(0xbcc6d2, 1);
-    this.graphics.fillRoundedRect(342, 364, 76, 70, 12);
-    this.graphics.lineStyle(4, 0x2a3038, 1);
-    this.graphics.strokeRoundedRect(342, 364, 76, 70, 12);
+    this.graphics.fillStyle(0x1f1b18, 0.28);
+    this.graphics.fillEllipse(380, 460, 120, 26);
+
+    this.graphics.lineStyle(7, 0x2f3a45, 1);
+    this.graphics.lineBetween(360, 430, 348, 470);
+    this.graphics.lineBetween(400, 430, 418, 470);
+    this.graphics.lineStyle(6, 0x6b4a36, 1);
+    this.graphics.lineBetween(338, 372, 316, 410);
+    this.graphics.lineBetween(422, 370, 454, 395);
+
+    this.graphics.fillStyle(0xbfc9d3, 1);
+    this.graphics.fillRoundedRect(338, 356, 84, 86, 12);
+    this.graphics.lineStyle(4, 0x252f3a, 1);
+    this.graphics.strokeRoundedRect(338, 356, 84, 86, 12);
+    this.graphics.fillStyle(0x7d8792, 1);
+    this.graphics.fillTriangle(380, 365, 404, 438, 356, 438);
     this.graphics.fillStyle(0xb33a35, 1);
-    this.graphics.fillTriangle(398, 366, 438, 396, 398, 400);
-    this.graphics.lineStyle(5, 0xe3e8f2, 1);
-    this.graphics.lineBetween(372, 423, 436, 466);
-    this.graphics.lineStyle(4, 0x314255, 1);
-    this.graphics.strokeCircle(338, 388, 21);
+    this.graphics.fillTriangle(414, 360, 462, 394, 414, 404);
+
+    this.graphics.fillStyle(0xd9b28d, 1);
+    this.graphics.fillCircle(380, 322, 34);
+    this.graphics.lineStyle(4, 0x27313b, 1);
+    this.graphics.strokeCircle(380, 322, 34);
+    this.graphics.fillStyle(0x6b4b35, 1);
+    this.graphics.fillCircle(356, 302, 18);
+    this.graphics.fillCircle(374, 292, 22);
+    this.graphics.fillCircle(398, 300, 18);
+    this.graphics.fillTriangle(352, 304, 370, 284, 374, 320);
+    this.graphics.fillTriangle(388, 292, 412, 304, 392, 322);
+
+    this.graphics.lineStyle(3, 0x26323d, 1);
+    this.graphics.lineBetween(362, 323, 372, 325);
+    this.graphics.lineBetween(389, 325, 399, 323);
+    this.graphics.lineStyle(3, 0x7a4631, 1);
+    this.graphics.lineBetween(372, 340, 388, 338);
+
+    this.graphics.lineStyle(5, 0xe6edf5, 1);
+    this.graphics.lineBetween(432, 382, 476, 450);
+    this.graphics.lineStyle(3, 0x36485a, 1);
+    this.graphics.strokeCircle(322, 392, 24);
   }
 
   private drawMonsterPlaceholder(role: MonsterRole): void {

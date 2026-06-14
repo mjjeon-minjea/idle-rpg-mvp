@@ -75,7 +75,7 @@ export class GameScene extends Phaser.Scene {
     this.hud = new Hud(this, this.dataSet.config.title, this.dataSet.config.subtitle);
     this.monster = this.createTargetMonster(this.time.now);
 
-    this.add.rectangle(640, 360, 1280, 720, 0x111318, 1).setDepth(-2);
+    this.createBattleBackground();
   }
 
   private normalizePlayerState(savedPlayer?: Partial<PlayerState>): PlayerState {
@@ -119,7 +119,7 @@ export class GameScene extends Phaser.Scene {
         this.playEffect("trainee_slash", this.getMonsterEffectPosition(), {
           durationMs: 360,
           rotation: -0.35,
-          scale: 0.48,
+          scale: 0.22,
         });
       }
 
@@ -127,7 +127,7 @@ export class GameScene extends Phaser.Scene {
         this.playEffect("heavy_training_strike", this.getMonsterEffectPosition(), {
           durationMs: 460,
           rotation: 0.18,
-          scale: 0.58,
+          scale: 0.28,
         });
       }
 
@@ -146,7 +146,7 @@ export class GameScene extends Phaser.Scene {
         this.playEffect("basic_hit", this.getMonsterEffectPosition(), {
           durationMs: 240,
           rotation: 0.12,
-          scale: 0.42,
+          scale: 0.16,
         });
       }
 
@@ -264,7 +264,65 @@ export class GameScene extends Phaser.Scene {
   }
 
   private getMonsterEffectPosition(): Phaser.Math.Vector2 {
-    return new Phaser.Math.Vector2(748, 230);
+    return new Phaser.Math.Vector2(780, 318);
+  }
+
+  private createBattleBackground(): void {
+    const background = this.add.graphics().setDepth(-3);
+
+    background.fillStyle(0x8fd6f1, 1);
+    background.fillRect(0, 0, 1280, 720);
+
+    background.fillStyle(0xdff7ff, 0.72);
+    background.fillCircle(210, 108, 86);
+    background.fillCircle(278, 96, 72);
+    background.fillCircle(1010, 116, 82);
+    background.fillCircle(1082, 104, 58);
+
+    background.fillStyle(0x6fbf78, 1);
+    background.fillEllipse(640, 440, 1320, 510);
+    background.fillStyle(0x4fa862, 0.85);
+    background.fillEllipse(190, 340, 520, 250);
+    background.fillEllipse(1060, 320, 520, 230);
+
+    background.fillStyle(0xd6b06e, 1);
+    background.fillEllipse(650, 548, 680, 190);
+    background.fillStyle(0xb98f56, 0.28);
+    background.fillEllipse(650, 548, 590, 142);
+
+    this.drawBackgroundTree(background, 70, 126, 1.2);
+    this.drawBackgroundTree(background, 1200, 128, 1.25);
+    this.drawBackgroundBush(background, 90, 612, 1.2);
+    this.drawBackgroundBush(background, 1130, 610, 1.05);
+    this.drawBackgroundBush(background, 1030, 480, 0.75);
+    this.drawBackgroundBush(background, 230, 470, 0.85);
+
+    background.fillStyle(0x8c6d4e, 0.52);
+    background.fillEllipse(520, 532, 42, 18);
+    background.fillEllipse(775, 520, 36, 16);
+    background.fillEllipse(705, 590, 50, 18);
+
+    this.add.rectangle(640, 360, 1280, 720, 0x0b1220, 0.08).setDepth(-2);
+  }
+
+  private drawBackgroundTree(graphics: Phaser.GameObjects.Graphics, x: number, y: number, scale: number): void {
+    graphics.fillStyle(0x6c4931, 1);
+    graphics.fillRoundedRect(x - 24 * scale, y + 42 * scale, 48 * scale, 200 * scale, 18 * scale);
+    graphics.fillStyle(0x2f7d47, 1);
+    graphics.fillCircle(x - 52 * scale, y + 24 * scale, 62 * scale);
+    graphics.fillCircle(x + 8 * scale, y, 78 * scale);
+    graphics.fillCircle(x + 66 * scale, y + 28 * scale, 58 * scale);
+    graphics.fillStyle(0x3f9d5a, 0.9);
+    graphics.fillCircle(x - 5 * scale, y + 16 * scale, 62 * scale);
+  }
+
+  private drawBackgroundBush(graphics: Phaser.GameObjects.Graphics, x: number, y: number, scale: number): void {
+    graphics.fillStyle(0x2f8f4f, 1);
+    graphics.fillCircle(x - 30 * scale, y, 34 * scale);
+    graphics.fillCircle(x + 4 * scale, y - 16 * scale, 42 * scale);
+    graphics.fillCircle(x + 44 * scale, y, 30 * scale);
+    graphics.fillStyle(0x4fbf6f, 0.9);
+    graphics.fillCircle(x + 8 * scale, y - 6 * scale, 30 * scale);
   }
 
   private playEffect(
@@ -279,15 +337,15 @@ export class GameScene extends Phaser.Scene {
 
     const effect = this.add
       .image(position.x, position.y, asset.key)
-      .setDepth(6)
+      .setDepth(4)
       .setAlpha(0)
       .setRotation(options.rotation * -0.25)
-      .setScale(options.scale * 0.75);
+      .setScale(options.scale * 0.55);
 
     this.tweens.add({
       targets: effect,
-      alpha: { from: 0.85, to: 0 },
-      scale: { from: options.scale * 0.85, to: options.scale * 1.18 },
+      alpha: { from: 0.72, to: 0 },
+      scale: { from: options.scale * 0.7, to: options.scale * 0.98 },
       rotation: options.rotation,
       duration: options.durationMs,
       ease: "Cubic.Out",
