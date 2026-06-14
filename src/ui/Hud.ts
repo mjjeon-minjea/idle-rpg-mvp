@@ -11,6 +11,7 @@ import type {
   StageData,
   StageEncounterType,
 } from "../types/GameTypes";
+import { getMonsterAsset } from "../assets/AssetRegistry";
 
 const PANEL_FILL = 0x171b22;
 const PANEL_STROKE = 0x2b3440;
@@ -35,6 +36,7 @@ export interface OwnedEquipmentView {
 
 export class Hud {
   private readonly graphics: Phaser.GameObjects.Graphics;
+  private readonly monsterImage: Phaser.GameObjects.Image;
   private readonly stageText: Phaser.GameObjects.Text;
   private readonly playerText: Phaser.GameObjects.Text;
   private readonly playerHpText: Phaser.GameObjects.Text;
@@ -45,9 +47,11 @@ export class Hud {
   private readonly inventoryText: Phaser.GameObjects.Text;
   private readonly logText: Phaser.GameObjects.Text;
   private readonly monsterLabelText: Phaser.GameObjects.Text;
+  private currentMonsterAssetKey?: string;
 
   constructor(scene: Phaser.Scene, title: string, subtitle: string) {
     this.graphics = scene.add.graphics();
+    this.monsterImage = scene.add.image(748, 226, "").setVisible(false).setDepth(1);
 
     scene.add.text(32, 18, title, this.textStyle("#f4f0df", "22px", 820));
     scene.add.text(32, 52, subtitle, this.textStyle("#aeb7c7", "14px", 820));
@@ -147,7 +151,10 @@ export class Hud {
     this.drawPanel({ x: 24, y: 526, width: 1232, height: 170 });
 
     this.drawPlayerPlaceholder();
-    this.drawMonsterPlaceholder(monster.data.role);
+    this.updateMonsterImage(monster);
+    if (!this.monsterImage.visible) {
+      this.drawMonsterPlaceholder(monster.data.role);
+    }
     this.drawHpBar(48, 316, 230, 18, player.hp, effectiveStats.maxHp);
     this.drawHpBar(588, 336, 250, 18, monster.currentHp, monster.data.maxHp);
   }
@@ -174,6 +181,40 @@ export class Hud {
     this.graphics.fillCircle(748, 234, visual.radius);
     this.graphics.lineStyle(3, visual.strokeColor, 1);
     this.graphics.strokeCircle(748, 234, visual.radius);
+  }
+
+  private updateMonsterImage(monster: MonsterInstance): void {
+    const asset = getMonsterAsset(monster.data.id);
+    if (!asset || !this.monsterImage.scene.textures.exists(asset.key)) {
+      this.currentMonsterAssetKey = undefined;
+      this.monsterImage.setVisible(false);
+      return;
+    }
+
+    if (this.currentMonsterAssetKey !== asset.key) {
+      this.currentMonsterAssetKey = asset.key;
+      this.monsterImage.setTexture(asset.key);
+      const size = this.getMonsterImageSize(monster.data.role, monster.data.id);
+      this.monsterImage.setDisplaySize(size.width, size.height);
+    }
+
+    this.monsterImage.setVisible(true);
+  }
+
+  private getMonsterImageSize(role: MonsterRole, monsterId: string): { width: number; height: number } {
+    if (monsterId === "ancient_mine_guardian") {
+      return { width: 190, height: 190 };
+    }
+
+    if (role === "boss") {
+      return { width: 170, height: 170 };
+    }
+
+    if (role === "leader") {
+      return { width: 138, height: 138 };
+    }
+
+    return { width: 112, height: 112 };
   }
 
   private drawHpBar(x: number, y: number, width: number, height: number, current: number, max: number): void {

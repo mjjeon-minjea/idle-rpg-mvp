@@ -131,3 +131,28 @@ Deferred:
 - `weaponProfile`
 - `DamageType`
 - Weapon-specific combat formulas
+
+## Asset Visual Integration (에셋 시각 연결)
+
+Status: Monster Visual Integration v1 implemented.
+
+Implemented:
+
+- Batch 1 monster assets are preloaded in `GameScene.preload()`.
+- `MONSTER_ASSETS` maps monster IDs to asset keys and runtime paths.
+- `Hud` displays monster images for the current target.
+- Existing role-based monster placeholder remains as fallback when an image is missing.
+
+Preserved:
+
+- No `src/systems/*` changes.
+- No `data/*.json` changes.
+- No `public/assets/**` changes.
+- No equipment/material icon HUD connection yet.
+
+Deferred:
+
+- Equipment / Material icon UI connection.
+- Inventory icon grid.
+- Reward log icon display.
+- Manual visual validation in browser.

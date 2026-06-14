@@ -123,3 +123,28 @@ If level requirement is not met (레벨 조건을 만족하지 못하면):
 - Battle Log category tags (전투 로그 분류 태그)
 
 Death / Reset log (사망 / 회복 로그)는 CombatSystem 구조를 바꾸지 않고, 전투 전 HP와 받은 피해량을 비교하는 방식으로 GameScene에서 표시한다.
+
+## Asset Visual Integration (에셋 시각 연결)
+
+Status: Monster Visual Integration v1 implemented.
+
+이번 단계는 `Batch 1 Monster assets`만 게임 화면에 연결한다.
+`Batch 2 Equipment / Material Icons`는 아직 HUD에 연결하지 않는다.
+
+적용 범위:
+
+- `src/assets/AssetRegistry.ts`에서 `MONSTER_ASSETS`를 관리한다.
+- `GameScene.preload()`에서 몬스터 이미지를 Phaser texture로 preload한다.
+- `Hud`는 현재 몬스터의 `monster.data.id`를 기준으로 이미지 texture를 표시한다.
+- 몬스터 이미지가 없거나 preload되지 않은 경우 기존 role 기반 placeholder를 fallback으로 사용한다.
+
+보류:
+
+- 장비 아이콘 HUD 표시
+- 재료 아이콘 HUD 표시
+- 보상 로그 아이콘화
+- 인벤토리 아이콘 그리드
+
+Manual visual validation:
+
+브라우저에서 몬스터 이미지 크기, HP bar 겹침, normal / leader / boss 구분 가독성을 별도 확인해야 한다.
