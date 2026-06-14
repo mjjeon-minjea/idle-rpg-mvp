@@ -44,6 +44,7 @@ Last updated: 2026-06-14
 - Equipped equipment HUD icon integration
 - Basic skill/hit effect visual integration
 - First screen HUD layout pass
+- Region background visual integration
 
 ## Current UI Direction
 
@@ -73,7 +74,6 @@ Last updated: 2026-06-14
 - Rebirth system
 - Job system
 - Skill upgrade system
-- Region background asset integration
 
 ## Verification Commands
 
@@ -100,3 +100,28 @@ location.reload();
 - `public/assets/**`는 이번 UI 작업에서 수정하지 않았다.
 - Visual Validation은 사용자가 브라우저에서 직접 확인하기 전까지 deferred로 유지한다.
 
+## Region Background Visual Integration
+
+Status: implemented, Visual Validation deferred.
+
+연결된 배경:
+
+```text
+dawn_forest_* -> bg_dawn_forest
+mist_gate_* -> bg_mist_gate
+old_mine_* -> bg_old_mine
+```
+
+구현 내용:
+
+- Batch 5 지역 배경 3장을 `AssetRegistry.ts`에 등록했다.
+- `GameScene.preload()`에서 지역 배경 이미지를 preload한다.
+- stage id prefix 기준으로 현재 지역 배경을 선택한다.
+- 배경은 가장 뒤 레이어에 표시된다.
+- 배경 누락 시 단색 fallback 배경을 유지한다.
+
+보류:
+
+- 실제 브라우저에서 Stage 1~9 지역별 배경 전환 확인
+- Electron preview에서 배경 스케일 확인
+- 캐릭터, 몬스터, 이펙트, HUD 가독성 확인

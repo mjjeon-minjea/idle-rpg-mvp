@@ -2,9 +2,11 @@ import Phaser from "phaser";
 import {
   EFFECT_ASSET_LIST,
   getEffectAsset,
+  getRegionBackgroundAsset,
   ITEM_ICON_ASSET_LIST,
   MONSTER_ASSET_LIST,
   PLAYER_ASSET_LIST,
+  REGION_BACKGROUND_ASSET_LIST,
 } from "../assets/AssetRegistry";
 import { DataLoader } from "../loaders/DataLoader";
 import { CombatSystem } from "../systems/CombatSystem";
@@ -41,6 +43,9 @@ export class GameScene extends Phaser.Scene {
   private hud!: Hud;
   private logLines: string[] = [];
   private saveElapsedMs = 0;
+  private regionBackgroundImage?: Phaser.GameObjects.Image;
+  private fallbackBackground?: Phaser.GameObjects.Graphics;
+  private currentRegionBackgroundKey?: string;
 
   constructor() {
     super("GameScene");
@@ -49,6 +54,10 @@ export class GameScene extends Phaser.Scene {
   preload(): void {
     for (const asset of PLAYER_ASSET_LIST) {
       this.load.svg(asset.key, asset.path, { width: 256, height: 256 });
+    }
+
+    for (const asset of REGION_BACKGROUND_ASSET_LIST) {
+      this.load.image(asset.key, asset.path);
     }
 
     for (const asset of MONSTER_ASSET_LIST) {
@@ -82,10 +91,9 @@ export class GameScene extends Phaser.Scene {
     this.monsterPoolSystem = new MonsterPoolSystem(this.dataSet.monsters, this.dataSet.monsterPools, randomService);
     this.rewardResolver = new RewardResolver(new DropResolver(this.dataSet.dropTables, randomService));
     this.rewardSystem = new RewardSystem(this.dataSet.rewards, this.growthSystem);
+    this.createBattleBackground();
     this.hud = new Hud(this, this.dataSet.config.title, this.dataSet.config.subtitle);
     this.monster = this.createTargetMonster(this.time.now);
-
-    this.createBattleBackground();
   }
 
   private normalizePlayerState(savedPlayer?: Partial<PlayerState>): PlayerState {
@@ -175,6 +183,7 @@ export class GameScene extends Phaser.Scene {
       this.saveGame();
     }
 
+    this.updateRegionBackground(this.stageSystem.getCurrentStage().id);
     this.hud.update(
       this.stageSystem.getCurrentStage(),
       this.stageSystem.getNormalKills(),
@@ -278,67 +287,40 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createBattleBackground(): void {
-    const background = this.add.graphics().setDepth(-3);
+    this.fallbackBackground = this.add.graphics().setDepth(-10);
+    this.fallbackBackground.fillStyle(0x8fd6f1, 1);
+    this.fallbackBackground.fillRect(0, 0, 1280, 720);
+    this.fallbackBackground.fillStyle(0x6fbf78, 1);
+    this.fallbackBackground.fillEllipse(640, 470, 1320, 460);
+    this.fallbackBackground.fillStyle(0xd6b06e, 1);
+    this.fallbackBackground.fillEllipse(650, 548, 680, 190);
 
-    background.fillStyle(0x8fd6f1, 1);
-    background.fillRect(0, 0, 1280, 720);
-
-    background.fillStyle(0xdff7ff, 0.72);
-    background.fillCircle(210, 108, 86);
-    background.fillCircle(278, 96, 72);
-    background.fillCircle(1010, 116, 82);
-    background.fillCircle(1082, 104, 58);
-
-    background.fillStyle(0x6fbf78, 1);
-    background.fillEllipse(640, 440, 1320, 510);
-    background.fillStyle(0x4fa862, 0.85);
-    background.fillEllipse(190, 340, 520, 250);
-    background.fillEllipse(1060, 320, 520, 230);
-    background.fillStyle(0x2c7c48, 0.95);
-    background.fillEllipse(108, 632, 280, 92);
-    background.fillEllipse(1140, 640, 300, 96);
-    background.fillStyle(0x3d9a58, 0.8);
-    background.fillEllipse(235, 610, 170, 58);
-    background.fillEllipse(995, 602, 170, 58);
-
-    background.fillStyle(0xd6b06e, 1);
-    background.fillEllipse(650, 548, 680, 190);
-    background.fillStyle(0xb98f56, 0.28);
-    background.fillEllipse(650, 548, 590, 142);
-
-    this.drawBackgroundTree(background, 70, 126, 1.2);
-    this.drawBackgroundTree(background, 1200, 128, 1.25);
-    this.drawBackgroundBush(background, 90, 612, 1.2);
-    this.drawBackgroundBush(background, 1130, 610, 1.05);
-    this.drawBackgroundBush(background, 1030, 480, 0.75);
-    this.drawBackgroundBush(background, 230, 470, 0.85);
-
-    background.fillStyle(0x8c6d4e, 0.52);
-    background.fillEllipse(520, 532, 42, 18);
-    background.fillEllipse(775, 520, 36, 16);
-    background.fillEllipse(705, 590, 50, 18);
-
-    this.add.rectangle(640, 360, 1280, 720, 0x0b1220, 0.08).setDepth(-2);
+    this.regionBackgroundImage = this.add.image(640, 360, "").setDepth(-9).setVisible(false);
+    this.add.rectangle(640, 360, 1280, 720, 0x0b1220, 0.08).setDepth(-8);
+    this.updateRegionBackground(this.stageSystem.getCurrentStage().id);
   }
 
-  private drawBackgroundTree(graphics: Phaser.GameObjects.Graphics, x: number, y: number, scale: number): void {
-    graphics.fillStyle(0x6c4931, 1);
-    graphics.fillRoundedRect(x - 24 * scale, y + 42 * scale, 48 * scale, 200 * scale, 18 * scale);
-    graphics.fillStyle(0x2f7d47, 1);
-    graphics.fillCircle(x - 52 * scale, y + 24 * scale, 62 * scale);
-    graphics.fillCircle(x + 8 * scale, y, 78 * scale);
-    graphics.fillCircle(x + 66 * scale, y + 28 * scale, 58 * scale);
-    graphics.fillStyle(0x3f9d5a, 0.9);
-    graphics.fillCircle(x - 5 * scale, y + 16 * scale, 62 * scale);
-  }
+  private updateRegionBackground(stageId: string): void {
+    const asset = getRegionBackgroundAsset(stageId);
+    if (!asset || !this.regionBackgroundImage || !this.textures.exists(asset.key)) {
+      this.currentRegionBackgroundKey = undefined;
+      this.regionBackgroundImage?.setVisible(false);
+      this.fallbackBackground?.setVisible(true);
+      return;
+    }
 
-  private drawBackgroundBush(graphics: Phaser.GameObjects.Graphics, x: number, y: number, scale: number): void {
-    graphics.fillStyle(0x2f8f4f, 1);
-    graphics.fillCircle(x - 30 * scale, y, 34 * scale);
-    graphics.fillCircle(x + 4 * scale, y - 16 * scale, 42 * scale);
-    graphics.fillCircle(x + 44 * scale, y, 30 * scale);
-    graphics.fillStyle(0x4fbf6f, 0.9);
-    graphics.fillCircle(x + 8 * scale, y - 6 * scale, 30 * scale);
+    if (this.currentRegionBackgroundKey !== asset.key) {
+      this.currentRegionBackgroundKey = asset.key;
+      const frame = this.textures.getFrame(asset.key);
+      const scale = Math.max(1280 / frame.width, 720 / frame.height);
+      this.regionBackgroundImage
+        .setTexture(asset.key)
+        .setDisplaySize(frame.width * scale, frame.height * scale)
+        .setPosition(640, 360);
+    }
+
+    this.regionBackgroundImage.setVisible(true);
+    this.fallbackBackground?.setVisible(false);
   }
 
   private playEffect(

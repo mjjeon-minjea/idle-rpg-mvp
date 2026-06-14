@@ -90,6 +90,7 @@ auto2 = x2
 - Batch 1 monster assets
 - Batch 2 equipped equipment icons
 - Batch 3 basic skill / hit effects
+- Batch 5 region backgrounds
 
 아이콘이나 이미지가 없으면 fallback 표시를 사용한다.
 
@@ -106,3 +107,28 @@ auto2 = x2
 - 1280x720 화면에서 텍스트가 겹치지 않는지
 - 전체 화면이 개발자 테스트 대시보드처럼 보이지 않는지
 
+## Region Background Visual Integration
+
+Batch 5 지역 배경 3장이 게임 화면 배경으로 연결되었다.
+
+연결 기준:
+
+```text
+dawn_forest_* -> bg_dawn_forest
+mist_gate_* -> bg_mist_gate
+old_mine_* -> bg_old_mine
+```
+
+구현 방식:
+
+- `AssetRegistry.ts`의 `REGION_BACKGROUND_ASSETS`에서 배경 key/path를 관리한다.
+- `GameScene.preload()`에서 지역 배경 이미지를 preload한다.
+- `GameScene`은 현재 stage id prefix를 기준으로 배경 texture를 선택한다.
+- 배경 이미지는 가장 뒤 레이어에 배치한다.
+- stage/region이 바뀌면 기존 image object의 texture만 교체한다.
+- 배경 누락 시 기존 단색 fallback 배경을 사용한다.
+
+Visual Validation:
+
+- 브라우저 수동 확인은 deferred 상태다.
+- Stage 1~9 진행 중 지역별 배경 전환과 캐릭터/몬스터/이펙트 가독성은 추후 직접 확인한다.

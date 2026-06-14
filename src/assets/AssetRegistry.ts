@@ -18,6 +18,42 @@ export function getPlayerAsset(playerId: string): VisualAssetEntry | undefined {
   return PLAYER_ASSETS[playerId];
 }
 
+export const REGION_BACKGROUND_ASSETS: Record<string, VisualAssetEntry> = {
+  dawn_forest: {
+    id: "dawn_forest",
+    key: "background:dawn_forest",
+    path: "assets/backgrounds/regions/bg_dawn_forest.png",
+  },
+  mist_gate: {
+    id: "mist_gate",
+    key: "background:mist_gate",
+    path: "assets/backgrounds/regions/bg_mist_gate.png",
+  },
+  old_mine: {
+    id: "old_mine",
+    key: "background:old_mine",
+    path: "assets/backgrounds/regions/bg_old_mine.png",
+  },
+};
+
+export const REGION_BACKGROUND_ASSET_LIST = Object.values(REGION_BACKGROUND_ASSETS);
+
+export function getRegionBackgroundAsset(stageId: string): VisualAssetEntry | undefined {
+  if (stageId.startsWith("dawn_forest")) {
+    return REGION_BACKGROUND_ASSETS.dawn_forest;
+  }
+
+  if (stageId.startsWith("mist_gate")) {
+    return REGION_BACKGROUND_ASSETS.mist_gate;
+  }
+
+  if (stageId.startsWith("old_mine")) {
+    return REGION_BACKGROUND_ASSETS.old_mine;
+  }
+
+  return undefined;
+}
+
 export const MONSTER_ASSETS: Record<string, VisualAssetEntry> = {
   dawn_slime: {
     id: "dawn_slime",
