@@ -21,6 +21,28 @@ const PLAYER_COLOR = 0x4f9cff;
 const HP_COLOR = 0x55d66b;
 const HP_LOW_COLOR = 0xff6b6b;
 const EQUIPMENT_ICON_SIZE = 38;
+const BUTTON_FILL = 0x202733;
+const BUTTON_ACTIVE_FILL = 0x2f7cc0;
+const BUTTON_LOCKED_FILL = 0x242833;
+const BUTTON_STROKE = 0x526171;
+const BUTTON_ACTIVE_STROKE = 0xffd35a;
+
+type RightMenuKey = "skill" | "equipment" | "inventory" | "quest";
+type CombatControlMode = "manual" | "auto" | "auto2" | "auto3";
+
+const RIGHT_MENU_ITEMS: Array<{ key: RightMenuKey; label: string; shortLabel: string; x: number; y: number }> = [
+  { key: "skill", label: "스킬", shortLabel: "스", x: 1080, y: 232 },
+  { key: "equipment", label: "장비", shortLabel: "장", x: 1080, y: 306 },
+  { key: "inventory", label: "가방", shortLabel: "가", x: 1080, y: 380 },
+  { key: "quest", label: "퀘스트", shortLabel: "퀘", x: 1080, y: 454 },
+];
+
+const COMBAT_CONTROL_MODES: Array<{ key: CombatControlMode; label: string; shortLabel: string; locked: boolean }> = [
+  { key: "manual", label: "수동", shortLabel: "수동", locked: false },
+  { key: "auto", label: "오토", shortLabel: "오토", locked: false },
+  { key: "auto2", label: "오토 x2", shortLabel: "x2", locked: true },
+  { key: "auto3", label: "오토 x3", shortLabel: "x3", locked: true },
+];
 
 const EQUIPMENT_ICON_SLOTS: Array<{ slot: EquipmentSlot; label: string; x: number; y: number }> = [
   { slot: "weapon", label: "WPN", x: 430, y: 632 },
@@ -36,6 +58,14 @@ interface PanelBounds {
   y: number;
   width: number;
   height: number;
+}
+
+interface UiButtonView {
+  container: Phaser.GameObjects.Container;
+  background: Phaser.GameObjects.Rectangle;
+  primaryText: Phaser.GameObjects.Text;
+  secondaryText?: Phaser.GameObjects.Text;
+  locked?: boolean;
 }
 
 export interface OwnedEquipmentView {
@@ -60,13 +90,23 @@ export class Hud {
   private readonly inventoryText: Phaser.GameObjects.Text;
   private readonly logText: Phaser.GameObjects.Text;
   private readonly monsterLabelText: Phaser.GameObjects.Text;
+  private readonly rightMenuToggleButton: UiButtonView;
+  private readonly rightMenuButtons = new Map<RightMenuKey, UiButtonView>();
+  private readonly combatControlToggleButton: UiButtonView;
+  private readonly combatControlButtons = new Map<CombatControlMode, UiButtonView>();
   private currentMonsterAssetKey?: string;
   private readonly currentEquipmentAssetKeys = new Map<EquipmentSlot, string | undefined>();
+  private rightMenuExpanded = false;
+  private selectedRightMenuKey: RightMenuKey = "skill";
+  private combatControlExpanded = false;
+  private selectedCombatControlMode: CombatControlMode = "auto";
 
   constructor(scene: Phaser.Scene, title: string, subtitle: string) {
     this.graphics = scene.add.graphics();
     this.monsterImage = scene.add.image(748, 226, "").setVisible(false).setDepth(1);
     this.createEquipmentIconObjects(scene);
+    this.rightMenuToggleButton = this.createRightMenuObjects(scene);
+    this.combatControlToggleButton = this.createCombatControlObjects(scene);
 
     scene.add.text(32, 18, title, this.textStyle("#f4f0df", "22px", 820));
     scene.add.text(32, 52, subtitle, this.textStyle("#aeb7c7", "14px", 820));
@@ -80,8 +120,11 @@ export class Hud {
     this.equipmentText = scene.add.text(430, 546, "", this.textStyle("#f8e7b0", "14px", 360));
     this.inventoryText = scene.add.text(820, 546, "", this.textStyle("#d7e4ff", "14px", 395));
     this.logText = scene.add.text(928, 142, "", this.textStyle("#e3e8f2", "14px", 300));
+    this.logText.setVisible(false);
     scene.add.text(420, 302, "수습기사", this.textStyle("#cfe8ff", "15px", 160));
     this.monsterLabelText = scene.add.text(710, 302, "", this.textStyle("#ffe1b8", "15px", 200));
+    this.syncRightMenuVisibility();
+    this.syncCombatControlVisibility();
   }
 
   update(
@@ -153,10 +196,13 @@ export class Hud {
       this.createInventorySummary(inventory),
     ]);
     this.updateEquipmentIcons(equippedItems);
+    this.syncRightMenuVisibility();
+    this.syncCombatControlVisibility();
   }
 
   setLog(lines: string[]): void {
-    this.logText.setText(["Battle Log (전투 로그)", ...lines.slice(0, 8)]);
+    void lines;
+    this.logText.setVisible(false);
   }
 
   private drawLayout(player: PlayerState, effectiveStats: EffectivePlayerStats, monster: MonsterInstance): void {
@@ -199,6 +245,120 @@ export class Hud {
     this.graphics.fillCircle(748, 234, visual.radius);
     this.graphics.lineStyle(3, visual.strokeColor, 1);
     this.graphics.strokeCircle(748, 234, visual.radius);
+  }
+
+  private createRightMenuObjects(scene: Phaser.Scene): UiButtonView {
+    const toggleButton = this.createUiButton(scene, 1080, 166, 126, 56, "메뉴", "", () => {
+      this.rightMenuExpanded = !this.rightMenuExpanded;
+      this.syncRightMenuVisibility();
+    });
+
+    for (const item of RIGHT_MENU_ITEMS) {
+      const button = this.createUiButton(scene, item.x, item.y, 126, 58, item.shortLabel, item.label, () => {
+        this.selectedRightMenuKey = item.key;
+        this.syncRightMenuVisibility();
+      });
+      this.rightMenuButtons.set(item.key, button);
+    }
+
+    return toggleButton;
+  }
+
+  private createCombatControlObjects(scene: Phaser.Scene): UiButtonView {
+    const toggleButton = this.createUiButton(scene, 108, 642, 104, 54, "오토", "전투", () => {
+      this.combatControlExpanded = !this.combatControlExpanded;
+      this.syncCombatControlVisibility();
+    });
+
+    COMBAT_CONTROL_MODES.forEach((mode, index) => {
+      const x = 74 + index * 90;
+      const secondary = mode.locked ? "잠금" : mode.label;
+      const button = this.createUiButton(scene, x, 642, 80, 54, mode.shortLabel, secondary, () => {
+        this.selectedCombatControlMode = mode.key;
+        this.combatControlExpanded = false;
+        this.syncCombatControlVisibility();
+      }, mode.locked);
+      this.combatControlButtons.set(mode.key, button);
+    });
+
+    return toggleButton;
+  }
+
+  private createUiButton(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    primaryLabel: string,
+    secondaryLabel: string,
+    onClick: () => void,
+    locked = false,
+  ): UiButtonView {
+    const background = scene.add
+      .rectangle(0, 0, width, height, locked ? BUTTON_LOCKED_FILL : BUTTON_FILL, 0.96)
+      .setStrokeStyle(2, BUTTON_STROKE, 1);
+    const primaryText = scene.add
+      .text(0, secondaryLabel ? -15 : -11, primaryLabel, this.textStyle("#f4f0df", "18px", width - 12))
+      .setOrigin(0.5);
+    const children: Phaser.GameObjects.GameObject[] = [background, primaryText];
+    let secondaryText: Phaser.GameObjects.Text | undefined;
+
+    if (secondaryLabel) {
+      secondaryText = scene.add
+        .text(0, 13, secondaryLabel, this.textStyle(locked ? "#9da7b5" : "#c8d8f0", "11px", width - 12))
+        .setOrigin(0.5);
+      children.push(secondaryText);
+    }
+
+    const container = scene.add.container(x, y, children).setDepth(6);
+    container.setSize(width, height);
+    container.setInteractive(
+      new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height),
+      Phaser.Geom.Rectangle.Contains,
+    );
+    container.on("pointerdown", onClick);
+    container.on("pointerover", () => container.setScale(1.03));
+    container.on("pointerout", () => container.setScale(1));
+
+    return { container, background, primaryText, secondaryText, locked };
+  }
+
+  private syncRightMenuVisibility(): void {
+    this.rightMenuToggleButton.primaryText.setText(this.rightMenuExpanded ? "접기" : "메뉴");
+    this.setUiButtonState(this.rightMenuToggleButton, false, true);
+
+    for (const item of RIGHT_MENU_ITEMS) {
+      const button = this.rightMenuButtons.get(item.key);
+      if (!button) {
+        continue;
+      }
+
+      this.setUiButtonState(button, item.key === this.selectedRightMenuKey, this.rightMenuExpanded);
+    }
+  }
+
+  private syncCombatControlVisibility(): void {
+    const selectedMode = COMBAT_CONTROL_MODES.find((mode) => mode.key === this.selectedCombatControlMode) ?? COMBAT_CONTROL_MODES[1];
+    this.combatControlToggleButton.primaryText.setText(selectedMode.shortLabel);
+    this.combatControlToggleButton.secondaryText?.setText("전투");
+    this.setUiButtonState(this.combatControlToggleButton, true, !this.combatControlExpanded, selectedMode.locked);
+
+    for (const mode of COMBAT_CONTROL_MODES) {
+      const button = this.combatControlButtons.get(mode.key);
+      if (!button) {
+        continue;
+      }
+
+      this.setUiButtonState(button, mode.key === this.selectedCombatControlMode, this.combatControlExpanded, mode.locked);
+    }
+  }
+
+  private setUiButtonState(button: UiButtonView, active: boolean, visible: boolean, locked = button.locked ?? false): void {
+    button.container.setVisible(visible);
+    button.container.setAlpha(locked && !active ? 0.72 : 1);
+    button.background.setFillStyle(active ? BUTTON_ACTIVE_FILL : locked ? BUTTON_LOCKED_FILL : BUTTON_FILL, 0.96);
+    button.background.setStrokeStyle(active ? 3 : 2, active ? BUTTON_ACTIVE_STROKE : BUTTON_STROKE, 1);
   }
 
   private createEquipmentIconObjects(scene: Phaser.Scene): void {
