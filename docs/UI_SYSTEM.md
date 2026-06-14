@@ -2,6 +2,27 @@
 
 Last updated: 2026-06-14
 
+## First Screen UI Polish v2
+
+목적:
+
+- 첫 화면에서 스킬/타격 이펙트가 중앙 전투 영역과 하단 스킬 슬롯을 과하게 가리지 않도록 조정했다.
+- 플레이어 PNG 에셋은 `load.svg()`가 아니라 `load.image()`로 불러온다.
+- 스킬 슬롯 아이콘은 texture 교체 후에도 62x62 크기로 다시 고정한다.
+
+반영 내용:
+
+- `trainee_slash`, `heavy_training_strike`, `basic_hit` 표시 크기를 줄였다.
+- 이펙트 위치를 몬스터 주변 전투 지점 기준으로 유지한다.
+- 이펙트 depth를 HUD보다 낮게 유지해 우측 메뉴와 하단 스킬 슬롯을 덮지 않게 했다.
+- 하단 스킬 슬롯 6칸은 유지한다.
+
+Visual Validation:
+
+- 1280x720 Dawn Forest 화면 기준으로 거대 이펙트가 사라진 것을 확인했다.
+- 시간차 캡처에서도 스킬 슬롯 아이콘이 원본 크기로 튀지 않는 것을 확인했다.
+- Old Mine 직접 검증은 이번 작업에서 진행하지 않았고, 추후 Stage별 수동 검증 때 확인한다.
+
 ## First Screen UI Polish Implementation v1
 
 첫 화면은 더 이상 기능 확인용 테스트 대시보드처럼 보이지 않도록, 실제 게임 첫 화면에 가까운 정보 밀도와 배치로 정리했다.

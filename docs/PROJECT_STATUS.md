@@ -2,6 +2,28 @@
 
 Last updated: 2026-06-14
 
+## First Screen UI Polish v2
+
+Status: implemented, Visual Validation pass for Dawn Forest/time-check.
+
+수정 이유:
+
+- v1 실제 화면 검증에서 스킬/타격 이펙트가 하단 스킬 슬롯을 크게 덮는 문제가 발견되었다.
+- 직접 원인은 스킬 슬롯 이미지가 `setTexture()` 후 원본 크기로 표시되는 것이었다.
+
+반영 내용:
+
+- 플레이어 PNG 에셋 로딩을 `load.image()`로 유지했다.
+- 스킬 슬롯 아이콘은 texture 교체 후에도 62x62로 고정한다.
+- `trainee_slash`, `heavy_training_strike`, `basic_hit` 이펙트 표시 크기와 depth를 낮췄다.
+- 하단 스킬 슬롯 6칸은 유지했다.
+
+검증:
+
+- 1280x720 Dawn Forest 캡처에서 스킬 슬롯을 덮던 거대 이펙트가 사라진 것을 확인했다.
+- 시간차 캡처에서도 스킬 슬롯 아이콘이 슬롯 안에 유지되는 것을 확인했다.
+- `src/systems/*`, `data/*.json`, `public/assets/**`는 수정하지 않았다.
+
 ## First Screen UI Polish Implementation v1
 
 Status: implemented, Visual Validation deferred.

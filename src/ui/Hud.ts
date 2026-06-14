@@ -585,7 +585,7 @@ export class Hud {
 
       const asset = this.getSkillIconAsset(skill.skillId);
       if (asset && view.image.scene.textures.exists(asset.key)) {
-        view.image.setTexture(asset.key).setVisible(true);
+        view.image.setTexture(asset.key).setDisplaySize(62, 62).setVisible(true);
       } else {
         view.image.setVisible(false);
       }

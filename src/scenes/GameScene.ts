@@ -53,7 +53,7 @@ export class GameScene extends Phaser.Scene {
 
   preload(): void {
     for (const asset of PLAYER_ASSET_LIST) {
-      this.load.svg(asset.key, asset.path, { width: 256, height: 256 });
+      this.load.image(asset.key, asset.path);
     }
 
     for (const asset of REGION_BACKGROUND_ASSET_LIST) {
@@ -134,18 +134,20 @@ export class GameScene extends Phaser.Scene {
     if (skillResult.triggered) {
       this.pushLog(`[Skill] ${skillResult.skillId} dealt ${skillResult.damage} damage`);
       if (skillResult.skillId === "trainee_slash") {
-        this.playEffect("trainee_slash", this.getMonsterEffectPosition(), {
-          durationMs: 360,
+        this.playEffect("trainee_slash", this.getSkillEffectPosition(), {
+          durationMs: 280,
           rotation: -0.35,
-          targetSize: 118,
+          targetSize: 30,
+          maxScale: 0.055,
         });
       }
 
       if (skillResult.skillId === "heavy_training_strike") {
-        this.playEffect("heavy_training_strike", this.getMonsterEffectPosition(), {
-          durationMs: 460,
+        this.playEffect("heavy_training_strike", this.getSkillEffectPosition(), {
+          durationMs: 340,
           rotation: 0.18,
-          targetSize: 136,
+          targetSize: 42,
+          maxScale: 0.075,
         });
       }
 
@@ -161,10 +163,11 @@ export class GameScene extends Phaser.Scene {
     if (result) {
       this.pushLog(`[Combat] Basic ${result.monsterDamage} / Counter ${result.playerDamage}`);
       if (result.monsterDamage > 0) {
-        this.playEffect("basic_hit", this.getMonsterEffectPosition(), {
-          durationMs: 240,
+        this.playEffect("basic_hit", this.getMonsterHitEffectPosition(), {
+          durationMs: 180,
           rotation: 0.12,
-          targetSize: 64,
+          targetSize: 22,
+          maxScale: 0.075,
         });
       }
 
@@ -282,7 +285,11 @@ export class GameScene extends Phaser.Scene {
       }));
   }
 
-  private getMonsterEffectPosition(): Phaser.Math.Vector2 {
+  private getSkillEffectPosition(): Phaser.Math.Vector2 {
+    return new Phaser.Math.Vector2(742, 292);
+  }
+
+  private getMonsterHitEffectPosition(): Phaser.Math.Vector2 {
     return new Phaser.Math.Vector2(780, 318);
   }
 
@@ -326,7 +333,7 @@ export class GameScene extends Phaser.Scene {
   private playEffect(
     effectId: string,
     position: Phaser.Math.Vector2,
-    options: { durationMs: number; rotation: number; targetSize: number },
+    options: { durationMs: number; rotation: number; targetSize: number; maxScale: number },
   ): void {
     const asset = getEffectAsset(effectId);
     if (!asset || !this.textures.exists(asset.key)) {
@@ -335,18 +342,18 @@ export class GameScene extends Phaser.Scene {
 
     const frame = this.textures.getFrame(asset.key);
     const maxDimension = Math.max(frame.width, frame.height, 1);
-    const baseScale = options.targetSize / maxDimension;
+    const baseScale = Math.min(options.targetSize / maxDimension, options.maxScale);
     const effect = this.add
       .image(position.x, position.y, asset.key)
-      .setDepth(4)
+      .setDepth(2.6)
       .setAlpha(0)
       .setRotation(options.rotation * -0.25)
-      .setScale(baseScale * 0.72);
+      .setScale(baseScale * 0.58);
 
     this.tweens.add({
       targets: effect,
-      alpha: { from: 0.62, to: 0 },
-      scale: { from: baseScale * 0.84, to: baseScale * 1.08 },
+      alpha: { from: 0.5, to: 0 },
+      scale: { from: baseScale * 0.68, to: baseScale * 0.92 },
       rotation: options.rotation,
       duration: options.durationMs,
       ease: "Cubic.Out",
