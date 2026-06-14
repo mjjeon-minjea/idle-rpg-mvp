@@ -30,33 +30,33 @@ const HP_LOW_COLOR = 0xff5f5f;
 const MONSTER_HP_COLOR = 0xe53935;
 const EXP_COLOR = 0xffd05a;
 const EMPTY_SLOT_FILL = 0x202833;
-const EQUIPMENT_ICON_SIZE = 26;
-const SKILL_SLOT_SIZE = 82;
+const EQUIPMENT_ICON_SIZE = 28;
+const SKILL_SLOT_SIZE = 76;
 
 type RightMenuKey = "skill" | "equipment" | "inventory" | "quest";
 type CombatControlMode = "manual" | "auto" | "auto1_5" | "auto2";
 
 const RIGHT_MENU_ITEMS: Array<{ key: RightMenuKey; label: string; icon: string; x: number; y: number }> = [
-  { key: "skill", label: "스킬", icon: "✦", x: 1180, y: 244 },
-  { key: "equipment", label: "장비", icon: "▰", x: 1180, y: 326 },
-  { key: "inventory", label: "가방", icon: "▣", x: 1180, y: 408 },
-  { key: "quest", label: "퀘스트", icon: "▤", x: 1180, y: 490 },
+  { key: "skill", label: "스킬", icon: "✦", x: 1184, y: 258 },
+  { key: "equipment", label: "장비", icon: "갑", x: 1184, y: 340 },
+  { key: "inventory", label: "가방", icon: "▣", x: 1184, y: 422 },
+  { key: "quest", label: "퀘스트", icon: "문", x: 1184, y: 504 },
 ];
 
 const COMBAT_CONTROL_MODES: Array<{ key: CombatControlMode; label: string; icon: string; locked: boolean }> = [
-  { key: "manual", label: "수동", icon: "✋", locked: false },
-  { key: "auto", label: "오토", icon: "⚔", locked: false },
+  { key: "manual", label: "수동", icon: "손", locked: false },
+  { key: "auto", label: "오토", icon: "검", locked: false },
   { key: "auto1_5", label: "x1.5", icon: "🔒", locked: true },
   { key: "auto2", label: "x2", icon: "🔒", locked: true },
 ];
 
 const EQUIPMENT_ICON_SLOTS: Array<{ slot: EquipmentSlot; label: string; x: number; y: number }> = [
-  { slot: "weapon", label: "무기", x: 54, y: 246 },
-  { slot: "helmet", label: "투구", x: 92, y: 246 },
-  { slot: "armor", label: "갑옷", x: 130, y: 246 },
-  { slot: "boots", label: "신발", x: 168, y: 246 },
-  { slot: "necklace", label: "목걸이", x: 206, y: 246 },
-  { slot: "ring", label: "반지", x: 244, y: 246 },
+  { slot: "weapon", label: "무기", x: 48, y: 238 },
+  { slot: "helmet", label: "투구", x: 88, y: 238 },
+  { slot: "armor", label: "갑옷", x: 128, y: 238 },
+  { slot: "boots", label: "신발", x: 168, y: 238 },
+  { slot: "necklace", label: "목걸이", x: 208, y: 238 },
+  { slot: "ring", label: "반지", x: 248, y: 238 },
 ];
 
 interface PanelBounds {
@@ -126,9 +126,9 @@ export class Hud {
   constructor(scene: Phaser.Scene, _title: string, _subtitle: string) {
     this.graphics = scene.add.graphics().setDepth(UI_DEPTH);
 
-    this.playerNameText = scene.add.text(104, 24, "", this.textStyle("#ffffff", "23px", 180)).setDepth(TEXT_DEPTH);
-    this.playerLevelText = scene.add.text(222, 25, "", this.textStyle("#ffffff", "18px", 88)).setDepth(TEXT_DEPTH);
-    this.playerHpText = scene.add.text(112, 76, "", this.textStyle("#ffffff", "15px", 150)).setDepth(TEXT_DEPTH);
+    this.playerNameText = scene.add.text(102, 24, "", this.textStyle("#ffffff", "22px", 150)).setDepth(TEXT_DEPTH);
+    this.playerLevelText = scene.add.text(222, 26, "", this.textStyle("#ffffff", "17px", 78)).setDepth(TEXT_DEPTH);
+    this.playerHpText = scene.add.text(112, 76, "", this.textStyle("#ffffff", "14px", 140)).setDepth(TEXT_DEPTH);
     this.playerHpLabelText = scene.add.text(20, 92, "", this.textStyle("#d6efff", "12px", 90)).setDepth(TEXT_DEPTH);
     this.stageTitleText = scene.add.text(458, 24, "", this.textStyle("#ffffff", "22px", 260)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
     this.stageSubtitleText = scene.add.text(458, 70, "", this.textStyle("#e9f2ff", "14px", 310)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
@@ -136,8 +136,8 @@ export class Hud {
     this.diamondText = scene.add.text(936, 34, "", this.textStyle("#eaf9ff", "17px", 130)).setDepth(TEXT_DEPTH);
     this.playerPortraitImage = scene.add.image(57, 56, "").setDisplaySize(46, 68).setVisible(false).setDepth(TEXT_DEPTH);
 
-    this.createUiButton(scene, 1102, 54, 68, 72, "상점", "🏪", () => undefined);
-    this.createUiButton(scene, 1194, 54, 68, 72, "편지함", "✉", () => undefined);
+    this.createUiButton(scene, 1102, 54, 68, 72, "🏪", "상점", () => undefined);
+    this.createUiButton(scene, 1194, 54, 68, 72, "✉", "편지함", () => undefined);
 
     scene.add.text(380, 192, "오계장", this.textStyle("#ffffff", "18px", 150)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
     this.playerCombatHpText = scene.add.text(380, 232, "", this.textStyle("#ffffff", "16px", 180)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
@@ -146,9 +146,9 @@ export class Hud {
     this.monsterLabelText = scene.add.text(780, 192, "", this.textStyle("#ffffff", "18px", 190)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
     this.monsterHpText = scene.add.text(780, 232, "", this.textStyle("#ffffff", "16px", 180)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
     this.objectiveText = scene.add.text(448, 112, "", this.textStyle("#fff0bd", "14px", 410)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
-    this.statText = scene.add.text(22, 132, "", this.textStyle("#edf4ff", "13px", 260)).setDepth(TEXT_DEPTH);
-    this.equipmentBonusText = scene.add.text(22, 274, "", this.textStyle("#f7e3a4", "12px", 260)).setDepth(TEXT_DEPTH);
-    this.inventoryText = scene.add.text(22, 308, "", this.textStyle("#d9e6ff", "12px", 270)).setDepth(TEXT_DEPTH);
+    this.statText = scene.add.text(22, 132, "", this.textStyle("#edf4ff", "12px", 250)).setDepth(TEXT_DEPTH);
+    this.equipmentBonusText = scene.add.text(22, 264, "", this.textStyle("#f7e3a4", "11px", 250)).setDepth(TEXT_DEPTH);
+    this.inventoryText = scene.add.text(22, 296, "", this.textStyle("#d9e6ff", "11px", 250)).setDepth(TEXT_DEPTH);
 
     this.createEquipmentIconObjects(scene);
     this.createSkillSlotObjects(scene);
@@ -189,12 +189,12 @@ export class Hud {
     this.monsterHpText.setText(`${monster.currentHp} / ${monster.data.maxHp}`);
     this.statText.setText(
       [
-        `공격 ${effectiveStats.attack}  (기본 ${player.attack} + 장비 ${equipmentBonus.attack})`,
-        `방어 ${effectiveStats.defense}  (기본 ${player.defense} + 장비 ${equipmentBonus.defense})`,
+        `공격 ${effectiveStats.attack}  기본 ${player.attack} + 장비 ${equipmentBonus.attack}`,
+        `방어 ${effectiveStats.defense}  기본 ${player.defense} + 장비 ${equipmentBonus.defense}`,
         `EXP ${player.exp} / ${requiredExp}  다음 ${nextExp}`,
       ].join("\n"),
     );
-    this.equipmentBonusText.setText(`장비 보너스  HP +${equipmentBonus.maxHp} / ATK +${equipmentBonus.attack} / DEF +${equipmentBonus.defense}`);
+    this.equipmentBonusText.setText(`장비 HP +${equipmentBonus.maxHp} / ATK +${equipmentBonus.attack} / DEF +${equipmentBonus.defense}`);
     this.inventoryText.setText(this.createInventorySummary(inventory, ownedEquipment));
 
     this.updateEquipmentIcons(equippedItems);
@@ -232,7 +232,7 @@ export class Hud {
     this.drawHpBar(126, 74, 166, 22, player.hp, effectiveStats.maxHp, HP_COLOR);
     this.drawHpBar(310, 222, 210, 18, player.hp, effectiveStats.maxHp, HP_COLOR);
     this.drawHpBar(670, 222, 220, 18, monster.currentHp, monster.data.maxHp, MONSTER_HP_COLOR);
-    this.drawExpBar(22, 344, 252, 8, skillCooldowns.length > 0 ? 1 : 0.35);
+    this.drawExpBar(22, 326, 252, 7, skillCooldowns.length > 0 ? 1 : 0.35);
     this.drawEquipmentIconSlots(equippedItems);
   }
 
@@ -262,8 +262,8 @@ export class Hud {
   }
 
   private drawCenterCombatArea(): void {
-    this.graphics.fillStyle(0x0b1017, 0.06);
-    this.graphics.fillRoundedRect(300, 126, 660, 360, 12);
+    this.graphics.fillStyle(0x0b1017, 0.035);
+    this.graphics.fillRoundedRect(308, 146, 628, 318, 12);
   }
 
   private drawRightMenuPanel(): void {
@@ -271,19 +271,19 @@ export class Hud {
       return;
     }
 
-    this.drawPanel({ x: 1134, y: 188, width: 104, height: 356, radius: 16 }, 0.86, PANEL_STROKE);
+    this.drawPanel({ x: 1136, y: 198, width: 96, height: 338, radius: 16 }, 0.84, PANEL_STROKE);
   }
 
   private drawBottomCombatControlPanel(): void {
-    this.drawPanel({ x: 54, y: 572, width: this.combatControlExpanded ? 356 : 146, height: 78, radius: 12 }, 0.86, PANEL_DARK_STROKE);
+    this.drawPanel({ x: 54, y: 584, width: this.combatControlExpanded ? 344 : 132, height: 70, radius: 12 }, 0.86, PANEL_DARK_STROKE);
   }
 
   private drawBottomSkillSlots(): void {
-    this.drawPanel({ x: 512, y: 586, width: 474, height: 98, radius: 12 }, 0.5, PANEL_DARK_STROKE);
+    this.drawPanel({ x: 526, y: 592, width: 444, height: 88, radius: 12 }, 0.46, PANEL_DARK_STROKE);
   }
 
   private drawLeftInfoPanel(): void {
-    this.drawPanel({ x: 14, y: 128, width: 274, height: 244, radius: 10 }, 0.42, PANEL_DARK_STROKE);
+    this.drawPanel({ x: 14, y: 128, width: 274, height: 214, radius: 10 }, 0.34, PANEL_DARK_STROKE);
   }
 
   private drawPanel(bounds: PanelBounds, alpha = 0.92, stroke = PANEL_STROKE): void {
@@ -378,13 +378,13 @@ export class Hud {
   }
 
   private createRightMenuObjects(scene: Phaser.Scene): UiButtonView {
-    const toggleButton = this.createUiButton(scene, 1186, 150, 102, 54, "<", "", () => {
+    const toggleButton = this.createUiButton(scene, 1186, 156, 96, 50, "<", "", () => {
       this.rightMenuExpanded = !this.rightMenuExpanded;
       this.syncRightMenuVisibility();
     }, false, "24px");
 
     for (const item of RIGHT_MENU_ITEMS) {
-      const button = this.createUiButton(scene, item.x, item.y, 78, 70, item.icon, item.label, () => {
+      const button = this.createUiButton(scene, item.x, item.y, 72, 64, item.icon, item.label, () => {
         this.selectedRightMenuKey = item.key;
         this.syncRightMenuVisibility();
       }, false, "24px");
@@ -395,14 +395,14 @@ export class Hud {
   }
 
   private createCombatControlObjects(scene: Phaser.Scene): UiButtonView {
-    const toggleButton = this.createUiButton(scene, 116, 611, 108, 54, "오토", "전투", () => {
+    const toggleButton = this.createUiButton(scene, 116, 619, 98, 50, "오토", "전투", () => {
       this.combatControlExpanded = !this.combatControlExpanded;
       this.syncCombatControlVisibility();
     }, false, "18px");
 
     COMBAT_CONTROL_MODES.forEach((mode, index) => {
-      const x = 112 + index * 86;
-      const button = this.createUiButton(scene, x, 611, 76, 54, mode.icon, mode.label, () => {
+      const x = 106 + index * 82;
+      const button = this.createUiButton(scene, x, 619, 70, 50, mode.icon, mode.label, () => {
         this.selectedCombatControlMode = mode.key;
         this.combatControlExpanded = false;
         this.syncCombatControlVisibility();
@@ -557,15 +557,15 @@ export class Hud {
   }
 
   private createSkillSlotObjects(scene: Phaser.Scene): void {
-    const startX = 550;
+    const startX = 566;
     for (let index = 0; index < 6; index += 1) {
-      const x = startX + index * 88;
+      const x = startX + index * 78;
       const background = scene.add.rectangle(x, 636, SKILL_SLOT_SIZE, SKILL_SLOT_SIZE, EMPTY_SLOT_FILL, 0.98)
         .setStrokeStyle(3, index < 2 ? 0xd3a24a : 0x42505f, 1)
         .setDepth(TEXT_DEPTH);
-      const image = scene.add.image(x, 636, "").setDisplaySize(68, 68).setVisible(false).setDepth(TEXT_DEPTH + 1);
+      const image = scene.add.image(x, 636, "").setDisplaySize(62, 62).setVisible(false).setDepth(TEXT_DEPTH + 1);
       const lockText = scene.add.text(x, 618, "🔒", this.textStyle("#d7dce5", "24px", 56)).setOrigin(0.5).setDepth(TEXT_DEPTH + 2);
-      const cooldownText = scene.add.text(x + 22, 662, "", this.textStyle("#ffffff", "15px", 44)).setOrigin(0.5).setDepth(TEXT_DEPTH + 3);
+      const cooldownText = scene.add.text(x + 20, 660, "", this.textStyle("#ffffff", "14px", 42)).setOrigin(0.5).setDepth(TEXT_DEPTH + 3);
       this.skillSlotViews.push({ background, image, lockText, cooldownText });
     }
   }

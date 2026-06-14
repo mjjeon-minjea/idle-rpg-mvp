@@ -137,7 +137,7 @@ export class GameScene extends Phaser.Scene {
         this.playEffect("trainee_slash", this.getMonsterEffectPosition(), {
           durationMs: 360,
           rotation: -0.35,
-          targetSize: 150,
+          targetSize: 118,
         });
       }
 
@@ -145,7 +145,7 @@ export class GameScene extends Phaser.Scene {
         this.playEffect("heavy_training_strike", this.getMonsterEffectPosition(), {
           durationMs: 460,
           rotation: 0.18,
-          targetSize: 178,
+          targetSize: 136,
         });
       }
 
@@ -164,7 +164,7 @@ export class GameScene extends Phaser.Scene {
         this.playEffect("basic_hit", this.getMonsterEffectPosition(), {
           durationMs: 240,
           rotation: 0.12,
-          targetSize: 82,
+          targetSize: 64,
         });
       }
 
