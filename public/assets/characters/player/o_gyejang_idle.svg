@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#101820" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <ellipse cx="128" cy="228" rx="58" ry="13" fill="#15202a" opacity="0.28"/>
+  <g filter="url(#shadow)" stroke="#1a2632" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M92 181 L82 226" stroke="#2c3844" stroke-width="14"/>
+    <path d="M156 181 L168 226" stroke="#2c3844" stroke-width="14"/>
+    <path d="M82 132 L54 165" stroke="#70472e" stroke-width="13"/>
+    <path d="M172 128 L208 158" stroke="#70472e" stroke-width="13"/>
+    <path d="M196 151 L229 210" stroke="#e8eef7" stroke-width="9"/>
+    <path d="M207 156 L240 215" stroke="#32465b" stroke-width="3"/>
+    <circle cx="61" cy="170" r="25" fill="#53677c" stroke-width="5"/>
+    <circle cx="61" cy="170" r="17" fill="#9fb2c7" stroke-width="3"/>
+    <path d="M79 117 C84 91 105 80 130 80 C157 80 177 98 180 124 L175 169 C172 198 151 215 126 215 C100 215 82 197 79 169 Z" fill="#c7d2de" stroke-width="6"/>
+    <path d="M96 126 L126 207 L158 126 Z" fill="#8995a2" opacity="0.82"/>
+    <path d="M94 125 C113 134 141 134 162 125" fill="none" stroke="#f4f6fb" stroke-width="5" opacity="0.85"/>
+    <path d="M169 118 L226 154 L173 170 Z" fill="#b53d37" stroke-width="5"/>
+    <circle cx="128" cy="75" r="43" fill="#deb28e" stroke-width="6"/>
+    <path d="M86 65 C92 31 119 19 149 28 C170 34 185 51 187 75 C171 63 157 58 141 62 C123 67 109 67 86 65 Z" fill="#6a4932" stroke-width="5"/>
+    <path d="M92 58 C104 29 126 18 152 27 C138 32 129 44 122 63 Z" fill="#7b553b" stroke-width="4"/>
+    <path d="M113 84 C119 88 126 88 132 84" fill="none" stroke="#26313d" stroke-width="5"/>
+    <path d="M146 84 C152 88 160 88 166 84" fill="none" stroke="#26313d" stroke-width="5"/>
+    <path d="M119 109 C130 113 140 112 148 107" fill="none" stroke="#7b4430" stroke-width="5"/>
+    <path d="M94 82 C82 79 76 89 81 99 C86 108 96 102 99 94" fill="#deb28e" stroke-width="5"/>
+    <path d="M184 82 C196 79 202 89 197 99 C192 108 182 102 179 94" fill="#deb28e" stroke-width="5"/>
+    <path d="M101 122 C117 132 143 133 160 122" fill="none" stroke="#fff2d2" stroke-width="4" opacity="0.48"/>
+    <path d="M95 124 C112 143 145 145 164 125" fill="none" stroke="#53606e" stroke-width="4" opacity="0.4"/>
+  </g>
+</svg>

@@ -1,5 +1,11 @@
 import Phaser from "phaser";
-import { EFFECT_ASSET_LIST, getEffectAsset, ITEM_ICON_ASSET_LIST, MONSTER_ASSET_LIST } from "../assets/AssetRegistry";
+import {
+  EFFECT_ASSET_LIST,
+  getEffectAsset,
+  ITEM_ICON_ASSET_LIST,
+  MONSTER_ASSET_LIST,
+  PLAYER_ASSET_LIST,
+} from "../assets/AssetRegistry";
 import { DataLoader } from "../loaders/DataLoader";
 import { CombatSystem } from "../systems/CombatSystem";
 import { DropResolver } from "../systems/DropResolver";
@@ -41,6 +47,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   preload(): void {
+    for (const asset of PLAYER_ASSET_LIST) {
+      this.load.svg(asset.key, asset.path, { width: 256, height: 256 });
+    }
+
     for (const asset of MONSTER_ASSET_LIST) {
       this.load.image(asset.key, asset.path);
     }
@@ -119,7 +129,7 @@ export class GameScene extends Phaser.Scene {
         this.playEffect("trainee_slash", this.getMonsterEffectPosition(), {
           durationMs: 360,
           rotation: -0.35,
-          scale: 0.22,
+          targetSize: 150,
         });
       }
 
@@ -127,7 +137,7 @@ export class GameScene extends Phaser.Scene {
         this.playEffect("heavy_training_strike", this.getMonsterEffectPosition(), {
           durationMs: 460,
           rotation: 0.18,
-          scale: 0.28,
+          targetSize: 178,
         });
       }
 
@@ -146,7 +156,7 @@ export class GameScene extends Phaser.Scene {
         this.playEffect("basic_hit", this.getMonsterEffectPosition(), {
           durationMs: 240,
           rotation: 0.12,
-          scale: 0.16,
+          targetSize: 82,
         });
       }
 
@@ -284,6 +294,12 @@ export class GameScene extends Phaser.Scene {
     background.fillStyle(0x4fa862, 0.85);
     background.fillEllipse(190, 340, 520, 250);
     background.fillEllipse(1060, 320, 520, 230);
+    background.fillStyle(0x2c7c48, 0.95);
+    background.fillEllipse(108, 632, 280, 92);
+    background.fillEllipse(1140, 640, 300, 96);
+    background.fillStyle(0x3d9a58, 0.8);
+    background.fillEllipse(235, 610, 170, 58);
+    background.fillEllipse(995, 602, 170, 58);
 
     background.fillStyle(0xd6b06e, 1);
     background.fillEllipse(650, 548, 680, 190);
@@ -328,24 +344,27 @@ export class GameScene extends Phaser.Scene {
   private playEffect(
     effectId: string,
     position: Phaser.Math.Vector2,
-    options: { durationMs: number; rotation: number; scale: number },
+    options: { durationMs: number; rotation: number; targetSize: number },
   ): void {
     const asset = getEffectAsset(effectId);
     if (!asset || !this.textures.exists(asset.key)) {
       return;
     }
 
+    const frame = this.textures.getFrame(asset.key);
+    const maxDimension = Math.max(frame.width, frame.height, 1);
+    const baseScale = options.targetSize / maxDimension;
     const effect = this.add
       .image(position.x, position.y, asset.key)
       .setDepth(4)
       .setAlpha(0)
       .setRotation(options.rotation * -0.25)
-      .setScale(options.scale * 0.55);
+      .setScale(baseScale * 0.72);
 
     this.tweens.add({
       targets: effect,
-      alpha: { from: 0.72, to: 0 },
-      scale: { from: options.scale * 0.7, to: options.scale * 0.98 },
+      alpha: { from: 0.62, to: 0 },
+      scale: { from: baseScale * 0.84, to: baseScale * 1.08 },
       rotation: options.rotation,
       duration: options.durationMs,
       ease: "Cubic.Out",

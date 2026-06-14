@@ -11,7 +11,7 @@ import type {
   StageData,
   StageEncounterType,
 } from "../types/GameTypes";
-import { getEffectAsset, getItemIconAsset, getMonsterAsset } from "../assets/AssetRegistry";
+import { getEffectAsset, getItemIconAsset, getMonsterAsset, getPlayerAsset } from "../assets/AssetRegistry";
 
 const UI_DEPTH = 5;
 const TEXT_DEPTH = 7;
@@ -100,6 +100,8 @@ export class Hud {
   private readonly goldText: Phaser.GameObjects.Text;
   private readonly diamondText: Phaser.GameObjects.Text;
   private readonly playerCombatHpText: Phaser.GameObjects.Text;
+  private readonly playerImage: Phaser.GameObjects.Image;
+  private readonly playerPortraitImage: Phaser.GameObjects.Image;
   private readonly monsterImage: Phaser.GameObjects.Image;
   private readonly monsterLabelText: Phaser.GameObjects.Text;
   private readonly monsterHpText: Phaser.GameObjects.Text;
@@ -132,12 +134,14 @@ export class Hud {
     this.stageSubtitleText = scene.add.text(458, 70, "", this.textStyle("#e9f2ff", "14px", 310)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
     this.goldText = scene.add.text(772, 34, "", this.textStyle("#fff3d0", "17px", 130)).setDepth(TEXT_DEPTH);
     this.diamondText = scene.add.text(936, 34, "", this.textStyle("#eaf9ff", "17px", 130)).setDepth(TEXT_DEPTH);
+    this.playerPortraitImage = scene.add.image(57, 56, "").setDisplaySize(62, 62).setVisible(false).setDepth(TEXT_DEPTH);
 
     this.createUiButton(scene, 1102, 54, 68, 72, "상점", "🏪", () => undefined);
     this.createUiButton(scene, 1194, 54, 68, 72, "편지함", "✉", () => undefined);
 
     scene.add.text(380, 192, "오계장", this.textStyle("#ffffff", "18px", 150)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
     this.playerCombatHpText = scene.add.text(380, 232, "", this.textStyle("#ffffff", "16px", 180)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
+    this.playerImage = scene.add.image(380, 382, "").setDisplaySize(168, 168).setVisible(false).setDepth(SPRITE_DEPTH);
     this.monsterImage = scene.add.image(780, 306, "").setVisible(false).setDepth(SPRITE_DEPTH);
     this.monsterLabelText = scene.add.text(780, 192, "", this.textStyle("#ffffff", "18px", 190)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
     this.monsterHpText = scene.add.text(780, 232, "", this.textStyle("#ffffff", "16px", 180)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
@@ -220,7 +224,7 @@ export class Hud {
     this.drawBottomCombatControlPanel();
     this.drawBottomSkillSlots();
     this.drawLeftInfoPanel();
-    this.drawPlayerPlaceholder();
+    this.updatePlayerImage();
     this.updateMonsterImage(monster);
     if (!this.monsterImage.visible) {
       this.drawMonsterPlaceholder(monster.data.role);
@@ -238,21 +242,6 @@ export class Hud {
     this.graphics.fillRoundedRect(22, 22, 70, 70, 10);
     this.graphics.lineStyle(2, 0xc7d8e9, 0.9);
     this.graphics.strokeRoundedRect(22, 22, 70, 70, 10);
-    this.graphics.fillStyle(0x2e3948, 1);
-    this.graphics.fillRoundedRect(36, 64, 42, 22, 5);
-    this.graphics.fillStyle(0xc6d1db, 1);
-    this.graphics.fillRoundedRect(42, 62, 30, 26, 5);
-    this.graphics.fillStyle(0xd8b08a, 1);
-    this.graphics.fillCircle(57, 51, 19);
-    this.graphics.fillStyle(0x6b4d39, 1);
-    this.graphics.fillCircle(44, 39, 12);
-    this.graphics.fillCircle(56, 35, 14);
-    this.graphics.fillCircle(70, 40, 10);
-    this.graphics.lineStyle(2, 0x1f2833, 1);
-    this.graphics.lineBetween(48, 54, 53, 55);
-    this.graphics.lineBetween(62, 55, 67, 54);
-    this.graphics.lineStyle(2, 0x5d3526, 1);
-    this.graphics.lineBetween(52, 63, 62, 62);
   }
 
   private drawTopStagePanel(): void {
@@ -346,6 +335,19 @@ export class Hud {
     this.graphics.lineBetween(432, 382, 476, 450);
     this.graphics.lineStyle(3, 0x36485a, 1);
     this.graphics.strokeCircle(322, 392, 24);
+  }
+
+  private updatePlayerImage(): void {
+    const asset = getPlayerAsset("o_gyejang_idle");
+    if (!asset || !this.playerImage.scene.textures.exists(asset.key)) {
+      this.playerImage.setVisible(false);
+      this.playerPortraitImage.setVisible(false);
+      this.drawPlayerPlaceholder();
+      return;
+    }
+
+    this.playerImage.setTexture(asset.key).setDisplaySize(172, 172).setVisible(true);
+    this.playerPortraitImage.setTexture(asset.key).setDisplaySize(62, 62).setVisible(true);
   }
 
   private drawMonsterPlaceholder(role: MonsterRole): void {

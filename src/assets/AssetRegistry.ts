@@ -4,6 +4,20 @@ export interface VisualAssetEntry {
   path: string;
 }
 
+export const PLAYER_ASSETS: Record<string, VisualAssetEntry> = {
+  o_gyejang_idle: {
+    id: "o_gyejang_idle",
+    key: "player:o_gyejang_idle",
+    path: "assets/characters/player/o_gyejang_idle.svg",
+  },
+};
+
+export const PLAYER_ASSET_LIST = Object.values(PLAYER_ASSETS);
+
+export function getPlayerAsset(playerId: string): VisualAssetEntry | undefined {
+  return PLAYER_ASSETS[playerId];
+}
+
 export const MONSTER_ASSETS: Record<string, VisualAssetEntry> = {
   dawn_slime: {
     id: "dawn_slime",
