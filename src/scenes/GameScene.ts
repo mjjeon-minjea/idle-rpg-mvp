@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { ITEM_ICON_ASSET_LIST, MONSTER_ASSET_LIST } from "../assets/AssetRegistry";
+import { EFFECT_ASSET_LIST, getEffectAsset, ITEM_ICON_ASSET_LIST, MONSTER_ASSET_LIST } from "../assets/AssetRegistry";
 import { DataLoader } from "../loaders/DataLoader";
 import { CombatSystem } from "../systems/CombatSystem";
 import { DropResolver } from "../systems/DropResolver";
@@ -46,6 +46,10 @@ export class GameScene extends Phaser.Scene {
     }
 
     for (const asset of ITEM_ICON_ASSET_LIST) {
+      this.load.image(asset.key, asset.path);
+    }
+
+    for (const asset of EFFECT_ASSET_LIST) {
       this.load.image(asset.key, asset.path);
     }
   }
@@ -111,6 +115,21 @@ export class GameScene extends Phaser.Scene {
 
     if (skillResult.triggered) {
       this.pushLog(`[Skill] ${skillResult.skillId} dealt ${skillResult.damage} damage`);
+      if (skillResult.skillId === "trainee_slash") {
+        this.playEffect("trainee_slash", this.getMonsterEffectPosition(), {
+          durationMs: 360,
+          rotation: -0.35,
+          scale: 0.48,
+        });
+      }
+
+      if (skillResult.skillId === "heavy_training_strike") {
+        this.playEffect("heavy_training_strike", this.getMonsterEffectPosition(), {
+          durationMs: 460,
+          rotation: 0.18,
+          scale: 0.58,
+        });
+      }
 
       if (skillResult.defeated) {
         defeatedBySkill = true;
@@ -123,6 +142,13 @@ export class GameScene extends Phaser.Scene {
 
     if (result) {
       this.pushLog(`[Combat] Basic ${result.monsterDamage} / Counter ${result.playerDamage}`);
+      if (result.monsterDamage > 0) {
+        this.playEffect("basic_hit", this.getMonsterEffectPosition(), {
+          durationMs: 240,
+          rotation: 0.12,
+          scale: 0.42,
+        });
+      }
 
       if (result.playerDamage > 0 && hpBeforeCombat - result.playerDamage <= 0) {
         this.pushLog("[Reset] Player HP reached 0 and auto-recovered");
@@ -235,5 +261,39 @@ export class GameScene extends Phaser.Scene {
         quantity: quantityByItemId.get(item.id) ?? 0,
         slot: item.equipment?.slot ?? "unknown",
       }));
+  }
+
+  private getMonsterEffectPosition(): Phaser.Math.Vector2 {
+    return new Phaser.Math.Vector2(748, 230);
+  }
+
+  private playEffect(
+    effectId: string,
+    position: Phaser.Math.Vector2,
+    options: { durationMs: number; rotation: number; scale: number },
+  ): void {
+    const asset = getEffectAsset(effectId);
+    if (!asset || !this.textures.exists(asset.key)) {
+      return;
+    }
+
+    const effect = this.add
+      .image(position.x, position.y, asset.key)
+      .setDepth(6)
+      .setAlpha(0)
+      .setRotation(options.rotation * -0.25)
+      .setScale(options.scale * 0.75);
+
+    this.tweens.add({
+      targets: effect,
+      alpha: { from: 0.85, to: 0 },
+      scale: { from: options.scale * 0.85, to: options.scale * 1.18 },
+      rotation: options.rotation,
+      duration: options.durationMs,
+      ease: "Cubic.Out",
+      onComplete: () => {
+        effect.destroy();
+      },
+    });
   }
 }

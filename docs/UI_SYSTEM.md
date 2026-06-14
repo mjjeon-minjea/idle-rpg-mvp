@@ -181,3 +181,35 @@ WPN / HELM / ARM / BOOT / NECK / RING
 Manual visual validation:
 
 브라우저에서 6슬롯 아이콘이 하단 패널에서 겹치지 않는지, 빈 슬롯과 장착 슬롯이 구분되는지 별도 확인해야 한다.
+
+## Effect Visual Integration (이펙트 시각 연결)
+
+Status: Basic skill and hit effects connected.
+
+이번 단계는 `Batch 3 Skill / Combat Effects` 중 3종만 전투 화면에 표시한다.
+
+연결된 이펙트:
+
+- `trainee_slash`: `SkillSystem` 결과의 `skillId`가 `trainee_slash`일 때 표시한다.
+- `heavy_training_strike`: `SkillSystem` 결과의 `skillId`가 `heavy_training_strike`일 때 표시한다.
+- `basic_hit`: `CombatSystem.update()` 결과에서 일반 공격 피해가 발생했을 때 표시한다.
+
+보류된 이펙트:
+
+- `critical_hit`
+- `monster_defeat`
+- `level_up`
+- `item_drop`
+- `gold_gain`
+
+구현 방식:
+
+- 단일 PNG + Phaser tween 방식을 사용한다.
+- sprite sheet와 particle effect는 아직 사용하지 않는다.
+- 이펙트는 표시 전용이며 피해량, 보상, 쿨타임, 전투 결과를 바꾸지 않는다.
+- 이벤트가 발생한 순간에만 image object를 생성하고 tween 완료 후 destroy한다.
+- 매 프레임 새 이펙트 오브젝트를 만들지 않는다.
+
+Manual visual validation:
+
+브라우저에서 이펙트 위치, 크기, HP bar 겹침, 몬스터 이미지 가림 정도를 별도로 확인해야 한다.

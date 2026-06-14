@@ -182,3 +182,31 @@ Deferred:
 - Material icon inventory display.
 - Reward icon display.
 - Manual visual validation in browser.
+
+## Effect Visual Integration (이펙트 시각 연결)
+
+Status: Basic skill and hit effects connected.
+
+Implemented:
+
+- `EFFECT_ASSETS` maps 8 Batch 3 effect IDs to asset keys and runtime paths.
+- `GameScene.preload()` preloads all 8 effect assets.
+- `trainee_slash`, `heavy_training_strike`, and `basic_hit` are displayed with single PNG + Phaser tween.
+- Effect visuals are display-only and do not change damage, rewards, cooldowns, save data, or stage progress.
+
+Deferred:
+
+- `critical_hit`
+- `monster_defeat`
+- `level_up`
+- `item_drop`
+- `gold_gain`
+- sprite sheets
+- particle effects
+- browser visual validation
+
+Preserved:
+
+- No `src/systems/*` changes.
+- No `data/*.json` changes.
+- No `public/assets/**` changes.

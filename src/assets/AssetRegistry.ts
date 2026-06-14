@@ -176,3 +176,52 @@ export const ITEM_ICON_ASSET_LIST = Object.values(ITEM_ICON_ASSETS);
 export function getItemIconAsset(itemId: string): VisualAssetEntry | undefined {
   return ITEM_ICON_ASSETS[itemId];
 }
+
+export const EFFECT_ASSETS: Record<string, VisualAssetEntry> = {
+  trainee_slash: {
+    id: "trainee_slash",
+    key: "effect:trainee_slash",
+    path: "assets/effects/skills/trainee_slash.png",
+  },
+  heavy_training_strike: {
+    id: "heavy_training_strike",
+    key: "effect:heavy_training_strike",
+    path: "assets/effects/skills/heavy_training_strike.png",
+  },
+  basic_hit: {
+    id: "basic_hit",
+    key: "effect:basic_hit",
+    path: "assets/effects/combat/basic_hit.png",
+  },
+  critical_hit: {
+    id: "critical_hit",
+    key: "effect:critical_hit",
+    path: "assets/effects/combat/critical_hit.png",
+  },
+  monster_defeat: {
+    id: "monster_defeat",
+    key: "effect:monster_defeat",
+    path: "assets/effects/combat/monster_defeat.png",
+  },
+  level_up: {
+    id: "level_up",
+    key: "effect:level_up",
+    path: "assets/effects/combat/level_up.png",
+  },
+  item_drop: {
+    id: "item_drop",
+    key: "effect:item_drop",
+    path: "assets/effects/combat/item_drop.png",
+  },
+  gold_gain: {
+    id: "gold_gain",
+    key: "effect:gold_gain",
+    path: "assets/effects/combat/gold_gain.png",
+  },
+};
+
+export const EFFECT_ASSET_LIST = Object.values(EFFECT_ASSETS);
+
+export function getEffectAsset(effectId: string): VisualAssetEntry | undefined {
+  return EFFECT_ASSETS[effectId];
+}
