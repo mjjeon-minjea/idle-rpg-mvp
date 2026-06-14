@@ -1,212 +1,102 @@
-# Project Status (프로젝트 현재 상태)
+# Project Status
 
-Last updated: 2026-06-13
+Last updated: 2026-06-14
 
-## Current State (현재 상태)
+## Current State
 
-이 프로젝트는 Phaser 3 + TypeScript + Vite 기반 idle RPG MVP (방치형 RPG MVP)입니다.
+`idle-rpg-mvp`는 Phaser 3 + TypeScript + Vite 기반 로컬 방치형 RPG MVP다.
 
-## Implemented (구현됨)
+게임 제목:
 
-- Game boot via Phaser/Vite (Phaser/Vite 실행)
-- JSON data loading (JSON 데이터 로딩)
-- Data validation (데이터 검증)
-- Auto Combat (자동 전투)
-- Monster Pool (몬스터 풀)
-- Monster Factory (몬스터 생성)
-- Stage Progress (스테이지 진행)
-- Stage Content 1~9 (스테이지 1~9 콘텐츠)
-- Reward Resolver (보상 계산)
-- Drop Resolver (드랍 계산)
-- Reward System (보상 적용)
-- Player Growth System (플레이어 성장)
-- Equipment System (장비 시스템)
-- Skill System (스킬 시스템)
-- Inventory quantity storage (인벤토리 수량 저장)
-- localStorage save/load (로컬 저장/불러오기)
-- HUD display (HUD 표시)
-- Manual playtest checklist (수동 플레이 검증 체크리스트)
-- MVP Visual Readability Pass (MVP 화면 가독성 개선)
+```text
+피곤해서 잠들었는데 일어나 보니 환생해서 어쩌다 수습기사 되어 이세계를 무쌍한다
+```
 
-## Partial (부분 구현)
+주인공:
 
-- Boss flow (보스 흐름): 3개 보스 스테이지는 있으나 보스 전용 패턴은 없음
-- Item drops (아이템 드랍): 기본 드랍과 고정 스탯 장비 드랍은 있으나 랜덤 옵션 장비는 없음
-- Stage clear rewards (스테이지 클리어 보상): 기본 적용만 있음
-- Skill system (스킬 시스템): 자동 발동 단일 대상 공격 스킬과 쿨타임은 구현됐으나 스킬 강화/트리/이펙트는 없음
-- UI art (UI 아트): 수동 검증용 임시 패널/placeholder/HP bar만 있으며 정식 아트는 없음
+```text
+오계장
+```
 
-## Documented / Designed (문서화/설계됨)
+## Implemented
 
-- MonsterData vs MonsterInstance
-- SingleEntityMonster MVP scope
-- SegmentedMonster future extension
-- Reward responsibility boundary
-- Future source folder structure
-- Advanced equipment farming structure
+- Phaser / Vite boot
+- JSON data loading and validation
+- Auto combat
+- Monster runtime instance
+- Monster pool selection
+- Monster factory
+- Stage progress
+- Stage 1~9 content
+- Reward resolver
+- Drop resolver
+- Reward system
+- Player growth system
+- Equipment system
+- Equipment slot expansion
+- Inventory quantity storage
+- Skill system
+- localStorage save/load
+- Batch 1 monster assets
+- Batch 2 equipment/material icon assets
+- Batch 3 skill/combat effect assets
+- Monster visual integration
+- Equipped equipment HUD icon integration
+- Basic skill/hit effect visual integration
+- First screen HUD layout pass
 
-## Not Started (미시작)
+## Current UI Direction
 
-- RebirthSystem (환생 시스템)
-- JobSystem (전직 시스템)
+`First Screen UI Implementation v1` 기준으로 HUD 구조를 정리했다.
 
-## Current Verification Commands (현재 검증 명령어)
+현재 방향:
+
+- 우측 Battle Log 패널은 첫 화면에서 제외
+- 우측 메뉴는 스킬 / 장비 / 가방 / 퀘스트 접힘/펼침 구조
+- 하단 전투 제어는 수동 / 오토 / x1.5 / x2 구조
+- 하단 스킬 슬롯은 6개 유지
+- 상점 / 편지함은 상단 우측에 유지
+- 전투 장면과 캐릭터/몬스터를 첫 화면 중심으로 유지
+
+현재 전투 제어 UI는 표시 상태만 구현되어 있으며, 실제 전투 속도 변경은 아직 연결하지 않았다.
+
+## Deferred
+
+- Manual browser visual validation
+- Actual combat speed integration
+- Skill panel
+- Equipment panel
+- Inventory panel
+- Quest panel
+- Reward popup
+- Stage clear popup
+- Rebirth system
+- Job system
+- Skill upgrade system
+- Region background asset integration
+
+## Verification Commands
 
 ```powershell
 npm.cmd run typecheck
 npm.cmd run build
 ```
 
-## Important Note (중요 메모)
+## Local Save Reset
 
-`idle-rpg-mvp` 폴더는 Git repository (Git 저장소)로 초기화되어 있으며, `origin/main`은 GitHub 저장소 `mjjeon-minjea/idle-rpg-mvp`를 추적합니다.
+MVP 개발 중 데이터 구조나 스테이지 순서가 바뀐 경우 기존 localStorage 저장 데이터가 현재 데이터와 맞지 않을 수 있다.
 
-Stage data expansion (스테이지 데이터 확장) 후 기존 localStorage 저장 데이터는 현재 스테이지 위치가 어긋날 수 있습니다. MVP 개발 중에는 필요 시 브라우저 콘솔에서 아래 명령으로 저장 데이터를 초기화합니다.
+필요 시 브라우저 콘솔에서 아래 명령으로 초기화한다.
 
 ```js
 localStorage.removeItem("idle-rpg-mvp-save");
 location.reload();
 ```
 
-Stage 1~9 브라우저 수동 검증은 `docs/MANUAL_PLAYTEST_CHECKLIST.md`를 기준으로 진행한다.
+## Notes
 
-현재 화면 가독성 개선은 정식 아트 제작이 아니라 `MVP Visual Readability Pass (MVP 화면 가독성 개선)`이다.
+- `src/systems/*`는 이번 UI 작업에서 수정하지 않았다.
+- `data/*.json`은 이번 UI 작업에서 수정하지 않았다.
+- `public/assets/**`는 이번 UI 작업에서 수정하지 않았다.
+- Visual Validation은 사용자가 브라우저에서 직접 확인하기 전까지 deferred로 유지한다.
 
-## Balance Patch 1 (밸런스 패치 1)
-
-Status: No Data Patch (데이터 패치 없음)
-
-Reason: Current Stage 1~9 numbers are suitable for later Manual Validation (수동 검증)에 사용하기 적합하다.
-
-Watch Point (주시 항목):
-
-- Stage 9 boss death/reset feel (Stage 9 보스 사망/회복 체감)
-- Armor impact (방어구 장착 체감)
-
-Decision (결정):
-
-- `data/*.json`은 아직 수정하지 않는다.
-- Gold economy (골드 경제)는 gold sink (골드 소비처)가 없으므로 아직 조정하지 않는다.
-- Korean Display Text Fix (한글 표시 문자열 수정)는 Balance Patch 1에 섞지 않고 별도 작업 후보로 분리한다.
-- CombatSystem / RewardSystem / PlayerGrowthSystem / EquipmentSystem / SkillSystem / StageProgressSystem 구조는 유지한다.
-
-## UI Panel Refinement (UI 패널 개선)
-
-Status: Implemented for Manual Validation (수동 검증용 구현 완료)
-
-Scope:
-
-- HUD / Panel / Battle Log readability (HUD / 패널 / 전투 로그 가독성) 개선
-- Current Stage / Region / Objective 표시
-- Owned Equipment (보유 장비)와 Equipped Equipment (장착 장비) 구분 표시
-- Skill / Combat / Reward / Reset 로그 태그 추가
-
-Preserved:
-
-- `data/*.json` 수정 없음
-- `src/systems/*` 수정 없음
-- 정식 이미지 / 애니메이션 / 이펙트 작업 없음
-- Korean Display Text Fix (한글 표시 문자열 수정)는 별도 작업 후보로 유지
-
-## Equipment Slot Expansion (장비 슬롯 확장)
-
-Status: Implemented with Option B (Option B 기준 구현 완료)
-
-Scope:
-
-- Equipment slots expanded to `weapon`, `helmet`, `armor`, `boots`, `necklace`, `ring`.
-- Weapon equipment now requires `weaponType`.
-- MVP 1 weaponType values are `sword`, `spear`, `axe`.
-- Existing `accessory` save data is treated as `ring` through fallback.
-- Five new equipment items were registered in `data/items.json` only.
-
-Preserved:
-
-- No CombatSystem / SkillSystem / RewardSystem / StageProgressSystem changes.
-- No dropTable / reward / stage reward connection for the five new equipment items yet.
-- Batch 2 Equipment / Material Icons remains on hold until the slot structure is fully accepted.
-
-Deferred:
-
-- `weaponProfile`
-- `DamageType`
-- Weapon-specific combat formulas
-
-## Asset Visual Integration (에셋 시각 연결)
-
-Status: Monster Visual Integration v1 implemented.
-
-Implemented:
-
-- Batch 1 monster assets are preloaded in `GameScene.preload()`.
-- `MONSTER_ASSETS` maps monster IDs to asset keys and runtime paths.
-- `Hud` displays monster images for the current target.
-- Existing role-based monster placeholder remains as fallback when an image is missing.
-
-Preserved:
-
-- No `src/systems/*` changes.
-- No `data/*.json` changes.
-- No `public/assets/**` changes.
-- No equipment/material icon HUD connection yet.
-
-Deferred:
-
-- Equipment / Material icon UI connection.
-- Inventory icon grid.
-- Reward log icon display.
-- Manual visual validation in browser.
-
-## Equipment / Material Icon HUD Integration (장비 / 재료 아이콘 HUD 연결)
-
-Status: Equipped Equipment HUD icon v1 implemented.
-
-Implemented:
-
-- `ITEM_ICON_ASSETS` maps 16 Batch 2 item IDs to icon asset keys and runtime paths.
-- `GameScene.preload()` preloads item icon assets.
-- `Hud` displays equipped equipment icons for six slots: weapon, helmet, armor, boots, necklace, ring.
-- Missing icon fallback is handled in the visual layer.
-
-Preserved:
-
-- No `src/systems/*` changes.
-- No `data/*.json` changes.
-- No `public/assets/**` changes.
-- No full inventory icon grid.
-- No reward log icon display.
-
-Deferred:
-
-- Owned Equipment icon summary.
-- Material icon inventory display.
-- Reward icon display.
-- Manual visual validation in browser.
-
-## Effect Visual Integration (이펙트 시각 연결)
-
-Status: Basic skill and hit effects connected.
-
-Implemented:
-
-- `EFFECT_ASSETS` maps 8 Batch 3 effect IDs to asset keys and runtime paths.
-- `GameScene.preload()` preloads all 8 effect assets.
-- `trainee_slash`, `heavy_training_strike`, and `basic_hit` are displayed with single PNG + Phaser tween.
-- Effect visuals are display-only and do not change damage, rewards, cooldowns, save data, or stage progress.
-
-Deferred:
-
-- `critical_hit`
-- `monster_defeat`
-- `level_up`
-- `item_drop`
-- `gold_gain`
-- sprite sheets
-- particle effects
-- browser visual validation
-
-Preserved:
-
-- No `src/systems/*` changes.
-- No `data/*.json` changes.
-- No `public/assets/**` changes.
