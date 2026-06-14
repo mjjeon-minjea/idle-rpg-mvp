@@ -28,7 +28,7 @@ const BUTTON_STROKE = 0x526171;
 const BUTTON_ACTIVE_STROKE = 0xffd35a;
 
 type RightMenuKey = "skill" | "equipment" | "inventory" | "quest";
-type CombatControlMode = "manual" | "auto" | "auto2" | "auto3";
+type CombatControlMode = "manual" | "auto" | "auto1_5" | "auto2";
 
 const RIGHT_MENU_ITEMS: Array<{ key: RightMenuKey; label: string; shortLabel: string; x: number; y: number }> = [
   { key: "skill", label: "스킬", shortLabel: "스", x: 1080, y: 232 },
@@ -40,8 +40,8 @@ const RIGHT_MENU_ITEMS: Array<{ key: RightMenuKey; label: string; shortLabel: st
 const COMBAT_CONTROL_MODES: Array<{ key: CombatControlMode; label: string; shortLabel: string; locked: boolean }> = [
   { key: "manual", label: "수동", shortLabel: "수동", locked: false },
   { key: "auto", label: "오토", shortLabel: "오토", locked: false },
+  { key: "auto1_5", label: "오토 x1.5", shortLabel: "x1.5", locked: true },
   { key: "auto2", label: "오토 x2", shortLabel: "x2", locked: true },
-  { key: "auto3", label: "오토 x3", shortLabel: "x3", locked: true },
 ];
 
 const EQUIPMENT_ICON_SLOTS: Array<{ slot: EquipmentSlot; label: string; x: number; y: number }> = [
