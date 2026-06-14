@@ -8,7 +8,7 @@ export const PLAYER_ASSETS: Record<string, VisualAssetEntry> = {
   o_gyejang_idle: {
     id: "o_gyejang_idle",
     key: "player:o_gyejang_idle",
-    path: "assets/characters/player/o_gyejang_idle.svg",
+    path: "assets/characters/player/o_gyejang_idle.png",
   },
 };
 
