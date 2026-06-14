@@ -1,5 +1,6 @@
 import type {
   EffectivePlayerStats,
+  EquipmentSlot,
   EquippedItemView,
   EquipmentStatBonus,
   InventoryEntry,
@@ -11,7 +12,7 @@ import type {
   StageData,
   StageEncounterType,
 } from "../types/GameTypes";
-import { getMonsterAsset } from "../assets/AssetRegistry";
+import { getItemIconAsset, getMonsterAsset } from "../assets/AssetRegistry";
 
 const PANEL_FILL = 0x171b22;
 const PANEL_STROKE = 0x2b3440;
@@ -19,6 +20,16 @@ const BAR_BG = 0x29313d;
 const PLAYER_COLOR = 0x4f9cff;
 const HP_COLOR = 0x55d66b;
 const HP_LOW_COLOR = 0xff6b6b;
+const EQUIPMENT_ICON_SIZE = 38;
+
+const EQUIPMENT_ICON_SLOTS: Array<{ slot: EquipmentSlot; label: string; x: number; y: number }> = [
+  { slot: "weapon", label: "WPN", x: 430, y: 632 },
+  { slot: "helmet", label: "HELM", x: 482, y: 632 },
+  { slot: "armor", label: "ARM", x: 534, y: 632 },
+  { slot: "boots", label: "BOOT", x: 586, y: 632 },
+  { slot: "necklace", label: "NECK", x: 638, y: 632 },
+  { slot: "ring", label: "RING", x: 690, y: 632 },
+];
 
 interface PanelBounds {
   x: number;
@@ -37,6 +48,8 @@ export interface OwnedEquipmentView {
 export class Hud {
   private readonly graphics: Phaser.GameObjects.Graphics;
   private readonly monsterImage: Phaser.GameObjects.Image;
+  private readonly equipmentIconImages = new Map<EquipmentSlot, Phaser.GameObjects.Image>();
+  private readonly equipmentFallbackTexts = new Map<EquipmentSlot, Phaser.GameObjects.Text>();
   private readonly stageText: Phaser.GameObjects.Text;
   private readonly playerText: Phaser.GameObjects.Text;
   private readonly playerHpText: Phaser.GameObjects.Text;
@@ -48,10 +61,12 @@ export class Hud {
   private readonly logText: Phaser.GameObjects.Text;
   private readonly monsterLabelText: Phaser.GameObjects.Text;
   private currentMonsterAssetKey?: string;
+  private readonly currentEquipmentAssetKeys = new Map<EquipmentSlot, string | undefined>();
 
   constructor(scene: Phaser.Scene, title: string, subtitle: string) {
     this.graphics = scene.add.graphics();
     this.monsterImage = scene.add.image(748, 226, "").setVisible(false).setDepth(1);
+    this.createEquipmentIconObjects(scene);
 
     scene.add.text(32, 18, title, this.textStyle("#f4f0df", "22px", 820));
     scene.add.text(32, 52, subtitle, this.textStyle("#aeb7c7", "14px", 820));
@@ -125,8 +140,9 @@ export class Hud {
     this.equipmentText.setText([
       "Equipped (장착)",
       `Slots: ${this.countEquippedItems(equippedItems)} / ${equippedItems.length}`,
-      ...this.createEquippedEquipmentLines(equippedItems),
       `Bonus: HP +${equipmentBonus.maxHp} / ATK +${equipmentBonus.attack} / DEF +${equipmentBonus.defense}`,
+      "",
+      "Icons: WPN / HELM / ARM / BOOT / NECK / RING",
       "",
       "Owned Equipment (보유 장비)",
       ...this.createOwnedEquipmentLines(ownedEquipment),
@@ -136,6 +152,7 @@ export class Hud {
       "Inventory (인벤토리)",
       this.createInventorySummary(inventory),
     ]);
+    this.updateEquipmentIcons(equippedItems);
   }
 
   setLog(lines: string[]): void {
@@ -155,6 +172,7 @@ export class Hud {
     if (!this.monsterImage.visible) {
       this.drawMonsterPlaceholder(monster.data.role);
     }
+    this.drawEquipmentIconSlots();
     this.drawHpBar(48, 316, 230, 18, player.hp, effectiveStats.maxHp);
     this.drawHpBar(588, 336, 250, 18, monster.currentHp, monster.data.maxHp);
   }
@@ -181,6 +199,73 @@ export class Hud {
     this.graphics.fillCircle(748, 234, visual.radius);
     this.graphics.lineStyle(3, visual.strokeColor, 1);
     this.graphics.strokeCircle(748, 234, visual.radius);
+  }
+
+  private createEquipmentIconObjects(scene: Phaser.Scene): void {
+    for (const slot of EQUIPMENT_ICON_SLOTS) {
+      const image = scene.add.image(slot.x, slot.y, "").setDisplaySize(32, 32).setVisible(false).setDepth(1);
+      const fallbackText = scene.add
+        .text(slot.x, slot.y - 11, "?", this.textStyle("#aeb7c7", "18px", 34))
+        .setOrigin(0.5, 0)
+        .setDepth(2)
+        .setVisible(false);
+      scene.add
+        .text(slot.x, slot.y + 22, slot.label, this.textStyle("#aeb7c7", "9px", 44))
+        .setOrigin(0.5, 0)
+        .setDepth(2);
+
+      this.equipmentIconImages.set(slot.slot, image);
+      this.equipmentFallbackTexts.set(slot.slot, fallbackText);
+    }
+  }
+
+  private drawEquipmentIconSlots(): void {
+    for (const slot of EQUIPMENT_ICON_SLOTS) {
+      const x = slot.x - EQUIPMENT_ICON_SIZE / 2;
+      const y = slot.y - EQUIPMENT_ICON_SIZE / 2;
+      this.graphics.fillStyle(0x202733, 1);
+      this.graphics.fillRoundedRect(x, y, EQUIPMENT_ICON_SIZE, EQUIPMENT_ICON_SIZE, 6);
+      this.graphics.lineStyle(1, 0x526171, 1);
+      this.graphics.strokeRoundedRect(x, y, EQUIPMENT_ICON_SIZE, EQUIPMENT_ICON_SIZE, 6);
+    }
+  }
+
+  private updateEquipmentIcons(equippedItems: EquippedItemView[]): void {
+    const equippedBySlot = new Map(equippedItems.map((item) => [item.slot, item]));
+
+    for (const slot of EQUIPMENT_ICON_SLOTS) {
+      const item = equippedBySlot.get(slot.slot);
+      const image = this.equipmentIconImages.get(slot.slot);
+      const fallbackText = this.equipmentFallbackTexts.get(slot.slot);
+      if (!image || !fallbackText) {
+        continue;
+      }
+
+      const itemId = item?.itemId;
+      if (!itemId) {
+        this.currentEquipmentAssetKeys.set(slot.slot, undefined);
+        image.setVisible(false);
+        fallbackText.setVisible(false);
+        continue;
+      }
+
+      const asset = getItemIconAsset(itemId);
+      if (!asset || !image.scene.textures.exists(asset.key)) {
+        this.currentEquipmentAssetKeys.set(slot.slot, undefined);
+        image.setVisible(false);
+        fallbackText.setVisible(true);
+        continue;
+      }
+
+      if (this.currentEquipmentAssetKeys.get(slot.slot) !== asset.key) {
+        this.currentEquipmentAssetKeys.set(slot.slot, asset.key);
+        image.setTexture(asset.key);
+        image.setDisplaySize(32, 32);
+      }
+
+      image.setVisible(true);
+      fallbackText.setVisible(false);
+    }
   }
 
   private updateMonsterImage(monster: MonsterInstance): void {
@@ -342,15 +427,6 @@ export class Hud {
     }
 
     return skillCooldowns.map((skill) => `- ${skill.skillName}: ${this.getSkillStatus(player, skill)}`);
-  }
-
-  private createEquippedEquipmentLines(equippedItems: EquippedItemView[]): string[] {
-    const visibleItems = equippedItems.filter((item) => item.itemId);
-    if (visibleItems.length === 0) {
-      return ["- Empty (없음)"];
-    }
-
-    return visibleItems.slice(0, 4).map((item) => `- ${this.getSlotLabel(item.slot)}: ${item.name}`);
   }
 
   private countEquippedItems(equippedItems: EquippedItemView[]): number {

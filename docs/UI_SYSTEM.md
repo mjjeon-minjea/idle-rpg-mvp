@@ -148,3 +148,36 @@ Status: Monster Visual Integration v1 implemented.
 Manual visual validation:
 
 브라우저에서 몬스터 이미지 크기, HP bar 겹침, normal / leader / boss 구분 가독성을 별도 확인해야 한다.
+
+## Equipment / Material Icon HUD Integration (장비 / 재료 아이콘 HUD 연결)
+
+Status: Equipped Equipment HUD icon v1 implemented.
+
+이번 단계는 `Batch 2 Equipment / Material Icons` 중 장착 장비 6슬롯 아이콘 표시만 게임 HUD에 연결한다.
+재료 아이콘, 인벤토리 전체 아이콘 그리드, 보상 로그 아이콘 표시는 아직 연결하지 않는다.
+
+적용 범위:
+
+- `src/assets/AssetRegistry.ts`에서 `ITEM_ICON_ASSETS` 16개를 관리한다.
+- `GameScene.preload()`에서 item icon assets를 Phaser texture로 preload한다.
+- `Hud`는 장착 장비 6슬롯에 해당하는 아이콘만 표시한다.
+- 장비 아이콘이 없거나 preload되지 않은 경우 슬롯 박스와 fallback `?` 표시를 사용한다.
+- 빈 슬롯은 슬롯 박스와 짧은 슬롯 라벨만 유지한다.
+
+6슬롯 표시:
+
+```text
+WPN / HELM / ARM / BOOT / NECK / RING
+```
+
+보류:
+
+- 보유 장비 아이콘 목록
+- 인벤토리 전체 아이콘 그리드
+- 재료 아이콘 HUD 표시
+- 보상 로그 아이콘화
+- tooltip / hover detail
+
+Manual visual validation:
+
+브라우저에서 6슬롯 아이콘이 하단 패널에서 겹치지 않는지, 빈 슬롯과 장착 슬롯이 구분되는지 별도 확인해야 한다.

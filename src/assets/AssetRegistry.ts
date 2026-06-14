@@ -87,3 +87,92 @@ export const MONSTER_ASSET_LIST = Object.values(MONSTER_ASSETS);
 export function getMonsterAsset(monsterId: string): VisualAssetEntry | undefined {
   return MONSTER_ASSETS[monsterId];
 }
+
+export const ITEM_ICON_ASSETS: Record<string, VisualAssetEntry> = {
+  rusty_training_sword: {
+    id: "rusty_training_sword",
+    key: "item:rusty_training_sword",
+    path: "assets/icons/equipment/rusty_training_sword.png",
+  },
+  bent_training_spear: {
+    id: "bent_training_spear",
+    key: "item:bent_training_spear",
+    path: "assets/icons/equipment/bent_training_spear.png",
+  },
+  chipped_training_axe: {
+    id: "chipped_training_axe",
+    key: "item:chipped_training_axe",
+    path: "assets/icons/equipment/chipped_training_axe.png",
+  },
+  dented_apprentice_helmet: {
+    id: "dented_apprentice_helmet",
+    key: "item:dented_apprentice_helmet",
+    path: "assets/icons/equipment/dented_apprentice_helmet.png",
+  },
+  worn_apprentice_armor: {
+    id: "worn_apprentice_armor",
+    key: "item:worn_apprentice_armor",
+    path: "assets/icons/equipment/worn_apprentice_armor.png",
+  },
+  worn_apprentice_boots: {
+    id: "worn_apprentice_boots",
+    key: "item:worn_apprentice_boots",
+    path: "assets/icons/equipment/worn_apprentice_boots.png",
+  },
+  frayed_apprentice_necklace: {
+    id: "frayed_apprentice_necklace",
+    key: "item:frayed_apprentice_necklace",
+    path: "assets/icons/equipment/frayed_apprentice_necklace.png",
+  },
+  cracked_apprentice_ring: {
+    id: "cracked_apprentice_ring",
+    key: "item:cracked_apprentice_ring",
+    path: "assets/icons/equipment/cracked_apprentice_ring.png",
+  },
+  trainee_medal: {
+    id: "trainee_medal",
+    key: "item:trainee_medal",
+    path: "assets/icons/material/trainee_medal.png",
+  },
+  soft_leaf: {
+    id: "soft_leaf",
+    key: "item:soft_leaf",
+    path: "assets/icons/material/soft_leaf.png",
+  },
+  mist_shard: {
+    id: "mist_shard",
+    key: "item:mist_shard",
+    path: "assets/icons/material/mist_shard.png",
+  },
+  mist_core: {
+    id: "mist_core",
+    key: "item:mist_core",
+    path: "assets/icons/material/mist_core.png",
+  },
+  ogre_badge: {
+    id: "ogre_badge",
+    key: "item:ogre_badge",
+    path: "assets/icons/material/ogre_badge.png",
+  },
+  old_ore_fragment: {
+    id: "old_ore_fragment",
+    key: "item:old_ore_fragment",
+    path: "assets/icons/material/old_ore_fragment.png",
+  },
+  old_ore_core: {
+    id: "old_ore_core",
+    key: "item:old_ore_core",
+    path: "assets/icons/material/old_ore_core.png",
+  },
+  guardian_stone: {
+    id: "guardian_stone",
+    key: "item:guardian_stone",
+    path: "assets/icons/material/guardian_stone.png",
+  },
+};
+
+export const ITEM_ICON_ASSET_LIST = Object.values(ITEM_ICON_ASSETS);
+
+export function getItemIconAsset(itemId: string): VisualAssetEntry | undefined {
+  return ITEM_ICON_ASSETS[itemId];
+}

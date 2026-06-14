@@ -156,3 +156,29 @@ Deferred:
 - Inventory icon grid.
 - Reward log icon display.
 - Manual visual validation in browser.
+
+## Equipment / Material Icon HUD Integration (장비 / 재료 아이콘 HUD 연결)
+
+Status: Equipped Equipment HUD icon v1 implemented.
+
+Implemented:
+
+- `ITEM_ICON_ASSETS` maps 16 Batch 2 item IDs to icon asset keys and runtime paths.
+- `GameScene.preload()` preloads item icon assets.
+- `Hud` displays equipped equipment icons for six slots: weapon, helmet, armor, boots, necklace, ring.
+- Missing icon fallback is handled in the visual layer.
+
+Preserved:
+
+- No `src/systems/*` changes.
+- No `data/*.json` changes.
+- No `public/assets/**` changes.
+- No full inventory icon grid.
+- No reward log icon display.
+
+Deferred:
+
+- Owned Equipment icon summary.
+- Material icon inventory display.
+- Reward icon display.
+- Manual visual validation in browser.

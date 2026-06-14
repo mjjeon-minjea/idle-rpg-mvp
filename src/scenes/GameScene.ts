@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { MONSTER_ASSET_LIST } from "../assets/AssetRegistry";
+import { ITEM_ICON_ASSET_LIST, MONSTER_ASSET_LIST } from "../assets/AssetRegistry";
 import { DataLoader } from "../loaders/DataLoader";
 import { CombatSystem } from "../systems/CombatSystem";
 import { DropResolver } from "../systems/DropResolver";
@@ -42,6 +42,10 @@ export class GameScene extends Phaser.Scene {
 
   preload(): void {
     for (const asset of MONSTER_ASSET_LIST) {
+      this.load.image(asset.key, asset.path);
+    }
+
+    for (const asset of ITEM_ICON_ASSET_LIST) {
       this.load.image(asset.key, asset.path);
     }
   }
