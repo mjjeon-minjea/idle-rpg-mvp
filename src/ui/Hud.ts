@@ -134,14 +134,14 @@ export class Hud {
     this.stageSubtitleText = scene.add.text(458, 70, "", this.textStyle("#e9f2ff", "14px", 310)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
     this.goldText = scene.add.text(772, 34, "", this.textStyle("#fff3d0", "17px", 130)).setDepth(TEXT_DEPTH);
     this.diamondText = scene.add.text(936, 34, "", this.textStyle("#eaf9ff", "17px", 130)).setDepth(TEXT_DEPTH);
-    this.playerPortraitImage = scene.add.image(57, 56, "").setDisplaySize(62, 62).setVisible(false).setDepth(TEXT_DEPTH);
+    this.playerPortraitImage = scene.add.image(57, 56, "").setDisplaySize(46, 68).setVisible(false).setDepth(TEXT_DEPTH);
 
     this.createUiButton(scene, 1102, 54, 68, 72, "상점", "🏪", () => undefined);
     this.createUiButton(scene, 1194, 54, 68, 72, "편지함", "✉", () => undefined);
 
     scene.add.text(380, 192, "오계장", this.textStyle("#ffffff", "18px", 150)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
     this.playerCombatHpText = scene.add.text(380, 232, "", this.textStyle("#ffffff", "16px", 180)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
-    this.playerImage = scene.add.image(380, 382, "").setDisplaySize(168, 168).setVisible(false).setDepth(SPRITE_DEPTH);
+    this.playerImage = scene.add.image(380, 378, "").setDisplaySize(198, 294).setVisible(false).setDepth(SPRITE_DEPTH);
     this.monsterImage = scene.add.image(780, 306, "").setVisible(false).setDepth(SPRITE_DEPTH);
     this.monsterLabelText = scene.add.text(780, 192, "", this.textStyle("#ffffff", "18px", 190)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
     this.monsterHpText = scene.add.text(780, 232, "", this.textStyle("#ffffff", "16px", 180)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
@@ -346,8 +346,8 @@ export class Hud {
       return;
     }
 
-    this.playerImage.setTexture(asset.key).setDisplaySize(172, 172).setVisible(true);
-    this.playerPortraitImage.setTexture(asset.key).setDisplaySize(62, 62).setVisible(true);
+    this.playerImage.setTexture(asset.key).setDisplaySize(198, 294).setVisible(true);
+    this.playerPortraitImage.setTexture(asset.key).setDisplaySize(46, 68).setVisible(true);
   }
 
   private drawMonsterPlaceholder(role: MonsterRole): void {
