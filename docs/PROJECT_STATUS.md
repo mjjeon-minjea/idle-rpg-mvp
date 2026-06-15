@@ -1,6 +1,30 @@
 # Project Status
 
-Last updated: 2026-06-14
+Last updated: 2026-06-16
+
+## UI Core Assets Integration v1
+
+Status: implemented, Visual Validation pending.
+
+반영 내용:
+
+- `public/assets/ui/core`의 승인 UI core 에셋 11개를 registry/preload 대상으로 추가했다.
+- 우측 메뉴 통짜 패널, 메뉴 아이콘 4종, 접힘/펼침 버튼을 이미지 기반으로 표시한다.
+- 하단 스킬 슬롯 6칸 바, 활성 슬롯, 잠금 슬롯을 이미지 기반으로 표시한다.
+- 전투 제어 접힘 상태에 `combat_control_collapsed` 이미지를 적용했다.
+
+수정하지 않은 영역:
+
+- `src/systems/*`
+- `data/*.json`
+- 기존 monster/icon/effect/background asset 폴더
+- 실제 메뉴 패널 기능
+- 실제 전투 속도 로직
+
+다음 확인:
+
+- 1280x720 브라우저 캡처로 목표 시안 방향과의 근접도 확인
+- 우측 메뉴 접힘/펼침과 하단 스킬 슬롯 6칸 유지 확인
 
 ## First Screen UI Polish v2
 

@@ -275,3 +275,67 @@ export const EFFECT_ASSET_LIST = Object.values(EFFECT_ASSETS);
 export function getEffectAsset(effectId: string): VisualAssetEntry | undefined {
   return EFFECT_ASSETS[effectId];
 }
+
+export const UI_CORE_ASSETS: Record<string, VisualAssetEntry> = {
+  collapse_chevron_button: {
+    id: "collapse_chevron_button",
+    key: "ui:collapse_chevron_button",
+    path: "assets/ui/core/collapse_chevron_button.png",
+  },
+  right_menu_panel: {
+    id: "right_menu_panel",
+    key: "ui:right_menu_panel",
+    path: "assets/ui/core/right_menu_panel.png",
+  },
+  skill_menu_icon: {
+    id: "skill_menu_icon",
+    key: "ui:skill_menu_icon",
+    path: "assets/ui/core/skill_menu_icon.png",
+  },
+  equipment_menu_icon: {
+    id: "equipment_menu_icon",
+    key: "ui:equipment_menu_icon",
+    path: "assets/ui/core/equipment_menu_icon.png",
+  },
+  inventory_menu_icon: {
+    id: "inventory_menu_icon",
+    key: "ui:inventory_menu_icon",
+    path: "assets/ui/core/inventory_menu_icon.png",
+  },
+  quest_menu_icon: {
+    id: "quest_menu_icon",
+    key: "ui:quest_menu_icon",
+    path: "assets/ui/core/quest_menu_icon.png",
+  },
+  expand_menu_icon: {
+    id: "expand_menu_icon",
+    key: "ui:expand_menu_icon",
+    path: "assets/ui/core/expand_menu_icon.png",
+  },
+  skill_slot_bar_6: {
+    id: "skill_slot_bar_6",
+    key: "ui:skill_slot_bar_6",
+    path: "assets/ui/core/skill_slot_bar_6.png",
+  },
+  skill_slot_active: {
+    id: "skill_slot_active",
+    key: "ui:skill_slot_active",
+    path: "assets/ui/core/skill_slot_active.png",
+  },
+  skill_slot_locked: {
+    id: "skill_slot_locked",
+    key: "ui:skill_slot_locked",
+    path: "assets/ui/core/skill_slot_locked.png",
+  },
+  combat_control_collapsed: {
+    id: "combat_control_collapsed",
+    key: "ui:combat_control_collapsed",
+    path: "assets/ui/core/combat_control_collapsed.png",
+  },
+};
+
+export const UI_CORE_ASSET_LIST = Object.values(UI_CORE_ASSETS);
+
+export function getUiCoreAsset(assetId: string): VisualAssetEntry | undefined {
+  return UI_CORE_ASSETS[assetId];
+}

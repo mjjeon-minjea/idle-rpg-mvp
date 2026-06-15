@@ -7,6 +7,7 @@ import {
   MONSTER_ASSET_LIST,
   PLAYER_ASSET_LIST,
   REGION_BACKGROUND_ASSET_LIST,
+  UI_CORE_ASSET_LIST,
 } from "../assets/AssetRegistry";
 import { DataLoader } from "../loaders/DataLoader";
 import { CombatSystem } from "../systems/CombatSystem";
@@ -71,9 +72,14 @@ export class GameScene extends Phaser.Scene {
     for (const asset of EFFECT_ASSET_LIST) {
       this.load.image(asset.key, asset.path);
     }
+
+    for (const asset of UI_CORE_ASSET_LIST) {
+      this.load.image(asset.key, asset.path);
+    }
   }
 
   create(): void {
+    this.applyPageLayoutStyle();
     this.dataSet = DataLoader.load();
     this.saveSystem = new SaveSystem();
     const saved = this.saveSystem.load();
@@ -94,6 +100,17 @@ export class GameScene extends Phaser.Scene {
     this.createBattleBackground();
     this.hud = new Hud(this, this.dataSet.config.title, this.dataSet.config.subtitle);
     this.monster = this.createTargetMonster(this.time.now);
+  }
+
+  private applyPageLayoutStyle(): void {
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    document.documentElement.style.margin = "0";
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.margin = "0";
+    document.body.style.overflow = "hidden";
   }
 
   private normalizePlayerState(savedPlayer?: Partial<PlayerState>): PlayerState {

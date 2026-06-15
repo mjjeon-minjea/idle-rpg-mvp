@@ -1,6 +1,32 @@
 # UI System
 
-Last updated: 2026-06-14
+Last updated: 2026-06-16
+
+## UI Core Assets Integration v1
+
+목적:
+
+- `public/assets/ui/core`에 저장된 승인 UI core 에셋을 첫 화면 HUD에 연결했다.
+- 우측 메뉴와 하단 스킬 슬롯이 기존 도형 placeholder보다 목표 시안에 가까운 이미지 기반 UI로 보이게 했다.
+
+반영 내용:
+
+- 우측 메뉴 패널은 `right_menu_panel.png`를 사용한다.
+- 우측 메뉴 버튼은 `skill_menu_icon`, `equipment_menu_icon`, `inventory_menu_icon`, `quest_menu_icon`을 사용한다.
+- 우측 메뉴 접힘/펼침 버튼은 `collapse_chevron_button`, `expand_menu_icon`을 사용한다.
+- 하단 스킬 슬롯 바는 `skill_slot_bar_6.png`를 사용한다.
+- 활성 슬롯과 잠금 슬롯은 `skill_slot_active`, `skill_slot_locked`를 사용한다.
+- 전투 제어 접힘 상태는 `combat_control_collapsed.png`를 사용한다.
+
+보류:
+
+- 스킬 / 장비 / 가방 / 퀘스트 실제 패널 열기
+- 실제 전투 속도 변경
+- 보상 팝업, 스테이지 클리어 팝업, 레벨업 연출
+
+검증 기준:
+
+- 1280x720 기준 첫 화면, 우측 메뉴 펼침/접힘, 하단 스킬 슬롯 6칸, 전투 제어 접힘 상태를 브라우저 캡처로 확인한다.
 
 ## First Screen UI Polish v2
 

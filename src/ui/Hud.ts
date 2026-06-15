@@ -11,7 +11,7 @@ import type {
   StageData,
   StageEncounterType,
 } from "../types/GameTypes";
-import { getEffectAsset, getItemIconAsset, getMonsterAsset, getPlayerAsset } from "../assets/AssetRegistry";
+import { getEffectAsset, getItemIconAsset, getMonsterAsset, getPlayerAsset, getUiCoreAsset } from "../assets/AssetRegistry";
 
 const UI_DEPTH = 5;
 const TEXT_DEPTH = 7;
@@ -32,15 +32,17 @@ const EXP_COLOR = 0xffd05a;
 const EMPTY_SLOT_FILL = 0x202833;
 const EQUIPMENT_ICON_SIZE = 28;
 const SKILL_SLOT_SIZE = 76;
+const RIGHT_MENU_PANEL_ASSET_SIZE = { width: 106, height: 440 };
+const SKILL_SLOT_BAR_ASSET_SIZE = { width: 520, height: 120 };
 
 type RightMenuKey = "skill" | "equipment" | "inventory" | "quest";
 type CombatControlMode = "manual" | "auto" | "auto1_5" | "auto2";
 
-const RIGHT_MENU_ITEMS: Array<{ key: RightMenuKey; label: string; icon: string; x: number; y: number }> = [
-  { key: "skill", label: "스킬", icon: "✦", x: 1184, y: 258 },
-  { key: "equipment", label: "장비", icon: "갑", x: 1184, y: 340 },
-  { key: "inventory", label: "가방", icon: "▣", x: 1184, y: 422 },
-  { key: "quest", label: "퀘스트", icon: "문", x: 1184, y: 504 },
+const RIGHT_MENU_ITEMS: Array<{ key: RightMenuKey; label: string; icon: string; assetId: string; x: number; y: number }> = [
+  { key: "skill", label: "스킬", icon: "✦", assetId: "skill_menu_icon", x: 1184, y: 258 },
+  { key: "equipment", label: "장비", icon: "갑", assetId: "equipment_menu_icon", x: 1184, y: 340 },
+  { key: "inventory", label: "가방", icon: "▣", assetId: "inventory_menu_icon", x: 1184, y: 422 },
+  { key: "quest", label: "퀘스트", icon: "문", assetId: "quest_menu_icon", x: 1184, y: 504 },
 ];
 
 const COMBAT_CONTROL_MODES: Array<{ key: CombatControlMode; label: string; icon: string; locked: boolean }> = [
@@ -72,11 +74,14 @@ interface UiButtonView {
   background: Phaser.GameObjects.Rectangle;
   primaryText: Phaser.GameObjects.Text;
   secondaryText?: Phaser.GameObjects.Text;
+  image?: Phaser.GameObjects.Image;
+  style?: "default" | "imageBackground" | "menuIcon";
   locked?: boolean;
 }
 
 interface SkillSlotView {
   background: Phaser.GameObjects.Rectangle;
+  frameImage: Phaser.GameObjects.Image;
   image: Phaser.GameObjects.Image;
   lockText: Phaser.GameObjects.Text;
   cooldownText: Phaser.GameObjects.Text;
@@ -109,8 +114,10 @@ export class Hud {
   private readonly statText: Phaser.GameObjects.Text;
   private readonly equipmentBonusText: Phaser.GameObjects.Text;
   private readonly inventoryText: Phaser.GameObjects.Text;
+  private readonly rightMenuPanelImage: Phaser.GameObjects.Image;
   private readonly rightMenuToggleButton: UiButtonView;
   private readonly rightMenuButtons = new Map<RightMenuKey, UiButtonView>();
+  private readonly skillSlotBarImage: Phaser.GameObjects.Image;
   private readonly combatControlToggleButton: UiButtonView;
   private readonly combatControlButtons = new Map<CombatControlMode, UiButtonView>();
   private readonly equipmentIconImages = new Map<EquipmentSlot, Phaser.GameObjects.Image>();
@@ -149,6 +156,10 @@ export class Hud {
     this.statText = scene.add.text(22, 132, "", this.textStyle("#edf4ff", "12px", 250)).setDepth(TEXT_DEPTH);
     this.equipmentBonusText = scene.add.text(22, 264, "", this.textStyle("#f7e3a4", "11px", 250)).setDepth(TEXT_DEPTH);
     this.inventoryText = scene.add.text(22, 296, "", this.textStyle("#d9e6ff", "11px", 250)).setDepth(TEXT_DEPTH);
+    this.rightMenuPanelImage = scene.add.image(1184, 404, "").setDepth(UI_DEPTH + 1).setVisible(false);
+    this.skillSlotBarImage = scene.add.image(760, 636, "").setDepth(UI_DEPTH + 1).setVisible(false);
+    this.setUiCoreImage(this.rightMenuPanelImage, "right_menu_panel", RIGHT_MENU_PANEL_ASSET_SIZE.width, RIGHT_MENU_PANEL_ASSET_SIZE.height);
+    this.setUiCoreImage(this.skillSlotBarImage, "skill_slot_bar_6", SKILL_SLOT_BAR_ASSET_SIZE.width, SKILL_SLOT_BAR_ASSET_SIZE.height);
 
     this.createEquipmentIconObjects(scene);
     this.createSkillSlotObjects(scene);
@@ -267,7 +278,12 @@ export class Hud {
   }
 
   private drawRightMenuPanel(): void {
+    this.rightMenuPanelImage.setVisible(this.rightMenuExpanded && this.hasUiCoreTexture("right_menu_panel"));
     if (!this.rightMenuExpanded) {
+      return;
+    }
+
+    if (this.rightMenuPanelImage.visible) {
       return;
     }
 
@@ -275,10 +291,19 @@ export class Hud {
   }
 
   private drawBottomCombatControlPanel(): void {
+    if (!this.combatControlExpanded && this.hasUiCoreTexture("combat_control_collapsed")) {
+      return;
+    }
+
     this.drawPanel({ x: 54, y: 584, width: this.combatControlExpanded ? 344 : 132, height: 70, radius: 12 }, 0.86, PANEL_DARK_STROKE);
   }
 
   private drawBottomSkillSlots(): void {
+    this.skillSlotBarImage.setVisible(this.hasUiCoreTexture("skill_slot_bar_6"));
+    if (this.skillSlotBarImage.visible) {
+      return;
+    }
+
     this.drawPanel({ x: 526, y: 592, width: 444, height: 88, radius: 12 }, 0.46, PANEL_DARK_STROKE);
   }
 
@@ -378,16 +403,16 @@ export class Hud {
   }
 
   private createRightMenuObjects(scene: Phaser.Scene): UiButtonView {
-    const toggleButton = this.createUiButton(scene, 1186, 156, 96, 50, "<", "", () => {
+    const toggleButton = this.createImageUiButton(scene, 1186, 156, 104, 58, "collapse_chevron_button", "<", "", () => {
       this.rightMenuExpanded = !this.rightMenuExpanded;
       this.syncRightMenuVisibility();
-    }, false, "24px");
+    }, false, "24px", "imageBackground");
 
     for (const item of RIGHT_MENU_ITEMS) {
-      const button = this.createUiButton(scene, item.x, item.y, 72, 64, item.icon, item.label, () => {
+      const button = this.createImageUiButton(scene, item.x, item.y, 76, 72, item.assetId, item.icon, item.label, () => {
         this.selectedRightMenuKey = item.key;
         this.syncRightMenuVisibility();
-      }, false, "24px");
+      }, false, "18px", "menuIcon");
       this.rightMenuButtons.set(item.key, button);
     }
 
@@ -395,10 +420,10 @@ export class Hud {
   }
 
   private createCombatControlObjects(scene: Phaser.Scene): UiButtonView {
-    const toggleButton = this.createUiButton(scene, 116, 619, 98, 50, "오토", "전투", () => {
+    const toggleButton = this.createImageUiButton(scene, 116, 619, 126, 52, "combat_control_collapsed", "검", "오토", () => {
       this.combatControlExpanded = !this.combatControlExpanded;
       this.syncCombatControlVisibility();
-    }, false, "18px");
+    }, false, "18px", "imageBackground");
 
     COMBAT_CONTROL_MODES.forEach((mode, index) => {
       const x = 106 + index * 82;
@@ -411,6 +436,63 @@ export class Hud {
     });
 
     return toggleButton;
+  }
+
+  private createImageUiButton(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    assetId: string,
+    primaryLabel: string,
+    secondaryLabel: string,
+    onClick: () => void,
+    locked = false,
+    primaryFontSize = "18px",
+    style: "imageBackground" | "menuIcon" = "imageBackground",
+  ): UiButtonView {
+    const background = scene.add
+      .rectangle(0, 0, width, height, locked ? BUTTON_LOCKED_FILL : BUTTON_FILL, 0.97)
+      .setStrokeStyle(2, BUTTON_STROKE, 1);
+    const imageY = style === "menuIcon" ? -10 : 0;
+    const imageSize = style === "menuIcon" ? 50 : width;
+    const imageHeight = style === "menuIcon" ? 50 : height;
+    const image = scene.add.image(0, imageY, "").setVisible(false);
+    const hasImage = this.setUiCoreImage(image, assetId, imageSize, imageHeight);
+    const primaryText = scene.add
+      .text(0, secondaryLabel ? -12 : 0, primaryLabel, this.textStyle("#ffffff", primaryFontSize, width - 10))
+      .setOrigin(0.5)
+      .setVisible(!hasImage || style === "imageBackground");
+    const children: Phaser.GameObjects.GameObject[] = [background, image, primaryText];
+    let secondaryText: Phaser.GameObjects.Text | undefined;
+
+    if (secondaryLabel) {
+      secondaryText = scene.add
+        .text(0, style === "menuIcon" ? 28 : 14, secondaryLabel, this.textStyle(locked ? "#b5c0ce" : "#ffffff", "13px", width - 10))
+        .setOrigin(0.5);
+      children.push(secondaryText);
+    }
+
+    if (hasImage && style === "menuIcon") {
+      background.setVisible(false);
+    }
+
+    if (hasImage && style === "imageBackground") {
+      background.setVisible(false);
+    }
+
+    const container = scene.add.container(x, y, children).setDepth(TEXT_DEPTH);
+    container.setSize(width, height);
+    container.setInteractive(
+      new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height),
+      Phaser.Geom.Rectangle.Contains,
+    );
+    container.on("pointerdown", onClick);
+    container.on("pointerover", () => container.setScale(1.03));
+    container.on("pointerout", () => container.setScale(1));
+
+    return { container, background, primaryText, secondaryText, image, style, locked };
   }
 
   private createUiButton(
@@ -455,7 +537,9 @@ export class Hud {
   }
 
   private syncRightMenuVisibility(): void {
-    this.rightMenuToggleButton.primaryText.setText(this.rightMenuExpanded ? "<" : "메뉴");
+    const toggleAssetId = this.rightMenuExpanded ? "collapse_chevron_button" : "expand_menu_icon";
+    const hasToggleAsset = this.setButtonAsset(this.rightMenuToggleButton, toggleAssetId, 104, 58);
+    this.rightMenuToggleButton.primaryText.setText(hasToggleAsset ? "" : this.rightMenuExpanded ? "<" : "메뉴");
     this.rightMenuToggleButton.secondaryText?.setText("");
     this.setUiButtonState(this.rightMenuToggleButton, false, true);
 
@@ -471,7 +555,8 @@ export class Hud {
 
   private syncCombatControlVisibility(): void {
     const selectedMode = COMBAT_CONTROL_MODES.find((mode) => mode.key === this.selectedCombatControlMode) ?? COMBAT_CONTROL_MODES[1];
-    this.combatControlToggleButton.primaryText.setText(selectedMode.icon);
+    const hasToggleAsset = this.setButtonAsset(this.combatControlToggleButton, "combat_control_collapsed", 126, 52);
+    this.combatControlToggleButton.primaryText.setText(hasToggleAsset ? "" : selectedMode.icon);
     this.combatControlToggleButton.secondaryText?.setText(selectedMode.label);
     this.setUiButtonState(this.combatControlToggleButton, true, !this.combatControlExpanded, selectedMode.locked);
 
@@ -488,8 +573,45 @@ export class Hud {
   private setUiButtonState(button: UiButtonView, active: boolean, visible: boolean, locked = button.locked ?? false): void {
     button.container.setVisible(visible);
     button.container.setAlpha(locked && !active ? 0.76 : 1);
+    if (button.style === "menuIcon") {
+      button.background.setVisible(false);
+      button.image?.setAlpha(active ? 1 : 0.9);
+      button.secondaryText?.setColor(active ? "#ffdf7a" : "#ffffff");
+      return;
+    }
+
+    if (button.style === "imageBackground" && button.image?.visible) {
+      button.background.setVisible(false);
+      return;
+    }
+
+    button.background.setVisible(true);
     button.background.setFillStyle(active ? BUTTON_ACTIVE_FILL : locked ? BUTTON_LOCKED_FILL : BUTTON_FILL, 0.97);
     button.background.setStrokeStyle(active ? 3 : 2, active ? BUTTON_ACTIVE_STROKE : BUTTON_STROKE, 1);
+  }
+
+  private setButtonAsset(button: UiButtonView, assetId: string, width: number, height: number): boolean {
+    if (!button.image) {
+      return false;
+    }
+
+    return this.setUiCoreImage(button.image, assetId, width, height);
+  }
+
+  private setUiCoreImage(image: Phaser.GameObjects.Image, assetId: string, width: number, height: number): boolean {
+    const asset = getUiCoreAsset(assetId);
+    if (!asset || !image.scene.textures.exists(asset.key)) {
+      image.setVisible(false);
+      return false;
+    }
+
+    image.setTexture(asset.key).setDisplaySize(width, height).setVisible(true);
+    return true;
+  }
+
+  private hasUiCoreTexture(assetId: string): boolean {
+    const asset = getUiCoreAsset(assetId);
+    return Boolean(asset && this.graphics.scene.textures.exists(asset.key));
   }
 
   private createEquipmentIconObjects(scene: Phaser.Scene): void {
@@ -563,10 +685,11 @@ export class Hud {
       const background = scene.add.rectangle(x, 636, SKILL_SLOT_SIZE, SKILL_SLOT_SIZE, EMPTY_SLOT_FILL, 0.98)
         .setStrokeStyle(3, index < 2 ? 0xd3a24a : 0x42505f, 1)
         .setDepth(TEXT_DEPTH);
+      const frameImage = scene.add.image(x, 636, "").setDisplaySize(SKILL_SLOT_SIZE, SKILL_SLOT_SIZE).setVisible(false).setDepth(TEXT_DEPTH);
       const image = scene.add.image(x, 636, "").setDisplaySize(62, 62).setVisible(false).setDepth(TEXT_DEPTH + 1);
-      const lockText = scene.add.text(x, 618, "🔒", this.textStyle("#d7dce5", "24px", 56)).setOrigin(0.5).setDepth(TEXT_DEPTH + 2);
+      const lockText = scene.add.text(x, 618, "🔒", this.textStyle("#d7dce5", "22px", 56)).setOrigin(0.5).setDepth(TEXT_DEPTH + 2);
       const cooldownText = scene.add.text(x + 20, 660, "", this.textStyle("#ffffff", "14px", 42)).setOrigin(0.5).setDepth(TEXT_DEPTH + 3);
-      this.skillSlotViews.push({ background, image, lockText, cooldownText });
+      this.skillSlotViews.push({ background, frameImage, image, lockText, cooldownText });
     }
   }
 
@@ -576,6 +699,8 @@ export class Hud {
       const skill = skillCooldowns[index];
 
       if (!skill) {
+        const hasLockedFrame = this.setUiCoreImage(view.frameImage, "skill_slot_locked", SKILL_SLOT_SIZE, SKILL_SLOT_SIZE);
+        view.background.setVisible(!hasLockedFrame);
         view.image.setVisible(false);
         view.lockText.setVisible(true);
         view.cooldownText.setText("");
@@ -591,6 +716,9 @@ export class Hud {
       }
 
       const locked = player.level < skill.requiredLevel || !skill.unlocked;
+      const frameAssetId = locked ? "skill_slot_locked" : "skill_slot_active";
+      const hasFrameAsset = this.setUiCoreImage(view.frameImage, frameAssetId, SKILL_SLOT_SIZE, SKILL_SLOT_SIZE);
+      view.background.setVisible(!hasFrameAsset);
       view.lockText.setVisible(locked);
       view.cooldownText.setText(this.getSkillSlotStatus(player, skill));
       view.background.setStrokeStyle(3, skill.ready && !locked ? 0xffd25a : 0x42505f, 1);
