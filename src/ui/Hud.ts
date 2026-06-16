@@ -11,7 +11,7 @@ import type {
   StageData,
   StageEncounterType,
 } from "../types/GameTypes";
-import { getEffectAsset, getItemIconAsset, getMonsterAsset, getPlayerAsset, getUiCoreAsset } from "../assets/AssetRegistry";
+import { getEffectAsset, getMonsterAsset, getPlayerAsset, getUiCoreAsset } from "../assets/AssetRegistry";
 
 const UI_DEPTH = 5;
 const TEXT_DEPTH = 7;
@@ -28,21 +28,19 @@ const BAR_BG = 0x1e2631;
 const HP_COLOR = 0x35d66f;
 const HP_LOW_COLOR = 0xff5f5f;
 const MONSTER_HP_COLOR = 0xe53935;
-const EXP_COLOR = 0xffd05a;
 const EMPTY_SLOT_FILL = 0x202833;
-const EQUIPMENT_ICON_SIZE = 28;
-const SKILL_SLOT_SIZE = 76;
-const RIGHT_MENU_PANEL_ASSET_SIZE = { width: 106, height: 440 };
-const SKILL_SLOT_BAR_ASSET_SIZE = { width: 520, height: 120 };
+const SKILL_SLOT_SIZE = 84;
+const RIGHT_MENU_PANEL_ASSET_SIZE = { width: 136, height: 486 };
+const SKILL_SLOT_BAR_ASSET_SIZE = { width: 580, height: 132 };
 
 type RightMenuKey = "skill" | "equipment" | "inventory" | "quest";
 type CombatControlMode = "manual" | "auto" | "auto1_5" | "auto2";
 
 const RIGHT_MENU_ITEMS: Array<{ key: RightMenuKey; label: string; icon: string; assetId: string; x: number; y: number }> = [
-  { key: "skill", label: "스킬", icon: "✦", assetId: "skill_menu_icon", x: 1184, y: 258 },
-  { key: "equipment", label: "장비", icon: "갑", assetId: "equipment_menu_icon", x: 1184, y: 340 },
-  { key: "inventory", label: "가방", icon: "▣", assetId: "inventory_menu_icon", x: 1184, y: 422 },
-  { key: "quest", label: "퀘스트", icon: "문", assetId: "quest_menu_icon", x: 1184, y: 504 },
+  { key: "skill", label: "스킬", icon: "✦", assetId: "skill_menu_icon", x: 1180, y: 248 },
+  { key: "equipment", label: "장비", icon: "갑", assetId: "equipment_menu_icon", x: 1180, y: 342 },
+  { key: "inventory", label: "가방", icon: "▣", assetId: "inventory_menu_icon", x: 1180, y: 436 },
+  { key: "quest", label: "퀘스트", icon: "문", assetId: "quest_menu_icon", x: 1180, y: 530 },
 ];
 
 const COMBAT_CONTROL_MODES: Array<{ key: CombatControlMode; label: string; icon: string; locked: boolean }> = [
@@ -123,7 +121,6 @@ export class Hud {
   private readonly equipmentIconImages = new Map<EquipmentSlot, Phaser.GameObjects.Image>();
   private readonly equipmentFallbackTexts = new Map<EquipmentSlot, Phaser.GameObjects.Text>();
   private readonly skillSlotViews: SkillSlotView[] = [];
-  private readonly currentEquipmentAssetKeys = new Map<EquipmentSlot, string | undefined>();
   private currentMonsterAssetKey?: string;
   private rightMenuExpanded = true;
   private selectedRightMenuKey: RightMenuKey = "skill";
@@ -139,12 +136,12 @@ export class Hud {
     this.playerHpLabelText = scene.add.text(20, 92, "", this.textStyle("#d6efff", "12px", 90)).setDepth(TEXT_DEPTH);
     this.stageTitleText = scene.add.text(458, 24, "", this.textStyle("#ffffff", "22px", 260)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
     this.stageSubtitleText = scene.add.text(458, 70, "", this.textStyle("#e9f2ff", "14px", 310)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
-    this.goldText = scene.add.text(772, 34, "", this.textStyle("#fff3d0", "17px", 130)).setDepth(TEXT_DEPTH);
-    this.diamondText = scene.add.text(936, 34, "", this.textStyle("#eaf9ff", "17px", 130)).setDepth(TEXT_DEPTH);
-    this.playerPortraitImage = scene.add.image(57, 56, "").setDisplaySize(46, 68).setVisible(false).setDepth(TEXT_DEPTH);
+    this.goldText = scene.add.text(786, 34, "", this.textStyle("#fff3d0", "17px", 108)).setDepth(TEXT_DEPTH);
+    this.diamondText = scene.add.text(970, 34, "", this.textStyle("#eaf9ff", "17px", 108)).setDepth(TEXT_DEPTH);
+    this.playerPortraitImage = scene.add.image(57, 56, "").setDisplaySize(64, 64).setVisible(false).setDepth(TEXT_DEPTH);
 
-    this.createUiButton(scene, 1102, 54, 68, 72, "🏪", "상점", () => undefined);
-    this.createUiButton(scene, 1194, 54, 68, 72, "✉", "편지함", () => undefined);
+    this.createTopShortcutButton(scene, 1104, 56, "🏪", "상점", false);
+    this.createTopShortcutButton(scene, 1194, 56, "✉", "편지함", true);
 
     scene.add.text(380, 192, "오계장", this.textStyle("#ffffff", "18px", 150)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
     this.playerCombatHpText = scene.add.text(380, 232, "", this.textStyle("#ffffff", "16px", 180)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
@@ -152,12 +149,12 @@ export class Hud {
     this.monsterImage = scene.add.image(780, 306, "").setVisible(false).setDepth(SPRITE_DEPTH);
     this.monsterLabelText = scene.add.text(780, 192, "", this.textStyle("#ffffff", "18px", 190)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
     this.monsterHpText = scene.add.text(780, 232, "", this.textStyle("#ffffff", "16px", 180)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
-    this.objectiveText = scene.add.text(448, 112, "", this.textStyle("#fff0bd", "14px", 410)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
-    this.statText = scene.add.text(22, 132, "", this.textStyle("#edf4ff", "12px", 250)).setDepth(TEXT_DEPTH);
-    this.equipmentBonusText = scene.add.text(22, 264, "", this.textStyle("#f7e3a4", "11px", 250)).setDepth(TEXT_DEPTH);
-    this.inventoryText = scene.add.text(22, 296, "", this.textStyle("#d9e6ff", "11px", 250)).setDepth(TEXT_DEPTH);
-    this.rightMenuPanelImage = scene.add.image(1184, 404, "").setDepth(UI_DEPTH + 1).setVisible(false);
-    this.skillSlotBarImage = scene.add.image(760, 636, "").setDepth(UI_DEPTH + 1).setVisible(false);
+    this.objectiveText = scene.add.text(448, 112, "", this.textStyle("#fff0bd", "14px", 410)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH).setVisible(false);
+    this.statText = scene.add.text(22, 132, "", this.textStyle("#edf4ff", "12px", 250)).setDepth(TEXT_DEPTH).setVisible(false);
+    this.equipmentBonusText = scene.add.text(22, 264, "", this.textStyle("#f7e3a4", "11px", 250)).setDepth(TEXT_DEPTH).setVisible(false);
+    this.inventoryText = scene.add.text(22, 296, "", this.textStyle("#d9e6ff", "11px", 250)).setDepth(TEXT_DEPTH).setVisible(false);
+    this.rightMenuPanelImage = scene.add.image(1180, 404, "").setDepth(UI_DEPTH + 1).setVisible(false);
+    this.skillSlotBarImage = scene.add.image(640, 636, "").setDepth(UI_DEPTH + 1).setVisible(false);
     this.setUiCoreImage(this.rightMenuPanelImage, "right_menu_panel", RIGHT_MENU_PANEL_ASSET_SIZE.width, RIGHT_MENU_PANEL_ASSET_SIZE.height);
     this.setUiCoreImage(this.skillSlotBarImage, "skill_slot_bar_6", SKILL_SLOT_BAR_ASSET_SIZE.width, SKILL_SLOT_BAR_ASSET_SIZE.height);
 
@@ -208,7 +205,7 @@ export class Hud {
     this.equipmentBonusText.setText(`장비 HP +${equipmentBonus.maxHp} / ATK +${equipmentBonus.attack} / DEF +${equipmentBonus.defense}`);
     this.inventoryText.setText(this.createInventorySummary(inventory, ownedEquipment));
 
-    this.updateEquipmentIcons(equippedItems);
+    this.hideEquipmentIconSlots();
     this.updateSkillSlots(player, skillCooldowns);
     this.syncRightMenuVisibility();
     this.syncCombatControlVisibility();
@@ -222,19 +219,18 @@ export class Hud {
     player: PlayerState,
     effectiveStats: EffectivePlayerStats,
     monster: MonsterInstance,
-    equippedItems: EquippedItemView[],
-    skillCooldowns: SkillCooldownView[],
+    _equippedItems: EquippedItemView[],
+    _skillCooldowns: SkillCooldownView[],
   ): void {
     this.graphics.clear();
     this.drawTopPlayerPanel();
     this.drawTopStagePanel();
-    this.drawCurrencyPanel(720, 14, 160, 72);
-    this.drawCurrencyPanel(904, 14, 160, 72);
+    this.drawCurrencyPanel(720, 14, 160, 72, "gold");
+    this.drawCurrencyPanel(904, 14, 160, 72, "diamond");
     this.drawCenterCombatArea();
     this.drawRightMenuPanel();
     this.drawBottomCombatControlPanel();
     this.drawBottomSkillSlots();
-    this.drawLeftInfoPanel();
     this.updatePlayerImage();
     this.updateMonsterImage(monster);
     if (!this.monsterImage.visible) {
@@ -243,8 +239,6 @@ export class Hud {
     this.drawHpBar(126, 74, 166, 22, player.hp, effectiveStats.maxHp, HP_COLOR);
     this.drawHpBar(310, 222, 210, 18, player.hp, effectiveStats.maxHp, HP_COLOR);
     this.drawHpBar(670, 222, 220, 18, monster.currentHp, monster.data.maxHp, MONSTER_HP_COLOR);
-    this.drawExpBar(22, 326, 252, 7, skillCooldowns.length > 0 ? 1 : 0.35);
-    this.drawEquipmentIconSlots(equippedItems);
   }
 
   private drawTopPlayerPanel(): void {
@@ -268,8 +262,25 @@ export class Hud {
     this.graphics.strokeCircle(546, 62, 4);
   }
 
-  private drawCurrencyPanel(x: number, y: number, width: number, height: number): void {
+  private drawCurrencyPanel(x: number, y: number, width: number, height: number, kind: "gold" | "diamond"): void {
     this.drawPanel({ x, y, width, height, radius: 12 }, 0.64);
+    if (kind === "gold") {
+      this.graphics.fillStyle(0xf4bd35, 1);
+      this.graphics.fillCircle(x + 34, y + 36, 18);
+      this.graphics.lineStyle(3, 0x7b4b16, 1);
+      this.graphics.strokeCircle(x + 34, y + 36, 18);
+      this.graphics.lineStyle(2, 0xffe58a, 0.9);
+      this.graphics.strokeCircle(x + 34, y + 36, 10);
+      return;
+    }
+
+    this.graphics.fillStyle(0x57ddff, 1);
+    this.graphics.fillTriangle(x + 34, y + 18, x + 54, y + 36, x + 34, y + 56);
+    this.graphics.fillStyle(0x2fb7f2, 1);
+    this.graphics.fillTriangle(x + 34, y + 18, x + 14, y + 36, x + 34, y + 56);
+    this.graphics.lineStyle(3, 0x0e5488, 1);
+    this.graphics.strokeTriangle(x + 34, y + 18, x + 54, y + 36, x + 34, y + 56);
+    this.graphics.strokeTriangle(x + 34, y + 18, x + 14, y + 36, x + 34, y + 56);
   }
 
   private drawCenterCombatArea(): void {
@@ -287,7 +298,7 @@ export class Hud {
       return;
     }
 
-    this.drawPanel({ x: 1136, y: 198, width: 96, height: 338, radius: 16 }, 0.84, PANEL_STROKE);
+    this.drawPanel({ x: 1112, y: 160, width: 136, height: 488, radius: 18 }, 0.84, PANEL_STROKE);
   }
 
   private drawBottomCombatControlPanel(): void {
@@ -304,11 +315,7 @@ export class Hud {
       return;
     }
 
-    this.drawPanel({ x: 526, y: 592, width: 444, height: 88, radius: 12 }, 0.46, PANEL_DARK_STROKE);
-  }
-
-  private drawLeftInfoPanel(): void {
-    this.drawPanel({ x: 14, y: 128, width: 274, height: 214, radius: 10 }, 0.34, PANEL_DARK_STROKE);
+    this.drawPanel({ x: 350, y: 574, width: 580, height: 112, radius: 12 }, 0.46, PANEL_DARK_STROKE);
   }
 
   private drawPanel(bounds: PanelBounds, alpha = 0.92, stroke = PANEL_STROKE): void {
@@ -372,7 +379,7 @@ export class Hud {
     }
 
     this.playerImage.setTexture(asset.key).setDisplaySize(198, 294).setVisible(true);
-    this.playerPortraitImage.setTexture(asset.key).setDisplaySize(46, 68).setVisible(true);
+    this.playerPortraitImage.setTexture(asset.key).setCrop(110, 80, 540, 540).setDisplaySize(84, 84).setVisible(true);
   }
 
   private drawMonsterPlaceholder(role: MonsterRole): void {
@@ -395,21 +402,14 @@ export class Hud {
     this.graphics.strokeRoundedRect(x, y, width, height, 6);
   }
 
-  private drawExpBar(x: number, y: number, width: number, height: number, ratio: number): void {
-    this.graphics.fillStyle(BAR_BG, 0.95);
-    this.graphics.fillRoundedRect(x, y, width, height, 4);
-    this.graphics.fillStyle(EXP_COLOR, 1);
-    this.graphics.fillRoundedRect(x, y, width * Phaser.Math.Clamp(ratio, 0, 1), height, 4);
-  }
-
   private createRightMenuObjects(scene: Phaser.Scene): UiButtonView {
-    const toggleButton = this.createImageUiButton(scene, 1186, 156, 104, 58, "collapse_chevron_button", "<", "", () => {
+    const toggleButton = this.createImageUiButton(scene, 1180, 154, 128, 64, "collapse_chevron_button", "<", "", () => {
       this.rightMenuExpanded = !this.rightMenuExpanded;
       this.syncRightMenuVisibility();
     }, false, "24px", "imageBackground");
 
     for (const item of RIGHT_MENU_ITEMS) {
-      const button = this.createImageUiButton(scene, item.x, item.y, 76, 72, item.assetId, item.icon, item.label, () => {
+      const button = this.createImageUiButton(scene, item.x, item.y, 98, 88, item.assetId, item.icon, item.label, () => {
         this.selectedRightMenuKey = item.key;
         this.syncRightMenuVisibility();
       }, false, "18px", "menuIcon");
@@ -424,6 +424,7 @@ export class Hud {
       this.combatControlExpanded = !this.combatControlExpanded;
       this.syncCombatControlVisibility();
     }, false, "18px", "imageBackground");
+    toggleButton.secondaryText?.setPosition(32, 0).setOrigin(0.5).setFontSize("18px").setColor("#ffffff");
 
     COMBAT_CONTROL_MODES.forEach((mode, index) => {
       const x = 106 + index * 82;
@@ -455,9 +456,9 @@ export class Hud {
     const background = scene.add
       .rectangle(0, 0, width, height, locked ? BUTTON_LOCKED_FILL : BUTTON_FILL, 0.97)
       .setStrokeStyle(2, BUTTON_STROKE, 1);
-    const imageY = style === "menuIcon" ? -10 : 0;
-    const imageSize = style === "menuIcon" ? 50 : width;
-    const imageHeight = style === "menuIcon" ? 50 : height;
+    const imageY = style === "menuIcon" ? -12 : 0;
+    const imageSize = style === "menuIcon" ? 58 : width;
+    const imageHeight = style === "menuIcon" ? 58 : height;
     const image = scene.add.image(0, imageY, "").setVisible(false);
     const hasImage = this.setUiCoreImage(image, assetId, imageSize, imageHeight);
     const primaryText = scene.add
@@ -469,7 +470,7 @@ export class Hud {
 
     if (secondaryLabel) {
       secondaryText = scene.add
-        .text(0, style === "menuIcon" ? 28 : 14, secondaryLabel, this.textStyle(locked ? "#b5c0ce" : "#ffffff", "13px", width - 10))
+        .text(0, style === "menuIcon" ? 32 : 14, secondaryLabel, this.textStyle(locked ? "#b5c0ce" : "#ffffff", style === "menuIcon" ? "18px" : "13px", width - 10))
         .setOrigin(0.5);
       children.push(secondaryText);
     }
@@ -536,9 +537,42 @@ export class Hud {
     return { container, background, primaryText, secondaryText, locked };
   }
 
+  private createTopShortcutButton(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    icon: string,
+    label: string,
+    showNotification: boolean,
+  ): void {
+    const iconText = scene.add
+      .text(0, -8, icon, this.textStyle("#ffffff", "38px", 70))
+      .setOrigin(0.5);
+    const labelText = scene.add
+      .text(0, 30, label, this.textStyle("#ffffff", "18px", 76))
+      .setOrigin(0.5);
+    const children: Phaser.GameObjects.GameObject[] = [iconText, labelText];
+
+    if (showNotification) {
+      const notificationDot = scene.add
+        .circle(28, -30, 7, 0xe93b4d, 1)
+        .setStrokeStyle(2, 0xffffff, 1);
+      children.push(notificationDot);
+    }
+
+    const container = scene.add.container(x, y, children).setDepth(TEXT_DEPTH);
+    container.setSize(76, 82);
+    container.setInteractive(
+      new Phaser.Geom.Rectangle(-38, -42, 76, 84),
+      Phaser.Geom.Rectangle.Contains,
+    );
+    container.on("pointerover", () => container.setScale(1.04));
+    container.on("pointerout", () => container.setScale(1));
+  }
+
   private syncRightMenuVisibility(): void {
     const toggleAssetId = this.rightMenuExpanded ? "collapse_chevron_button" : "expand_menu_icon";
-    const hasToggleAsset = this.setButtonAsset(this.rightMenuToggleButton, toggleAssetId, 104, 58);
+    const hasToggleAsset = this.setButtonAsset(this.rightMenuToggleButton, toggleAssetId, 128, 64);
     this.rightMenuToggleButton.primaryText.setText(hasToggleAsset ? "" : this.rightMenuExpanded ? "<" : "메뉴");
     this.rightMenuToggleButton.secondaryText?.setText("");
     this.setUiButtonState(this.rightMenuToggleButton, false, true);
@@ -628,68 +662,28 @@ export class Hud {
     }
   }
 
-  private drawEquipmentIconSlots(equippedItems: EquippedItemView[]): void {
-    void equippedItems;
-    for (const slot of EQUIPMENT_ICON_SLOTS) {
-      const x = slot.x - EQUIPMENT_ICON_SIZE / 2;
-      const y = slot.y - EQUIPMENT_ICON_SIZE / 2;
-      this.graphics.fillStyle(EMPTY_SLOT_FILL, 0.96);
-      this.graphics.fillRoundedRect(x, y, EQUIPMENT_ICON_SIZE, EQUIPMENT_ICON_SIZE, 5);
-      this.graphics.lineStyle(1, 0x526171, 1);
-      this.graphics.strokeRoundedRect(x, y, EQUIPMENT_ICON_SIZE, EQUIPMENT_ICON_SIZE, 5);
-    }
-  }
-
-  private updateEquipmentIcons(equippedItems: EquippedItemView[]): void {
-    const equippedBySlot = new Map(equippedItems.map((item) => [item.slot, item]));
-
-    for (const slot of EQUIPMENT_ICON_SLOTS) {
-      const item = equippedBySlot.get(slot.slot);
-      const image = this.equipmentIconImages.get(slot.slot);
-      const fallbackText = this.equipmentFallbackTexts.get(slot.slot);
-      if (!image || !fallbackText) {
-        continue;
-      }
-
-      const itemId = item?.itemId;
-      if (!itemId) {
-        this.currentEquipmentAssetKeys.set(slot.slot, undefined);
-        image.setVisible(false);
-        fallbackText.setVisible(false);
-        continue;
-      }
-
-      const asset = getItemIconAsset(itemId);
-      if (!asset || !image.scene.textures.exists(asset.key)) {
-        this.currentEquipmentAssetKeys.set(slot.slot, undefined);
-        image.setVisible(false);
-        fallbackText.setVisible(true);
-        continue;
-      }
-
-      if (this.currentEquipmentAssetKeys.get(slot.slot) !== asset.key) {
-        this.currentEquipmentAssetKeys.set(slot.slot, asset.key);
-        image.setTexture(asset.key);
-        image.setDisplaySize(24, 24);
-      }
-
-      image.setVisible(true);
-      fallbackText.setVisible(false);
-    }
-  }
-
   private createSkillSlotObjects(scene: Phaser.Scene): void {
-    const startX = 566;
+    const startX = 425;
     for (let index = 0; index < 6; index += 1) {
-      const x = startX + index * 78;
+      const x = startX + index * 86;
       const background = scene.add.rectangle(x, 636, SKILL_SLOT_SIZE, SKILL_SLOT_SIZE, EMPTY_SLOT_FILL, 0.98)
         .setStrokeStyle(3, index < 2 ? 0xd3a24a : 0x42505f, 1)
         .setDepth(TEXT_DEPTH);
       const frameImage = scene.add.image(x, 636, "").setDisplaySize(SKILL_SLOT_SIZE, SKILL_SLOT_SIZE).setVisible(false).setDepth(TEXT_DEPTH);
-      const image = scene.add.image(x, 636, "").setDisplaySize(62, 62).setVisible(false).setDepth(TEXT_DEPTH + 1);
-      const lockText = scene.add.text(x, 618, "🔒", this.textStyle("#d7dce5", "22px", 56)).setOrigin(0.5).setDepth(TEXT_DEPTH + 2);
-      const cooldownText = scene.add.text(x + 20, 660, "", this.textStyle("#ffffff", "14px", 42)).setOrigin(0.5).setDepth(TEXT_DEPTH + 3);
+      const image = scene.add.image(x, 636, "").setDisplaySize(68, 68).setVisible(false).setDepth(TEXT_DEPTH + 1);
+      const lockText = scene.add.text(x, 616, "🔒", this.textStyle("#d7dce5", "24px", 60)).setOrigin(0.5).setDepth(TEXT_DEPTH + 2);
+      const cooldownText = scene.add.text(x + 22, 664, "", this.textStyle("#ffffff", "15px", 46)).setOrigin(0.5).setDepth(TEXT_DEPTH + 3);
       this.skillSlotViews.push({ background, frameImage, image, lockText, cooldownText });
+    }
+  }
+
+  private hideEquipmentIconSlots(): void {
+    for (const image of this.equipmentIconImages.values()) {
+      image.setVisible(false);
+    }
+
+    for (const fallbackText of this.equipmentFallbackTexts.values()) {
+      fallbackText.setVisible(false);
     }
   }
 
@@ -710,7 +704,7 @@ export class Hud {
 
       const asset = this.getSkillIconAsset(skill.skillId);
       if (asset && view.image.scene.textures.exists(asset.key)) {
-        view.image.setTexture(asset.key).setDisplaySize(62, 62).setVisible(true);
+        view.image.setTexture(asset.key).setDisplaySize(68, 68).setVisible(true);
       } else {
         view.image.setVisible(false);
       }
