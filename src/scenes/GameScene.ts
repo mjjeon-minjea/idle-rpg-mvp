@@ -7,6 +7,7 @@ import {
   MONSTER_ASSET_LIST,
   PLAYER_ASSET_LIST,
   REGION_BACKGROUND_ASSET_LIST,
+  SKILL_ICON_ASSET_LIST,
   UI_CORE_ASSET_LIST,
 } from "../assets/AssetRegistry";
 import { DataLoader } from "../loaders/DataLoader";
@@ -23,7 +24,7 @@ import { RewardSystem } from "../systems/RewardSystem";
 import { SaveSystem } from "../systems/SaveSystem";
 import { SkillSystem } from "../systems/SkillSystem";
 import { StageProgressSystem } from "../systems/StageProgressSystem";
-import type { GameData, MonsterInstance, PlayerState, RewardItemData } from "../types/GameTypes";
+import type { GameData, MonsterInstance, PlayerState, RewardItemData, SkillState } from "../types/GameTypes";
 import { Hud, type OwnedEquipmentView } from "../ui/Hud";
 
 export class GameScene extends Phaser.Scene {
@@ -73,6 +74,10 @@ export class GameScene extends Phaser.Scene {
       this.load.image(asset.key, asset.path);
     }
 
+    for (const asset of SKILL_ICON_ASSET_LIST) {
+      this.load.image(asset.key, asset.path);
+    }
+
     for (const asset of UI_CORE_ASSET_LIST) {
       this.load.image(asset.key, asset.path);
     }
@@ -89,7 +94,7 @@ export class GameScene extends Phaser.Scene {
 
     this.inventorySystem = new InventorySystem(saved?.inventory);
     this.equipmentSystem = new EquipmentSystem(this.dataSet.items, saved?.equipment ?? { equipped: {} });
-    this.skillSystem = new SkillSystem(this.dataSet.skills, saved?.skills ?? this.dataSet.defaultSkillState);
+    this.skillSystem = new SkillSystem(this.dataSet.skills, this.normalizeSkillState(saved?.skills));
     this.stageSystem = new StageProgressSystem(this.dataSet.stages, saved?.stage);
     const randomService = new RandomService();
     this.combatSystem = new CombatSystem();
@@ -140,6 +145,21 @@ export class GameScene extends Phaser.Scene {
       hp: savedPlayer.hp ?? savedPlayer.maxHp ?? 120,
       attack: savedPlayer.attack ?? 14,
       defense: savedPlayer.defense ?? 3,
+    };
+  }
+
+  private normalizeSkillState(savedSkills?: SkillState): SkillState {
+    const defaultSkillIds = this.dataSet.defaultSkillState.equippedSkillIds;
+    const unlockedSkillIds = Array.from(
+      new Set([
+        ...this.dataSet.defaultSkillState.unlockedSkillIds,
+        ...(savedSkills?.unlockedSkillIds ?? []),
+      ]),
+    );
+
+    return {
+      unlockedSkillIds,
+      equippedSkillIds: defaultSkillIds,
     };
   }
 

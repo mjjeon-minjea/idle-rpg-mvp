@@ -227,6 +227,45 @@ export function getItemIconAsset(itemId: string): VisualAssetEntry | undefined {
   return ITEM_ICON_ASSETS[itemId];
 }
 
+export const SKILL_ICON_ASSETS: Record<string, VisualAssetEntry> = {
+  trainee_slash: {
+    id: "trainee_slash",
+    key: "skill:trainee_slash",
+    path: "assets/icons/skills/skill_01_trainee_slash.png",
+  },
+  heavy_training_strike: {
+    id: "heavy_training_strike",
+    key: "skill:heavy_training_strike",
+    path: "assets/icons/skills/skill_02_heavy_strike.png",
+  },
+  shield_bash: {
+    id: "shield_bash",
+    key: "skill:shield_bash",
+    path: "assets/icons/skills/skill_03_shield_bash.png",
+  },
+  healing_prayer: {
+    id: "healing_prayer",
+    key: "skill:healing_prayer",
+    path: "assets/icons/skills/skill_04_healing_prayer.png",
+  },
+  flame_slash: {
+    id: "flame_slash",
+    key: "skill:flame_slash",
+    path: "assets/icons/skills/skill_05_flame_slash.png",
+  },
+  knight_charge: {
+    id: "knight_charge",
+    key: "skill:knight_charge",
+    path: "assets/icons/skills/skill_06_knight_charge.png",
+  },
+};
+
+export const SKILL_ICON_ASSET_LIST = Object.values(SKILL_ICON_ASSETS);
+
+export function getSkillIconAsset(skillId: string): VisualAssetEntry | undefined {
+  return SKILL_ICON_ASSETS[skillId];
+}
+
 export const EFFECT_ASSETS: Record<string, VisualAssetEntry> = {
   trainee_slash: {
     id: "trainee_slash",
@@ -331,6 +370,96 @@ export const UI_CORE_ASSETS: Record<string, VisualAssetEntry> = {
     id: "combat_control_collapsed",
     key: "ui:combat_control_collapsed",
     path: "assets/ui/core/combat_control_collapsed.png",
+  },
+  combat_control_panel_back: {
+    id: "combat_control_panel_back",
+    key: "ui:combat_control_panel_back",
+    path: "assets/ui/core/combat_control_panel_back.png",
+  },
+  combat_button_manual: {
+    id: "combat_button_manual",
+    key: "ui:combat_button_manual",
+    path: "assets/ui/core/combat_button_manual.png",
+  },
+  combat_button_manual_labeled: {
+    id: "combat_button_manual_labeled",
+    key: "ui:combat_button_manual_labeled",
+    path: "assets/ui/core/combat_button_manual_labeled.png",
+  },
+  combat_button_auto: {
+    id: "combat_button_auto",
+    key: "ui:combat_button_auto",
+    path: "assets/ui/core/combat_button_auto.png",
+  },
+  combat_button_auto_labeled: {
+    id: "combat_button_auto_labeled",
+    key: "ui:combat_button_auto_labeled",
+    path: "assets/ui/core/combat_button_auto_labeled.png",
+  },
+  combat_button_locked_x15: {
+    id: "combat_button_locked_x15",
+    key: "ui:combat_button_locked_x15",
+    path: "assets/ui/core/combat_button_locked_x15.png",
+  },
+  combat_button_locked_x15_labeled: {
+    id: "combat_button_locked_x15_labeled",
+    key: "ui:combat_button_locked_x15_labeled",
+    path: "assets/ui/core/combat_button_locked_x15_labeled.png",
+  },
+  combat_button_locked_x2: {
+    id: "combat_button_locked_x2",
+    key: "ui:combat_button_locked_x2",
+    path: "assets/ui/core/combat_button_locked_x2.png",
+  },
+  combat_button_locked_x2_labeled: {
+    id: "combat_button_locked_x2_labeled",
+    key: "ui:combat_button_locked_x2_labeled",
+    path: "assets/ui/core/combat_button_locked_x2_labeled.png",
+  },
+  combat_button_collapsed_auto: {
+    id: "combat_button_collapsed_auto",
+    key: "ui:combat_button_collapsed_auto",
+    path: "assets/ui/core/combat_button_collapsed_auto.png",
+  },
+  combat_button_collapsed_auto_labeled: {
+    id: "combat_button_collapsed_auto_labeled",
+    key: "ui:combat_button_collapsed_auto_labeled",
+    path: "assets/ui/core/combat_button_collapsed_auto_labeled.png",
+  },
+  combat_button_chevron: {
+    id: "combat_button_chevron",
+    key: "ui:combat_button_chevron",
+    path: "assets/ui/core/combat_button_chevron.png",
+  },
+  combat_new_panel: {
+    id: "combat_new_panel",
+    key: "ui:combat_new_panel",
+    path: "assets/ui/core/combat_new_panel.png",
+  },
+  combat_new_manual: {
+    id: "combat_new_manual",
+    key: "ui:combat_new_manual",
+    path: "assets/ui/core/combat_new_manual.png",
+  },
+  combat_new_auto: {
+    id: "combat_new_auto",
+    key: "ui:combat_new_auto",
+    path: "assets/ui/core/combat_new_auto.png",
+  },
+  combat_new_locked_x15: {
+    id: "combat_new_locked_x15",
+    key: "ui:combat_new_locked_x15",
+    path: "assets/ui/core/combat_new_locked_x15.png",
+  },
+  combat_new_locked_x2: {
+    id: "combat_new_locked_x2",
+    key: "ui:combat_new_locked_x2",
+    path: "assets/ui/core/combat_new_locked_x2.png",
+  },
+  combat_new_chevron: {
+    id: "combat_new_chevron",
+    key: "ui:combat_new_chevron",
+    path: "assets/ui/core/combat_new_chevron.png",
   },
 };
 

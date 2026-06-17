@@ -11,14 +11,15 @@ import type {
   StageData,
   StageEncounterType,
 } from "../types/GameTypes";
-import { getEffectAsset, getMonsterAsset, getPlayerAsset, getUiCoreAsset } from "../assets/AssetRegistry";
+import { getMonsterAsset, getPlayerAsset, getSkillIconAsset as getSkillIconVisualAsset, getUiCoreAsset } from "../assets/AssetRegistry";
 
 const UI_DEPTH = 5;
 const TEXT_DEPTH = 7;
 const SPRITE_DEPTH = 3;
+const UI_EDITOR_DEPTH = 2000;
+const UI_EDITOR_STORAGE_KEY = "idle-rpg-ui-editor-draft-v1";
 const PANEL_FILL = 0x111923;
 const PANEL_STROKE = 0xd8a64e;
-const PANEL_DARK_STROKE = 0x2a3644;
 const BUTTON_FILL = 0x243140;
 const BUTTON_ACTIVE_FILL = 0xf4b83f;
 const BUTTON_LOCKED_FILL = 0x163151;
@@ -29,12 +30,27 @@ const HP_COLOR = 0x35d66f;
 const HP_LOW_COLOR = 0xff5f5f;
 const MONSTER_HP_COLOR = 0xe53935;
 const EMPTY_SLOT_FILL = 0x202833;
-const SKILL_SLOT_SIZE = 84;
-const RIGHT_MENU_PANEL_ASSET_SIZE = { width: 136, height: 486 };
-const SKILL_SLOT_BAR_ASSET_SIZE = { width: 580, height: 132 };
+const SKILL_SLOT_SIZE = 106;
+const SKILL_SLOT_ICON_SIZE = 84;
+const SKILL_SLOT_START_X = 566;
+const SKILL_SLOT_STEP_X = 115;
+const SKILL_SLOT_Y = 622;
+const COMBAT_TOGGLE_AUTO_WIDTH = 193;
+const COMBAT_TOGGLE_AUTO_HEIGHT = 105;
+const COMBAT_TOGGLE_AUTO_X = 127;
+const COMBAT_TOGGLE_CHEVRON_WIDTH = 290;
+const COMBAT_TOGGLE_CHEVRON_HEIGHT = 107;
+const COMBAT_TOGGLE_CHEVRON_X = 175;
+const COMBAT_TOGGLE_Y = 642;
+const COMBAT_PANEL_BOUNDS = { x: 48, y: 557, width: 420, height: 72, radius: 15 };
+const COMBAT_OPTION_SIZE = { width: 92, height: 54 };
+const COMBAT_OPTION_START_X = 105;
+const COMBAT_OPTION_STEP_X = 101;
+const COMBAT_OPTION_Y = 592;
 
 type RightMenuKey = "skill" | "equipment" | "inventory" | "quest";
 type CombatControlMode = "manual" | "auto" | "auto1_5" | "auto2";
+type UiButtonStyle = "default" | "imageBackground" | "menuIcon" | "combatImageOption";
 
 const RIGHT_MENU_ITEMS: Array<{ key: RightMenuKey; label: string; icon: string; assetId: string; x: number; y: number }> = [
   { key: "skill", label: "스킬", icon: "✦", assetId: "skill_menu_icon", x: 1180, y: 248 },
@@ -43,11 +59,11 @@ const RIGHT_MENU_ITEMS: Array<{ key: RightMenuKey; label: string; icon: string; 
   { key: "quest", label: "퀘스트", icon: "문", assetId: "quest_menu_icon", x: 1180, y: 530 },
 ];
 
-const COMBAT_CONTROL_MODES: Array<{ key: CombatControlMode; label: string; icon: string; locked: boolean }> = [
-  { key: "manual", label: "수동", icon: "손", locked: false },
-  { key: "auto", label: "오토", icon: "검", locked: false },
-  { key: "auto1_5", label: "x1.5", icon: "🔒", locked: true },
-  { key: "auto2", label: "x2", icon: "🔒", locked: true },
+const COMBAT_CONTROL_MODES: Array<{ key: CombatControlMode; label: string; icon: string; assetId: string; locked: boolean }> = [
+  { key: "manual", label: "수동", icon: "✋", assetId: "combat_new_manual", locked: false },
+  { key: "auto", label: "오토", icon: "⚔", assetId: "combat_new_auto", locked: false },
+  { key: "auto1_5", label: "x1.5", icon: "🔒", assetId: "combat_new_locked_x15", locked: true },
+  { key: "auto2", label: "x2.0", icon: "🔒", assetId: "combat_new_locked_x2", locked: true },
 ];
 
 const EQUIPMENT_ICON_SLOTS: Array<{ slot: EquipmentSlot; label: string; x: number; y: number }> = [
@@ -73,7 +89,7 @@ interface UiButtonView {
   primaryText: Phaser.GameObjects.Text;
   secondaryText?: Phaser.GameObjects.Text;
   image?: Phaser.GameObjects.Image;
-  style?: "default" | "imageBackground" | "menuIcon";
+  style?: UiButtonStyle;
   locked?: boolean;
 }
 
@@ -83,6 +99,22 @@ interface SkillSlotView {
   image: Phaser.GameObjects.Image;
   lockText: Phaser.GameObjects.Text;
   cooldownText: Phaser.GameObjects.Text;
+}
+
+interface UiEditorRect {
+  centerX: number;
+  centerY: number;
+  width: number;
+  height: number;
+}
+
+interface UiEditorTarget {
+  id: string;
+  label: string;
+  getRect: () => UiEditorRect;
+  applyRect: (rect: UiEditorRect) => void;
+  overlay?: Phaser.GameObjects.Rectangle;
+  labelText?: Phaser.GameObjects.Text;
 }
 
 export interface OwnedEquipmentView {
@@ -116,29 +148,37 @@ export class Hud {
   private readonly rightMenuToggleButton: UiButtonView;
   private readonly rightMenuButtons = new Map<RightMenuKey, UiButtonView>();
   private readonly skillSlotBarImage: Phaser.GameObjects.Image;
+  private readonly combatControlPanelImage: Phaser.GameObjects.Image;
   private readonly combatControlToggleButton: UiButtonView;
+  private combatControlChevronButton?: UiButtonView;
   private readonly combatControlButtons = new Map<CombatControlMode, UiButtonView>();
   private readonly equipmentIconImages = new Map<EquipmentSlot, Phaser.GameObjects.Image>();
   private readonly equipmentFallbackTexts = new Map<EquipmentSlot, Phaser.GameObjects.Text>();
   private readonly skillSlotViews: SkillSlotView[] = [];
+  private readonly uiEditorEnabled = this.isUiEditorMode();
+  private readonly uiEditorRects = new Map<string, UiEditorRect>();
+  private uiEditorTargets: UiEditorTarget[] = [];
+  private uiEditorSelected?: UiEditorTarget;
+  private uiEditorSelectionText?: HTMLDivElement;
+  private uiEditorTextarea?: HTMLTextAreaElement;
   private currentMonsterAssetKey?: string;
   private rightMenuExpanded = true;
   private selectedRightMenuKey: RightMenuKey = "skill";
-  private combatControlExpanded = false;
+  private combatControlExpanded = true;
   private selectedCombatControlMode: CombatControlMode = "auto";
 
   constructor(scene: Phaser.Scene, _title: string, _subtitle: string) {
     this.graphics = scene.add.graphics().setDepth(UI_DEPTH);
 
-    this.playerNameText = scene.add.text(102, 24, "", this.textStyle("#ffffff", "22px", 150)).setDepth(TEXT_DEPTH);
-    this.playerLevelText = scene.add.text(222, 26, "", this.textStyle("#ffffff", "17px", 78)).setDepth(TEXT_DEPTH);
+    this.playerNameText = scene.add.text(118, 24, "", this.textStyle("#ffffff", "22px", 150)).setDepth(TEXT_DEPTH);
+    this.playerLevelText = scene.add.text(236, 26, "", this.textStyle("#ffffff", "17px", 78)).setDepth(TEXT_DEPTH);
     this.playerHpText = scene.add.text(112, 76, "", this.textStyle("#ffffff", "14px", 140)).setDepth(TEXT_DEPTH);
-    this.playerHpLabelText = scene.add.text(20, 92, "", this.textStyle("#d6efff", "12px", 90)).setDepth(TEXT_DEPTH);
+    this.playerHpLabelText = scene.add.text(20, 96, "", this.textStyle("#d6efff", "12px", 90)).setDepth(TEXT_DEPTH);
     this.stageTitleText = scene.add.text(458, 24, "", this.textStyle("#ffffff", "22px", 260)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
     this.stageSubtitleText = scene.add.text(458, 70, "", this.textStyle("#e9f2ff", "14px", 310)).setOrigin(0.5, 0).setDepth(TEXT_DEPTH);
     this.goldText = scene.add.text(786, 34, "", this.textStyle("#fff3d0", "17px", 108)).setDepth(TEXT_DEPTH);
     this.diamondText = scene.add.text(970, 34, "", this.textStyle("#eaf9ff", "17px", 108)).setDepth(TEXT_DEPTH);
-    this.playerPortraitImage = scene.add.image(57, 56, "").setDisplaySize(64, 64).setVisible(false).setDepth(TEXT_DEPTH);
+    this.playerPortraitImage = scene.add.image(60, 58, "").setDisplaySize(80, 80).setVisible(false).setDepth(TEXT_DEPTH);
 
     this.createTopShortcutButton(scene, 1104, 56, "🏪", "상점", false);
     this.createTopShortcutButton(scene, 1194, 56, "✉", "편지함", true);
@@ -154,9 +194,18 @@ export class Hud {
     this.equipmentBonusText = scene.add.text(22, 264, "", this.textStyle("#f7e3a4", "11px", 250)).setDepth(TEXT_DEPTH).setVisible(false);
     this.inventoryText = scene.add.text(22, 296, "", this.textStyle("#d9e6ff", "11px", 250)).setDepth(TEXT_DEPTH).setVisible(false);
     this.rightMenuPanelImage = scene.add.image(1180, 404, "").setDepth(UI_DEPTH + 1).setVisible(false);
-    this.skillSlotBarImage = scene.add.image(640, 636, "").setDepth(UI_DEPTH + 1).setVisible(false);
-    this.setUiCoreImage(this.rightMenuPanelImage, "right_menu_panel", RIGHT_MENU_PANEL_ASSET_SIZE.width, RIGHT_MENU_PANEL_ASSET_SIZE.height);
-    this.setUiCoreImage(this.skillSlotBarImage, "skill_slot_bar_6", SKILL_SLOT_BAR_ASSET_SIZE.width, SKILL_SLOT_BAR_ASSET_SIZE.height);
+    this.skillSlotBarImage = scene.add.image(820, 626, "").setDepth(UI_DEPTH + 1).setVisible(false);
+    this.combatControlPanelImage = scene.add
+      .image(
+        COMBAT_PANEL_BOUNDS.x + COMBAT_PANEL_BOUNDS.width / 2,
+        COMBAT_PANEL_BOUNDS.y + COMBAT_PANEL_BOUNDS.height / 2,
+        "",
+      )
+      .setDepth(UI_DEPTH + 1)
+      .setVisible(false);
+    this.rightMenuPanelImage.setVisible(false);
+    this.skillSlotBarImage.setVisible(false);
+    this.combatControlPanelImage.setVisible(false);
 
     this.createEquipmentIconObjects(scene);
     this.createSkillSlotObjects(scene);
@@ -164,6 +213,9 @@ export class Hud {
     this.combatControlToggleButton = this.createCombatControlObjects(scene);
     this.syncRightMenuVisibility();
     this.syncCombatControlVisibility();
+    if (this.uiEditorEnabled) {
+      this.createUiEditor(scene);
+    }
   }
 
   update(
@@ -209,6 +261,7 @@ export class Hud {
     this.updateSkillSlots(player, skillCooldowns);
     this.syncRightMenuVisibility();
     this.syncCombatControlVisibility();
+    this.applyUiEditorLayouts();
   }
 
   setLog(_lines: string[]): void {
@@ -244,9 +297,9 @@ export class Hud {
   private drawTopPlayerPanel(): void {
     this.drawPanel({ x: 12, y: 12, width: 300, height: 112, radius: 12 }, 0.58);
     this.graphics.fillStyle(0x1a2531, 0.95);
-    this.graphics.fillRoundedRect(22, 22, 70, 70, 10);
+    this.graphics.fillRoundedRect(16, 16, 88, 88, 12);
     this.graphics.lineStyle(2, 0xc7d8e9, 0.9);
-    this.graphics.strokeRoundedRect(22, 22, 70, 70, 10);
+    this.graphics.strokeRoundedRect(16, 16, 88, 88, 12);
   }
 
   private drawTopStagePanel(): void {
@@ -289,33 +342,56 @@ export class Hud {
   }
 
   private drawRightMenuPanel(): void {
-    this.rightMenuPanelImage.setVisible(this.rightMenuExpanded && this.hasUiCoreTexture("right_menu_panel"));
-    if (!this.rightMenuExpanded) {
-      return;
-    }
-
-    if (this.rightMenuPanelImage.visible) {
-      return;
-    }
-
-    this.drawPanel({ x: 1112, y: 160, width: 136, height: 488, radius: 18 }, 0.84, PANEL_STROKE);
+    this.rightMenuPanelImage.setVisible(false);
   }
 
   private drawBottomCombatControlPanel(): void {
-    if (!this.combatControlExpanded && this.hasUiCoreTexture("combat_control_collapsed")) {
-      return;
+    if (this.combatControlExpanded) {
+      this.drawCombatControlExpandedPanel();
+    } else {
+      this.combatControlPanelImage.setVisible(false);
     }
-
-    this.drawPanel({ x: 54, y: 584, width: this.combatControlExpanded ? 344 : 132, height: 70, radius: 12 }, 0.86, PANEL_DARK_STROKE);
   }
 
-  private drawBottomSkillSlots(): void {
-    this.skillSlotBarImage.setVisible(this.hasUiCoreTexture("skill_slot_bar_6"));
-    if (this.skillSlotBarImage.visible) {
+  private drawCombatControlExpandedPanel(): void {
+    const hasPanelAsset = this.setUiCoreImage(
+      this.combatControlPanelImage,
+      "combat_new_panel",
+      COMBAT_PANEL_BOUNDS.width,
+      COMBAT_PANEL_BOUNDS.height,
+    );
+    if (hasPanelAsset) {
       return;
     }
 
-    this.drawPanel({ x: 350, y: 574, width: 580, height: 112, radius: 12 }, 0.46, PANEL_DARK_STROKE);
+    this.graphics.fillStyle(0x151c24, 0.94);
+    this.graphics.fillRoundedRect(
+      COMBAT_PANEL_BOUNDS.x,
+      COMBAT_PANEL_BOUNDS.y,
+      COMBAT_PANEL_BOUNDS.width,
+      COMBAT_PANEL_BOUNDS.height,
+      COMBAT_PANEL_BOUNDS.radius,
+    );
+    this.graphics.lineStyle(5, 0x05090d, 0.95);
+    this.graphics.strokeRoundedRect(
+      COMBAT_PANEL_BOUNDS.x,
+      COMBAT_PANEL_BOUNDS.y,
+      COMBAT_PANEL_BOUNDS.width,
+      COMBAT_PANEL_BOUNDS.height,
+      COMBAT_PANEL_BOUNDS.radius,
+    );
+    this.graphics.lineStyle(2, 0x3f4a55, 0.95);
+    this.graphics.strokeRoundedRect(
+      COMBAT_PANEL_BOUNDS.x + 5,
+      COMBAT_PANEL_BOUNDS.y + 5,
+      COMBAT_PANEL_BOUNDS.width - 10,
+      COMBAT_PANEL_BOUNDS.height - 10,
+      COMBAT_PANEL_BOUNDS.radius - 6,
+    );
+
+  }
+  private drawBottomSkillSlots(): void {
+    this.skillSlotBarImage.setVisible(false);
   }
 
   private drawPanel(bounds: PanelBounds, alpha = 0.92, stroke = PANEL_STROKE): void {
@@ -379,7 +455,7 @@ export class Hud {
     }
 
     this.playerImage.setTexture(asset.key).setDisplaySize(198, 294).setVisible(true);
-    this.playerPortraitImage.setTexture(asset.key).setCrop(110, 80, 540, 540).setDisplaySize(84, 84).setVisible(true);
+    this.playerPortraitImage.setTexture(asset.key).setCrop(155, 70, 455, 455).setDisplaySize(84, 84).setVisible(true);
   }
 
   private drawMonsterPlaceholder(role: MonsterRole): void {
@@ -420,19 +496,49 @@ export class Hud {
   }
 
   private createCombatControlObjects(scene: Phaser.Scene): UiButtonView {
-    const toggleButton = this.createImageUiButton(scene, 116, 619, 126, 52, "combat_control_collapsed", "검", "오토", () => {
+    const toggleCombatPanel = () => {
       this.combatControlExpanded = !this.combatControlExpanded;
       this.syncCombatControlVisibility();
-    }, false, "18px", "imageBackground");
-    toggleButton.secondaryText?.setPosition(32, 0).setOrigin(0.5).setFontSize("18px").setColor("#ffffff");
+    };
+
+    this.combatControlChevronButton = this.createImageUiButton(
+      scene,
+      COMBAT_TOGGLE_CHEVRON_X,
+      COMBAT_TOGGLE_Y,
+      COMBAT_TOGGLE_CHEVRON_WIDTH,
+      COMBAT_TOGGLE_CHEVRON_HEIGHT,
+      "combat_new_chevron",
+      "",
+      "",
+      toggleCombatPanel,
+      false,
+      "28px",
+      "imageBackground",
+    );
+
+    const toggleButton = this.createImageUiButton(
+      scene,
+      COMBAT_TOGGLE_AUTO_X,
+      COMBAT_TOGGLE_Y,
+      COMBAT_TOGGLE_AUTO_WIDTH,
+      COMBAT_TOGGLE_AUTO_HEIGHT,
+      "combat_new_auto",
+      "",
+      "",
+      toggleCombatPanel,
+      false,
+      "28px",
+      "imageBackground",
+    );
 
     COMBAT_CONTROL_MODES.forEach((mode, index) => {
-      const x = 106 + index * 82;
-      const button = this.createUiButton(scene, x, 619, 70, 50, mode.icon, mode.label, () => {
+      const x = COMBAT_OPTION_START_X + index * COMBAT_OPTION_STEP_X;
+      const button = this.createImageUiButton(scene, x, COMBAT_OPTION_Y, COMBAT_OPTION_SIZE.width, COMBAT_OPTION_SIZE.height, mode.assetId, mode.icon, "", () => {
         this.selectedCombatControlMode = mode.key;
         this.combatControlExpanded = false;
         this.syncCombatControlVisibility();
-      }, mode.locked, "16px");
+      }, false, "18px", "combatImageOption");
+      button.primaryText.setVisible(false);
       this.combatControlButtons.set(mode.key, button);
     });
 
@@ -451,7 +557,7 @@ export class Hud {
     onClick: () => void,
     locked = false,
     primaryFontSize = "18px",
-    style: "imageBackground" | "menuIcon" = "imageBackground",
+    style: "imageBackground" | "menuIcon" | "combatImageOption" = "imageBackground",
   ): UiButtonView {
     const background = scene.add
       .rectangle(0, 0, width, height, locked ? BUTTON_LOCKED_FILL : BUTTON_FILL, 0.97)
@@ -495,48 +601,6 @@ export class Hud {
 
     return { container, background, primaryText, secondaryText, image, style, locked };
   }
-
-  private createUiButton(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    primaryLabel: string,
-    secondaryLabel: string,
-    onClick: () => void,
-    locked = false,
-    primaryFontSize = "18px",
-  ): UiButtonView {
-    const background = scene.add
-      .rectangle(0, 0, width, height, locked ? BUTTON_LOCKED_FILL : BUTTON_FILL, 0.97)
-      .setStrokeStyle(2, BUTTON_STROKE, 1);
-    const primaryText = scene.add
-      .text(0, secondaryLabel ? -15 : 0, primaryLabel, this.textStyle("#ffffff", primaryFontSize, width - 10))
-      .setOrigin(0.5);
-    const children: Phaser.GameObjects.GameObject[] = [background, primaryText];
-    let secondaryText: Phaser.GameObjects.Text | undefined;
-
-    if (secondaryLabel) {
-      secondaryText = scene.add
-        .text(0, 16, secondaryLabel, this.textStyle(locked ? "#b5c0ce" : "#ffffff", "13px", width - 10))
-        .setOrigin(0.5);
-      children.push(secondaryText);
-    }
-
-    const container = scene.add.container(x, y, children).setDepth(TEXT_DEPTH);
-    container.setSize(width, height);
-    container.setInteractive(
-      new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height),
-      Phaser.Geom.Rectangle.Contains,
-    );
-    container.on("pointerdown", onClick);
-    container.on("pointerover", () => container.setScale(1.03));
-    container.on("pointerout", () => container.setScale(1));
-
-    return { container, background, primaryText, secondaryText, locked };
-  }
-
   private createTopShortcutButton(
     scene: Phaser.Scene,
     x: number,
@@ -589,10 +653,14 @@ export class Hud {
 
   private syncCombatControlVisibility(): void {
     const selectedMode = COMBAT_CONTROL_MODES.find((mode) => mode.key === this.selectedCombatControlMode) ?? COMBAT_CONTROL_MODES[1];
-    const hasToggleAsset = this.setButtonAsset(this.combatControlToggleButton, "combat_control_collapsed", 126, 52);
+    const hasToggleAsset = this.setButtonAsset(this.combatControlToggleButton, "combat_new_auto", COMBAT_TOGGLE_AUTO_WIDTH, COMBAT_TOGGLE_AUTO_HEIGHT);
     this.combatControlToggleButton.primaryText.setText(hasToggleAsset ? "" : selectedMode.icon);
-    this.combatControlToggleButton.secondaryText?.setText(selectedMode.label);
-    this.setUiButtonState(this.combatControlToggleButton, true, !this.combatControlExpanded, selectedMode.locked);
+    this.combatControlToggleButton.secondaryText?.setText(hasToggleAsset ? "" : selectedMode.label);
+    this.setUiButtonState(this.combatControlToggleButton, true, true, selectedMode.locked);
+    if (this.combatControlChevronButton) {
+      this.setButtonAsset(this.combatControlChevronButton, "combat_new_chevron", COMBAT_TOGGLE_CHEVRON_WIDTH, COMBAT_TOGGLE_CHEVRON_HEIGHT);
+      this.setUiButtonState(this.combatControlChevronButton, false, true);
+    }
 
     for (const mode of COMBAT_CONTROL_MODES) {
       const button = this.combatControlButtons.get(mode.key);
@@ -606,7 +674,15 @@ export class Hud {
 
   private setUiButtonState(button: UiButtonView, active: boolean, visible: boolean, locked = button.locked ?? false): void {
     button.container.setVisible(visible);
-    button.container.setAlpha(locked && !active ? 0.76 : 1);
+    button.container.setAlpha(button.style !== "combatImageOption" && locked && !active ? 0.76 : 1);
+    if (button.style === "combatImageOption") {
+      button.background.setVisible(false);
+      button.image?.setAlpha(active ? 1 : 0.97);
+      button.primaryText.setColor("#ffffff");
+      button.secondaryText?.setColor("#ffffff");
+      return;
+    }
+
     if (button.style === "menuIcon") {
       button.background.setVisible(false);
       button.image?.setAlpha(active ? 1 : 0.9);
@@ -643,11 +719,6 @@ export class Hud {
     return true;
   }
 
-  private hasUiCoreTexture(assetId: string): boolean {
-    const asset = getUiCoreAsset(assetId);
-    return Boolean(asset && this.graphics.scene.textures.exists(asset.key));
-  }
-
   private createEquipmentIconObjects(scene: Phaser.Scene): void {
     for (const slot of EQUIPMENT_ICON_SLOTS) {
       const image = scene.add.image(slot.x, slot.y, "").setDisplaySize(24, 24).setVisible(false).setDepth(TEXT_DEPTH);
@@ -663,16 +734,15 @@ export class Hud {
   }
 
   private createSkillSlotObjects(scene: Phaser.Scene): void {
-    const startX = 425;
     for (let index = 0; index < 6; index += 1) {
-      const x = startX + index * 86;
-      const background = scene.add.rectangle(x, 636, SKILL_SLOT_SIZE, SKILL_SLOT_SIZE, EMPTY_SLOT_FILL, 0.98)
+      const x = SKILL_SLOT_START_X + index * SKILL_SLOT_STEP_X;
+      const background = scene.add.rectangle(x, SKILL_SLOT_Y, SKILL_SLOT_SIZE, SKILL_SLOT_SIZE, EMPTY_SLOT_FILL, 0.98)
         .setStrokeStyle(3, index < 2 ? 0xd3a24a : 0x42505f, 1)
         .setDepth(TEXT_DEPTH);
-      const frameImage = scene.add.image(x, 636, "").setDisplaySize(SKILL_SLOT_SIZE, SKILL_SLOT_SIZE).setVisible(false).setDepth(TEXT_DEPTH);
-      const image = scene.add.image(x, 636, "").setDisplaySize(68, 68).setVisible(false).setDepth(TEXT_DEPTH + 1);
-      const lockText = scene.add.text(x, 616, "🔒", this.textStyle("#d7dce5", "24px", 60)).setOrigin(0.5).setDepth(TEXT_DEPTH + 2);
-      const cooldownText = scene.add.text(x + 22, 664, "", this.textStyle("#ffffff", "15px", 46)).setOrigin(0.5).setDepth(TEXT_DEPTH + 3);
+      const frameImage = scene.add.image(x, SKILL_SLOT_Y, "").setDisplaySize(SKILL_SLOT_SIZE, SKILL_SLOT_SIZE).setVisible(false).setDepth(TEXT_DEPTH);
+      const image = scene.add.image(x, SKILL_SLOT_Y, "").setDisplaySize(SKILL_SLOT_ICON_SIZE, SKILL_SLOT_ICON_SIZE).setVisible(false).setDepth(TEXT_DEPTH + 1);
+      const lockText = scene.add.text(x, SKILL_SLOT_Y - 20, "🔒", this.textStyle("#d7dce5", "24px", 60)).setOrigin(0.5).setDepth(TEXT_DEPTH + 2);
+      const cooldownText = scene.add.text(x + 26, SKILL_SLOT_Y + 31, "", this.textStyle("#ffffff", "15px", 46)).setOrigin(0.5).setDepth(TEXT_DEPTH + 3);
       this.skillSlotViews.push({ background, frameImage, image, lockText, cooldownText });
     }
   }
@@ -696,7 +766,7 @@ export class Hud {
         const hasLockedFrame = this.setUiCoreImage(view.frameImage, "skill_slot_locked", SKILL_SLOT_SIZE, SKILL_SLOT_SIZE);
         view.background.setVisible(!hasLockedFrame);
         view.image.setVisible(false);
-        view.lockText.setVisible(true);
+        view.lockText.setVisible(!hasLockedFrame);
         view.cooldownText.setText("");
         view.background.setStrokeStyle(3, 0x42505f, 1);
         continue;
@@ -704,7 +774,7 @@ export class Hud {
 
       const asset = this.getSkillIconAsset(skill.skillId);
       if (asset && view.image.scene.textures.exists(asset.key)) {
-        view.image.setTexture(asset.key).setDisplaySize(68, 68).setVisible(true);
+        view.image.setTexture(asset.key).setDisplaySize(SKILL_SLOT_ICON_SIZE, SKILL_SLOT_ICON_SIZE).setVisible(true);
       } else {
         view.image.setVisible(false);
       }
@@ -713,22 +783,14 @@ export class Hud {
       const frameAssetId = locked ? "skill_slot_locked" : "skill_slot_active";
       const hasFrameAsset = this.setUiCoreImage(view.frameImage, frameAssetId, SKILL_SLOT_SIZE, SKILL_SLOT_SIZE);
       view.background.setVisible(!hasFrameAsset);
-      view.lockText.setVisible(locked);
-      view.cooldownText.setText(this.getSkillSlotStatus(player, skill));
+      view.lockText.setVisible(locked && !hasFrameAsset);
+      view.cooldownText.setText(locked && hasFrameAsset ? "" : this.getSkillSlotStatus(player, skill));
       view.background.setStrokeStyle(3, skill.ready && !locked ? 0xffd25a : 0x42505f, 1);
     }
   }
 
   private getSkillIconAsset(skillId: string): { key: string } | undefined {
-    if (skillId === "trainee_slash") {
-      return getEffectAsset("trainee_slash");
-    }
-
-    if (skillId === "heavy_training_strike") {
-      return getEffectAsset("heavy_training_strike");
-    }
-
-    return undefined;
+    return getSkillIconVisualAsset(skillId);
   }
 
   private updateMonsterImage(monster: MonsterInstance): void {
@@ -755,14 +817,503 @@ export class Hud {
     }
 
     if (role === "boss") {
-      return { width: 190, height: 190 };
+      return { width: 210, height: 210 };
     }
 
     if (role === "leader") {
-      return { width: 148, height: 148 };
+      return { width: 170, height: 170 };
     }
 
-    return { width: 124, height: 124 };
+    return { width: 150, height: 150 };
+  }
+
+  private isUiEditorMode(): boolean {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    return new URLSearchParams(window.location.search).has("ui_editor");
+  }
+
+  private createUiEditor(scene: Phaser.Scene): void {
+    const draft = this.readUiEditorDraft();
+
+    this.setUiCoreImage(this.combatControlPanelImage, "combat_new_panel", COMBAT_PANEL_BOUNDS.width, COMBAT_PANEL_BOUNDS.height);
+    this.uiEditorTargets = [
+      this.createImageEditorTarget("combat.panel", "전투 상단 패널", this.combatControlPanelImage, COMBAT_PANEL_BOUNDS.width, COMBAT_PANEL_BOUNDS.height),
+      this.createButtonEditorTarget("combat.collapsed.auto", "접힘 오토 버튼", this.combatControlToggleButton, COMBAT_TOGGLE_AUTO_WIDTH, COMBAT_TOGGLE_AUTO_HEIGHT),
+    ];
+
+    if (this.combatControlChevronButton) {
+      this.uiEditorTargets.push(
+        this.createButtonEditorTarget(
+          "combat.collapsed.chevron",
+          "접힘 화살표 버튼",
+          this.combatControlChevronButton,
+          COMBAT_TOGGLE_CHEVRON_WIDTH,
+          COMBAT_TOGGLE_CHEVRON_HEIGHT,
+        ),
+      );
+    }
+
+    for (const mode of COMBAT_CONTROL_MODES) {
+      const button = this.combatControlButtons.get(mode.key);
+      if (button) {
+        this.uiEditorTargets.push(
+          this.createButtonEditorTarget(`combat.${mode.key}`, `${mode.label} 버튼`, button, COMBAT_OPTION_SIZE.width, COMBAT_OPTION_SIZE.height),
+        );
+      }
+    }
+
+    for (let index = 0; index < this.skillSlotViews.length; index += 1) {
+      this.uiEditorTargets.push(this.createSkillSlotEditorTarget(index));
+    }
+
+    for (const item of RIGHT_MENU_ITEMS) {
+      const button = this.rightMenuButtons.get(item.key);
+      if (button) {
+        this.uiEditorTargets.push(this.createButtonEditorTarget(`right.${item.key}`, `우측 ${item.label}`, button, 98, 88));
+      }
+    }
+
+    for (const target of this.uiEditorTargets) {
+      const rect = draft.get(target.id) ?? target.getRect();
+      this.uiEditorRects.set(target.id, { ...rect });
+      target.applyRect(rect);
+      this.createUiEditorHandle(scene, target);
+    }
+
+    this.createUiEditorPanel();
+    scene.input.keyboard?.on("keydown", this.handleUiEditorKey, this);
+    if (this.uiEditorTargets[0]) {
+      this.selectUiEditorTarget(this.uiEditorTargets[0]);
+    }
+    this.applyUiEditorLayouts();
+  }
+
+  private createImageEditorTarget(
+    id: string,
+    label: string,
+    image: Phaser.GameObjects.Image,
+    fallbackWidth: number,
+    fallbackHeight: number,
+  ): UiEditorTarget {
+    return {
+      id,
+      label,
+      getRect: () => ({
+        centerX: Math.round(image.x),
+        centerY: Math.round(image.y),
+        width: Math.round(image.displayWidth || fallbackWidth),
+        height: Math.round(image.displayHeight || fallbackHeight),
+      }),
+      applyRect: (rect) => {
+        image.setPosition(rect.centerX, rect.centerY).setDisplaySize(rect.width, rect.height);
+      },
+    };
+  }
+
+  private createButtonEditorTarget(
+    id: string,
+    label: string,
+    button: UiButtonView,
+    fallbackWidth: number,
+    fallbackHeight: number,
+  ): UiEditorTarget {
+    return {
+      id,
+      label,
+      getRect: () => ({
+        centerX: Math.round(button.container.x),
+        centerY: Math.round(button.container.y),
+        width: Math.round(button.image?.displayWidth || fallbackWidth),
+        height: Math.round(button.image?.displayHeight || fallbackHeight),
+      }),
+      applyRect: (rect) => {
+        button.container.setPosition(rect.centerX, rect.centerY).setSize(rect.width, rect.height);
+        button.background.setSize(rect.width, rect.height);
+        button.image?.setDisplaySize(rect.width, rect.height);
+        button.container.setInteractive(
+          new Phaser.Geom.Rectangle(-rect.width / 2, -rect.height / 2, rect.width, rect.height),
+          Phaser.Geom.Rectangle.Contains,
+        );
+      },
+    };
+  }
+
+  private createSkillSlotEditorTarget(index: number): UiEditorTarget {
+    const view = this.skillSlotViews[index];
+    const id = `skill.slot${index + 1}`;
+
+    return {
+      id,
+      label: `스킬 슬롯 ${index + 1}`,
+      getRect: () => ({
+        centerX: Math.round(view.frameImage.x),
+        centerY: Math.round(view.frameImage.y),
+        width: Math.round(view.frameImage.displayWidth || SKILL_SLOT_SIZE),
+        height: Math.round(view.frameImage.displayHeight || SKILL_SLOT_SIZE),
+      }),
+      applyRect: (rect) => {
+        const iconSize = Math.max(24, Math.round(Math.min(rect.width, rect.height) * 0.72));
+        view.background.setPosition(rect.centerX, rect.centerY).setSize(rect.width, rect.height);
+        view.frameImage.setPosition(rect.centerX, rect.centerY).setDisplaySize(rect.width, rect.height);
+        view.image.setPosition(rect.centerX, rect.centerY).setDisplaySize(iconSize, iconSize);
+        view.lockText.setPosition(rect.centerX, rect.centerY - rect.height * 0.2);
+        view.cooldownText.setPosition(rect.centerX + rect.width * 0.25, rect.centerY + rect.height * 0.29);
+      },
+    };
+  }
+
+  private createUiEditorHandle(scene: Phaser.Scene, target: UiEditorTarget): void {
+    const rect = this.getUiEditorRect(target);
+    const overlay = scene.add
+      .rectangle(rect.centerX, rect.centerY, rect.width, rect.height, 0xff00ff, 0.12)
+      .setStrokeStyle(2, 0xff00ff, 0.95)
+      .setDepth(UI_EDITOR_DEPTH)
+      .setInteractive(new Phaser.Geom.Rectangle(-rect.width / 2, -rect.height / 2, rect.width, rect.height), Phaser.Geom.Rectangle.Contains);
+    const labelText = scene.add
+      .text(rect.centerX - rect.width / 2, rect.centerY - rect.height / 2 - 18, target.label, {
+        fontFamily: "Segoe UI",
+        fontSize: "13px",
+        color: "#ffffff",
+        backgroundColor: "#000000",
+        padding: { x: 4, y: 2 },
+      })
+      .setDepth(UI_EDITOR_DEPTH + 1);
+
+    scene.input.setDraggable(overlay);
+    overlay.on("pointerdown", () => this.selectUiEditorTarget(target));
+    overlay.on("drag", (_pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
+      const current = this.getUiEditorRect(target);
+      this.setUiEditorTargetRect(target, {
+        ...current,
+        centerX: Math.round(dragX),
+        centerY: Math.round(dragY),
+      });
+    });
+
+    target.overlay = overlay;
+    target.labelText = labelText;
+  }
+
+  private handleUiEditorKey(event: KeyboardEvent): void {
+    if (!this.uiEditorSelected) {
+      return;
+    }
+
+    const rect = this.getUiEditorRect(this.uiEditorSelected);
+    const step = event.shiftKey ? 10 : 1;
+    const next = { ...rect };
+
+    if (event.key === "ArrowLeft") {
+      next.centerX -= step;
+    } else if (event.key === "ArrowRight") {
+      next.centerX += step;
+    } else if (event.key === "ArrowUp") {
+      next.centerY -= step;
+    } else if (event.key === "ArrowDown") {
+      next.centerY += step;
+    } else if (event.key === "=" || event.key === "+") {
+      next.width += step;
+      next.height += step;
+    } else if (event.key === "-" || event.key === "_") {
+      next.width = Math.max(8, next.width - step);
+      next.height = Math.max(8, next.height - step);
+    } else if (event.key === "]") {
+      next.width += step;
+    } else if (event.key === "[") {
+      next.width = Math.max(8, next.width - step);
+    } else if (event.key === ".") {
+      next.height += step;
+    } else if (event.key === ",") {
+      next.height = Math.max(8, next.height - step);
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+    this.setUiEditorTargetRect(this.uiEditorSelected, next);
+  }
+
+  private createUiEditorPanel(): void {
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    document.getElementById("idle-rpg-ui-editor-panel")?.remove();
+
+    const panel = document.createElement("div");
+    panel.id = "idle-rpg-ui-editor-panel";
+    Object.assign(panel.style, {
+      position: "fixed",
+      right: "12px",
+      top: "12px",
+      zIndex: "99999",
+      width: "340px",
+      padding: "10px",
+      color: "#ffffff",
+      background: "rgba(6, 10, 14, 0.92)",
+      border: "2px solid #ffcc33",
+      borderRadius: "8px",
+      fontFamily: "Segoe UI, sans-serif",
+      fontSize: "12px",
+      boxShadow: "0 8px 24px rgba(0,0,0,0.45)",
+    });
+
+    const title = document.createElement("div");
+    title.textContent = "UI 편집 모드";
+    title.style.fontWeight = "700";
+    title.style.fontSize = "15px";
+    title.style.marginBottom = "6px";
+
+    const help = document.createElement("div");
+    help.textContent = "드래그 이동 / 방향키 1px / Shift+방향키 10px / +/- 전체 크기 / [ ] 폭 / , . 높이";
+    help.style.lineHeight = "1.45";
+    help.style.marginBottom = "8px";
+
+    const selected = document.createElement("div");
+    selected.style.marginBottom = "6px";
+    selected.style.color = "#ffdf7a";
+
+    const sizeTitle = document.createElement("div");
+    sizeTitle.textContent = "선택 요소 크기 조절";
+    Object.assign(sizeTitle.style, {
+      marginTop: "8px",
+      marginBottom: "6px",
+      fontWeight: "700",
+      color: "#ffffff",
+    });
+
+    const sizeControls = document.createElement("div");
+    Object.assign(sizeControls.style, {
+      display: "grid",
+      gridTemplateColumns: "repeat(4, 1fr)",
+      gap: "6px",
+      marginBottom: "8px",
+    });
+
+    sizeControls.append(
+      this.createUiEditorDomButton("전체 -10", () => this.resizeSelectedUiEditorTarget(-10, -10)),
+      this.createUiEditorDomButton("전체 -1", () => this.resizeSelectedUiEditorTarget(-1, -1)),
+      this.createUiEditorDomButton("전체 +1", () => this.resizeSelectedUiEditorTarget(1, 1)),
+      this.createUiEditorDomButton("전체 +10", () => this.resizeSelectedUiEditorTarget(10, 10)),
+      this.createUiEditorDomButton("폭 -10", () => this.resizeSelectedUiEditorTarget(-10, 0)),
+      this.createUiEditorDomButton("폭 -1", () => this.resizeSelectedUiEditorTarget(-1, 0)),
+      this.createUiEditorDomButton("폭 +1", () => this.resizeSelectedUiEditorTarget(1, 0)),
+      this.createUiEditorDomButton("폭 +10", () => this.resizeSelectedUiEditorTarget(10, 0)),
+      this.createUiEditorDomButton("높이 -10", () => this.resizeSelectedUiEditorTarget(0, -10)),
+      this.createUiEditorDomButton("높이 -1", () => this.resizeSelectedUiEditorTarget(0, -1)),
+      this.createUiEditorDomButton("높이 +1", () => this.resizeSelectedUiEditorTarget(0, 1)),
+      this.createUiEditorDomButton("높이 +10", () => this.resizeSelectedUiEditorTarget(0, 10)),
+    );
+
+    const textarea = document.createElement("textarea");
+    Object.assign(textarea.style, {
+      width: "100%",
+      height: "220px",
+      boxSizing: "border-box",
+      fontFamily: "Consolas, monospace",
+      fontSize: "11px",
+      color: "#e8f0ff",
+      background: "#101820",
+      border: "1px solid #56687b",
+      borderRadius: "4px",
+      padding: "6px",
+      resize: "vertical",
+    });
+
+    const buttons = document.createElement("div");
+    buttons.style.display = "flex";
+    buttons.style.gap = "6px";
+    buttons.style.marginTop = "8px";
+
+    const copyButton = this.createUiEditorDomButton("Copy JSON", () => this.copyUiEditorJson());
+    const saveButton = this.createUiEditorDomButton("Save Draft", () => this.saveUiEditorDraft());
+    const clearButton = this.createUiEditorDomButton("Clear Draft", () => this.clearUiEditorDraft());
+    buttons.append(copyButton, saveButton, clearButton);
+    panel.append(title, help, selected, sizeTitle, sizeControls, textarea, buttons);
+    document.body.appendChild(panel);
+
+    this.uiEditorSelectionText = selected;
+    this.uiEditorTextarea = textarea;
+    this.updateUiEditorPanel();
+  }
+
+  private createUiEditorDomButton(label: string, onClick: () => void): HTMLButtonElement {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = label;
+    Object.assign(button.style, {
+      flex: "1",
+      padding: "6px 4px",
+      cursor: "pointer",
+      border: "1px solid #ffcc33",
+      borderRadius: "4px",
+      color: "#ffffff",
+      background: "#253140",
+      fontWeight: "700",
+      fontSize: "11px",
+    });
+    button.addEventListener("click", onClick);
+    return button;
+  }
+
+  private resizeSelectedUiEditorTarget(deltaWidth: number, deltaHeight: number): void {
+    if (!this.uiEditorSelected) {
+      return;
+    }
+
+    const rect = this.getUiEditorRect(this.uiEditorSelected);
+    this.setUiEditorTargetRect(this.uiEditorSelected, {
+      ...rect,
+      width: rect.width + deltaWidth,
+      height: rect.height + deltaHeight,
+    });
+  }
+
+  private selectUiEditorTarget(target: UiEditorTarget): void {
+    this.uiEditorSelected = target;
+    for (const item of this.uiEditorTargets) {
+      item.overlay?.setStrokeStyle(item === target ? 4 : 2, item === target ? 0x44ff66 : 0xff00ff, 0.95);
+      item.overlay?.setFillStyle(item === target ? 0x44ff66 : 0xff00ff, 0.12);
+    }
+    this.updateUiEditorPanel();
+  }
+
+  private setUiEditorTargetRect(target: UiEditorTarget, rect: UiEditorRect): void {
+    const rounded = {
+      centerX: Math.round(rect.centerX),
+      centerY: Math.round(rect.centerY),
+      width: Math.max(8, Math.round(rect.width)),
+      height: Math.max(8, Math.round(rect.height)),
+    };
+    this.uiEditorRects.set(target.id, rounded);
+    target.applyRect(rounded);
+    this.updateUiEditorHandle(target);
+    this.updateUiEditorPanel();
+  }
+
+  private applyUiEditorLayouts(): void {
+    if (!this.uiEditorEnabled || this.uiEditorTargets.length === 0) {
+      return;
+    }
+
+    for (const target of this.uiEditorTargets) {
+      const rect = this.uiEditorRects.get(target.id);
+      if (rect) {
+        target.applyRect(rect);
+        this.updateUiEditorHandle(target);
+      }
+    }
+  }
+
+  private updateUiEditorHandle(target: UiEditorTarget): void {
+    const rect = this.getUiEditorRect(target);
+    target.overlay
+      ?.setPosition(rect.centerX, rect.centerY)
+      .setSize(rect.width, rect.height)
+      .setInteractive(new Phaser.Geom.Rectangle(-rect.width / 2, -rect.height / 2, rect.width, rect.height), Phaser.Geom.Rectangle.Contains);
+    target.labelText?.setPosition(rect.centerX - rect.width / 2, rect.centerY - rect.height / 2 - 18);
+  }
+
+  private getUiEditorRect(target: UiEditorTarget): UiEditorRect {
+    return this.uiEditorRects.get(target.id) ?? target.getRect();
+  }
+
+  private getUiEditorExport(): {
+    mode: string;
+    canvas: { width: number; height: number };
+    selected: string | null;
+    items: Array<UiEditorRect & { id: string; label: string; left: number; top: number; right: number; bottom: number }>;
+  } {
+    return {
+      mode: "idle-rpg-ui-editor",
+      canvas: { width: 1280, height: 720 },
+      selected: this.uiEditorSelected?.id ?? null,
+      items: this.uiEditorTargets.map((target) => {
+        const rect = this.getUiEditorRect(target);
+        return {
+          id: target.id,
+          label: target.label,
+          ...rect,
+          left: Math.round(rect.centerX - rect.width / 2),
+          top: Math.round(rect.centerY - rect.height / 2),
+          right: Math.round(rect.centerX + rect.width / 2),
+          bottom: Math.round(rect.centerY + rect.height / 2),
+        };
+      }),
+    };
+  }
+
+  private updateUiEditorPanel(): void {
+    if (!this.uiEditorTextarea) {
+      return;
+    }
+
+    const selected = this.uiEditorSelected ? this.getUiEditorRect(this.uiEditorSelected) : undefined;
+    if (this.uiEditorSelectionText) {
+      this.uiEditorSelectionText.textContent = this.uiEditorSelected && selected
+        ? `선택: ${this.uiEditorSelected.label}  x:${selected.centerX} y:${selected.centerY} w:${selected.width} h:${selected.height}`
+        : "선택: 없음";
+    }
+    this.uiEditorTextarea.value = JSON.stringify(this.getUiEditorExport(), null, 2);
+  }
+
+  private copyUiEditorJson(): void {
+    const text = JSON.stringify(this.getUiEditorExport(), null, 2);
+    if (navigator.clipboard) {
+      void navigator.clipboard.writeText(text);
+      return;
+    }
+
+    this.uiEditorTextarea?.select();
+    document.execCommand("copy");
+  }
+
+  private saveUiEditorDraft(): void {
+    if (typeof localStorage === "undefined") {
+      return;
+    }
+
+    localStorage.setItem(UI_EDITOR_STORAGE_KEY, JSON.stringify(this.getUiEditorExport()));
+  }
+
+  private clearUiEditorDraft(): void {
+    if (typeof localStorage === "undefined") {
+      return;
+    }
+
+    localStorage.removeItem(UI_EDITOR_STORAGE_KEY);
+  }
+
+  private readUiEditorDraft(): Map<string, UiEditorRect> {
+    const layouts = new Map<string, UiEditorRect>();
+    if (typeof localStorage === "undefined") {
+      return layouts;
+    }
+
+    try {
+      const raw = localStorage.getItem(UI_EDITOR_STORAGE_KEY);
+      if (!raw) {
+        return layouts;
+      }
+      const parsed = JSON.parse(raw) as { items?: Array<UiEditorRect & { id?: string }> };
+      for (const item of parsed.items ?? []) {
+        if (item.id && Number.isFinite(item.centerX) && Number.isFinite(item.centerY)) {
+          layouts.set(item.id, {
+            centerX: item.centerX,
+            centerY: item.centerY,
+            width: item.width,
+            height: item.height,
+          });
+        }
+      }
+    } catch {
+      return layouts;
+    }
+
+    return layouts;
   }
 
   private textStyle(color: string, fontSize = "16px", wordWrapWidth = 320): Phaser.Types.GameObjects.Text.TextStyle {

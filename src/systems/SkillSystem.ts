@@ -159,8 +159,8 @@ export class SkillSystem {
     this.validateSkillIdList(state.unlockedSkillIds, "unlockedSkillIds");
     this.validateSkillIdList(state.equippedSkillIds, "equippedSkillIds");
 
-    if (state.equippedSkillIds.length > 2) {
-      throw new Error("SkillState.equippedSkillIds must include at most 2 skills.");
+    if (state.equippedSkillIds.length > 6) {
+      throw new Error("SkillState.equippedSkillIds must include at most 6 skills.");
     }
   }
 

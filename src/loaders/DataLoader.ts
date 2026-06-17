@@ -230,8 +230,8 @@ export class DataLoader {
     this.validateSkillIdList(state.unlockedSkillIds, skillIds, `${label}.unlockedSkillIds`);
     this.validateSkillIdList(state.equippedSkillIds, skillIds, `${label}.equippedSkillIds`);
 
-    if (state.equippedSkillIds.length > 2) {
-      throw new Error(`${label}.equippedSkillIds must include at most 2 skills.`);
+    if (state.equippedSkillIds.length > 6) {
+      throw new Error(`${label}.equippedSkillIds must include at most 6 skills.`);
     }
   }
 

@@ -1,7 +1,14 @@
 {
   "defaultState": {
     "unlockedSkillIds": ["trainee_slash"],
-    "equippedSkillIds": ["trainee_slash", "heavy_training_strike"]
+    "equippedSkillIds": [
+      "trainee_slash",
+      "heavy_training_strike",
+      "shield_bash",
+      "healing_prayer",
+      "flame_slash",
+      "knight_charge"
+    ]
   },
   "skills": [
     {
@@ -17,7 +24,7 @@
     },
     {
       "id": "heavy_training_strike",
-      "name": "묵직한 수련 일격",
+      "name": "묵직한 일격",
       "description": "느리지만 강한 단일 대상 공격 스킬",
       "trigger": "auto",
       "target": "currentMonster",
@@ -25,6 +32,50 @@
       "damageMultiplier": 2.4,
       "flatDamage": 5,
       "requiredLevel": 3
+    },
+    {
+      "id": "shield_bash",
+      "name": "방패 강타",
+      "description": "방패로 적을 밀어붙이는 전투 스킬",
+      "trigger": "auto",
+      "target": "currentMonster",
+      "cooldownMs": 7200,
+      "damageMultiplier": 2.0,
+      "flatDamage": 4,
+      "requiredLevel": 5
+    },
+    {
+      "id": "healing_prayer",
+      "name": "회복 기도",
+      "description": "전투 중 생존력을 보조하는 회복 계열 스킬",
+      "trigger": "auto",
+      "target": "currentMonster",
+      "cooldownMs": 9000,
+      "damageMultiplier": 1.2,
+      "flatDamage": 1,
+      "requiredLevel": 7
+    },
+    {
+      "id": "flame_slash",
+      "name": "화염 참격",
+      "description": "불꽃을 두른 검격으로 강하게 베는 스킬",
+      "trigger": "auto",
+      "target": "currentMonster",
+      "cooldownMs": 8200,
+      "damageMultiplier": 2.8,
+      "flatDamage": 6,
+      "requiredLevel": 10
+    },
+    {
+      "id": "knight_charge",
+      "name": "기사 돌진",
+      "description": "앞으로 돌진해 적에게 큰 피해를 주는 스킬",
+      "trigger": "auto",
+      "target": "currentMonster",
+      "cooldownMs": 10000,
+      "damageMultiplier": 3.1,
+      "flatDamage": 8,
+      "requiredLevel": 12
     }
   ]
 }
